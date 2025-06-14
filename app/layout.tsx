@@ -1,10 +1,10 @@
+import './normalize.css';
+import './fonts.css';
+
 import { config as dotenvConfig } from 'dotenv';
 import type { Metadata, Viewport } from 'next';
 
 import Providers from './providers';
-
-import './normalize.css';
-import './fonts.css';
 
 dotenvConfig();
 
