@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\" && eslint \"app/*.{js,jsx,ts,tsx}\" --fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "pre-commit": "npm run format && git add ."
   },
   "dependencies": {
     "@tanstack/react-query": "^5.80.7",
@@ -27,7 +28,11 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "husky": "^9.1.7",
+    "lint-staged": "^16.1.1",
     "prettier": "^3.5.3",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": ["npm run format", "git add"]
   }
 }
