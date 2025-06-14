@@ -33,9 +33,6 @@
     "typescript": "^5"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "npm run format",
-      "git add"
-    ]
+    "*.{js,jsx,ts,tsx}": ["npm run format"]
   }
 }
