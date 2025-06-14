@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\" && eslint \"app/*.{js,jsx,ts,tsx}\" --fix",
-    "prepare": "husky",
-    "pre-commit": "npm run format"
+    "prepare": "husky"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.80.7",
@@ -33,6 +32,8 @@
     "typescript": "^5"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": ["npm run format"]
+    "*.{js,jsx,ts,tsx}": [
+      "npm run format"
+    ]
   }
 }
