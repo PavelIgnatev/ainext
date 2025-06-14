@@ -1,0 +1,14 @@
+.startupWidget {
+  width: 100vw;
+  max-width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0 80px;
+}
+
+.startupWidgetWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

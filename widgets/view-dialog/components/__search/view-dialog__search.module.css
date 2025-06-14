@@ -1,0 +1,505 @@
+.viewDialogSearch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.viewDialogInput {
+  border: 2px solid black;
+  border-radius: 4px;
+  padding: 12px;
+  flex: 1;
+  margin-right: 12px;
+  height: 66px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+  font-size: 20px;
+  font-weight: 400;
+  background-color: white;
+  color: black;
+  flex: 1;
+}
+
+.viewDialogInputSearch {
+  border: 2px solid black;
+  border-radius: 4px;
+  padding: 12px;
+  height: 66px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+  font-size: 20px;
+  font-weight: 400;
+  background-color: white;
+  color: black;
+  flex: 3;
+}
+
+.viewDialogInput:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+}
+
+.viewDialogInput:disabled {
+  cursor: not-allowed;
+  background-color: white;
+  color: black;
+  border: 2px solid black;
+}
+
+.viewDialogInput:focus {
+  outline: none;
+  border: 2px solid black;
+}
+
+.viewDialogButton {
+  position: relative;
+  border: 2px solid black;
+  border-radius: 4px;
+  height: 66px;
+  width: 66px;
+  background-color: white;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color border color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .viewDialogSearchSvg {
+    color: white;
+  }
+}
+
+.viewDialogStatisticsButton,
+.viewDialogIncognitoButton {
+  border: 2px solid black;
+  border-radius: 4px;
+  height: 66px;
+  width: 66px;
+  background-color: white;
+  color: black;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewDialogStatisticsButton:hover,
+.viewDialogIncognitoButton:hover {
+  background: black;
+  color: white;
+}
+
+.viewDialogStatisticsButtonVisible,
+.viewDialogIncognitoButtonInc {
+  background: black;
+  color: white;
+}
+
+.viewDialogSearchSvg {
+  color: black;
+
+  transform: scale(0.82);
+}
+
+.viewDialogButton:hover {
+  background-color: black;
+  border: 2px solid black;
+
+  .viewDialogSearchSvg {
+    color: black;
+  }
+}
+
+.viewDialogButton:focus {
+  outline: none;
+}
+
+.viewDialogButton:disabled {
+  background-color: white;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.viewDialogButton:disabled:hover {
+  background-color: white;
+  color: #999;
+}
+
+.viewDialogStatisticsButton {
+  color: black;
+}
+
+.viewDialogStatisticsButtonVisible {
+  background: black;
+  color: white;
+
+  .viewDialogSearchStatisticsSvg {
+    color: white;
+  }
+}
+
+.viewDialogStatisticsButton:not(:disabled):hover {
+  background-color: black;
+  color: #fff;
+
+  .viewDialogSearchStatisticsSvg {
+    color: #fff;
+  }
+}
+
+.searchInputsWrapper {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+}
+
+.searchButtonsWrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.tooltipsWrapper {
+  position: absolute;
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .navigationDrawer {
+    display: block !important;
+  }
+
+  .viewDialogSearch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    margin-bottom: 8px;
+    flex-wrap: nowrap;
+    background: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .menuButton {
+    display: flex !important;
+    border: none;
+    height: 36px;
+    width: 36px;
+    background: transparent;
+    color: #000;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+    font-size: 18px;
+  }
+
+  .menuButton:hover {
+    opacity: 0.7;
+  }
+
+  .menuButton:active {
+    transform: scale(0.95);
+  }
+
+  .searchInputsWrapper {
+    flex: 1;
+    gap: 8px;
+    min-width: 0;
+    display: flex;
+  }
+
+  .searchButtonsWrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .viewDialogInput,
+  .viewDialogInputSearch {
+    height: 36px;
+    padding: 8px;
+    font-size: 14px;
+    margin-right: 0;
+    min-width: 0;
+    border: 2px solid black;
+    border-radius: 0;
+    background: #fff;
+    transition: none;
+    flex: 1 !important;
+  }
+
+  .viewDialogInput:focus,
+  .viewDialogInputSearch:focus {
+    background: #fff;
+    border: 2px solid black;
+    outline: none;
+  }
+
+  .viewDialogInput {
+    flex: 0.8;
+  }
+
+  .viewDialogInputSearch {
+    flex: 1.2;
+  }
+
+  .viewDialogButton {
+    height: 36px;
+    width: 36px;
+    min-width: 36px;
+    margin-right: 0;
+    padding: 8px;
+    border: 2px solid black;
+    border-radius: 0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: none;
+  }
+
+  .viewDialogButton:active {
+    transform: scale(0.95);
+  }
+
+  .viewDialogButton:hover {
+    background: #fff;
+    border: 2px solid black;
+    color: black;
+  }
+
+  .viewDialogSearchSvg {
+    transform: scale(1.75);
+  }
+
+  .tooltipsWrapper {
+    display: none;
+  }
+
+  .viewDialogStatisticsButton,
+  .viewDialogIncognitoButton {
+    display: none;
+  }
+
+  .viewDialogButton.active {
+    background: #000;
+    color: #fff;
+  }
+
+  .menuActionsWrapper {
+    display: none;
+  }
+
+  .menuActionButton {
+    display: none;
+  }
+}
+
+.viewDialogIcon {
+  transform: scale(2.2);
+}
+
+.viewDialogP {
+  display: flex;
+  align-items: center;
+}
+
+.viewDialogP p {
+  margin-left: 5px;
+}
+
+.menuButton {
+  display: none;
+}
+
+/* Стили для навигационного drawer */
+.navigationDrawer {
+  position: fixed;
+  display: none;
+}
+
+.navigationDrawer :global(.ant-drawer-content-wrapper) {
+  width: 280px !important;
+}
+
+.navigationDrawer :global(.ant-drawer-content) {
+  background: #fff;
+}
+
+.navigationDrawer :global(.ant-drawer-header) {
+  padding: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background: #fff;
+}
+
+.navigationDrawer :global(.ant-drawer-title) {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  margin-left: 10px;
+}
+
+.navigationDrawer :global(.ant-drawer-close) {
+  padding: 16px;
+  margin: -16px;
+}
+
+.navigationDrawer :global(.ant-drawer-body) {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 55px);
+}
+
+.viewDialogTopButtonsWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 8px;
+}
+
+.mainNavigation {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: #f8f8f8;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.serviceNavigation {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 24px;
+  background: #f8f8f8;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.serviceNavigationTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 12px 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.separator {
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin: 8px 0;
+  width: 100%;
+}
+
+.viewDialogTopButtonsWrapper button {
+  width: 100%;
+  padding: 12px 8px;
+  text-align: left;
+  font-size: 12px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #000;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+}
+
+.viewDialogTopButtonsWrapper button:last-child {
+  margin-bottom: 0;
+}
+
+.viewDialogTopButtonsWrapper button > span:first-child {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.viewDialogTopButtonsWrapper button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.viewDialogTopButtonsWrapper button.all,
+.viewDialogTopButtonsWrapper button.dialog,
+.viewDialogTopButtonsWrapper button.lead,
+.viewDialogTopButtonsWrapper button.managment,
+.viewDialogTopButtonsWrapper button.blocked {
+  background: #000;
+  color: white;
+  border: none;
+}
+
+.viewDialogTopButtonsWrapper button.all:hover,
+.viewDialogTopButtonsWrapper button.dialog:hover,
+.viewDialogTopButtonsWrapper button.lead:hover,
+.viewDialogTopButtonsWrapper button.managment:hover,
+.viewDialogTopButtonsWrapper button.blocked:hover {
+  background: #222;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.viewDialogTopButtonsWrapper .serviceNavigation button {
+  padding: 10px 12px;
+  font-size: 14px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  opacity: 1;
+  margin-bottom: 8px;
+  color: #000;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.viewDialogTopButtonsWrapper .serviceNavigation button:hover {
+  background: rgba(0, 0, 0, 0.02);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.viewDialogTopButtonsWrapper .serviceNavigation button:last-child {
+  margin-bottom: 0;
+}
+
+.viewDialogIconStats {
+  transform: scale(0.65);
+  position: absolute;
+  right: -3px;
+}
+
+.viewDialogIcon {
+  font-size: 18px;
+}
+
+.viewDialogIconSettings {
+  font-size: 22px;
+  margin-right: -2px;
+}

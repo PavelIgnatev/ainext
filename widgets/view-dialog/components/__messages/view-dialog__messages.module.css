@@ -1,0 +1,95 @@
+/* view-dialog__messages.module.css */
+
+.dialogContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  overflow: hidden;
+  margin-right: -16px;
+
+  min-height: 250px;
+}
+
+@media (max-width: 768px) {
+  .dialogContainer {
+    flex: 1;
+    max-height: max(350px, calc(100vh - 200px));
+  }
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-right: 16px;
+  margin-top: 12px;
+}
+
+.message {
+  display: inline-block;
+  max-width: calc(100% - 50px);
+  flex: 1;
+  margin-bottom: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  position: relative;
+}
+
+.message:last-child {
+  margin-bottom: 0;
+}
+
+.messageRight {
+  align-self: flex-end;
+  background-color: #dcf8c6;
+  color: #333;
+}
+
+.messageRight .messageTime {
+  text-align: right;
+}
+
+.messageLeft .messageTime {
+  text-align: left;
+}
+
+.messageLeft {
+  align-self: flex-start;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.aiManager {
+  max-width: 100%;
+  background: #ffde41e3;
+}
+
+.pending {
+  color: black;
+  font-weight: 500;
+}
+
+.messageContainer {
+  position: relative;
+}
+
+.checkmarkSvg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.aiMessage {
+  border: 1px solid currentColor;
+}
+
+.messageTime {
+  font-size: 0.75rem;
+  color: #888888;
+  margin-bottom: -5px;
+}

@@ -1,0 +1,380 @@
+html {
+  line-height: 1.15;
+
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  display: block;
+}
+
+h1 {
+  margin: 0.67em 0;
+  font-size: 2em;
+}
+
+hr {
+  box-sizing: content-box;
+
+  height: 0;
+
+  overflow: visible;
+}
+
+pre {
+  font-size: 1em;
+  font-family: monospace, monospace;
+}
+
+a {
+  background-color: transparent;
+}
+
+/**
+   * 1. Remove the bottom border in Chrome 57-
+   * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.
+   */
+
+abbr[title] {
+  border-bottom: none;
+
+  text-decoration: underline;
+
+  text-decoration: underline dotted;
+}
+
+/**
+   * Add the correct font weight in Chrome, Edge, and Safari.
+   */
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+/**
+   * 1. Correct the inheritance and scaling of font size in all browsers.
+   * 2. Correct the odd `em` font sizing in all browsers.
+   */
+
+code,
+kbd,
+samp {
+  font-size: 1em;
+  font-family: monospace, monospace;
+}
+
+small {
+  font-size: 80%;
+}
+
+sub,
+sup {
+  position: relative;
+  font-size: 75%;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/* Embedded content
+     ========================================================================== */
+
+/**
+   * Remove the border on images inside links in IE 10.
+   */
+
+img {
+  border-style: none;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  margin: 0;
+
+  font-size: 100%;
+
+  line-height: 1.15;
+  font-family: inherit;
+}
+
+button,
+input {
+  overflow: visible;
+}
+
+button,
+select {
+  text-transform: none;
+}
+
+button::-moz-focus-inner,
+[type='button']::-moz-focus-inner,
+[type='reset']::-moz-focus-inner,
+[type='submit']::-moz-focus-inner {
+  padding: 0;
+  border-style: none;
+}
+
+button:-moz-focusring,
+[type='button']:-moz-focusring,
+[type='reset']:-moz-focusring,
+[type='submit']:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+fieldset {
+  padding: 0.35em 0.75em 0.625em;
+}
+
+legend {
+  box-sizing: border-box;
+
+  display: table;
+
+  max-width: 100%;
+
+  padding: 0;
+
+  color: inherit;
+
+  /* 3 */
+  white-space: normal;
+}
+
+progress {
+  vertical-align: baseline;
+}
+
+textarea {
+  overflow: auto;
+}
+
+[type='checkbox'],
+[type='radio'] {
+  box-sizing: border-box;
+
+  padding: 0;
+}
+
+[type='number']::-webkit-inner-spin-button,
+[type='number']::-webkit-outer-spin-button {
+  height: auto;
+}
+
+[type='search'] {
+  outline-offset: -2px;
+}
+
+[type='search']::-webkit-search-decoration {
+  appearance: none;
+}
+
+::-webkit-file-upload-button {
+  appearance: auto;
+
+  font: inherit;
+}
+
+details {
+  display: block;
+}
+
+summary {
+  display: list-item;
+}
+
+template {
+  display: none;
+}
+
+[hidden] {
+  display: none;
+}
+
+:where(html) {
+  line-height: 1.15;
+}
+
+:where(h1) {
+  margin-block: 0.67em;
+  font-size: 2em;
+}
+
+:where(dl, ol, ul) :where(dl, ol, ul) {
+  margin-block: 0;
+}
+
+:where(hr) {
+  box-sizing: content-box;
+
+  height: 0;
+
+  color: inherit;
+}
+
+:where(pre) {
+  font-size: 1em;
+  font-family: monospace, monospace;
+}
+
+:where(abbr[title]) {
+  text-decoration: underline;
+  text-decoration: underline dotted;
+}
+
+:where(b, strong) {
+  font-weight: bolder;
+}
+
+:where(code, kbd, samp) {
+  font-size: 1em;
+  font-family: monospace, monospace;
+}
+
+:where(small) {
+  font-size: 80%;
+}
+
+:where(table) {
+  border-color: currentcolor;
+
+  text-indent: 0;
+}
+
+:where(button, input, select) {
+  margin: 0;
+}
+
+:where(button) {
+  text-transform: none;
+}
+
+:where(progress) {
+  vertical-align: baseline;
+}
+
+:where(select) {
+  text-transform: none;
+}
+
+:where(textarea) {
+  margin: 0;
+}
+
+:where(input[type='search' i]) {
+  outline-offset: -2px;
+}
+
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+  height: auto;
+}
+
+::input-placeholder {
+  color: inherit;
+  opacity: 0.54;
+}
+
+::-webkit-search-decoration {
+  appearance: none;
+}
+
+::-webkit-file-upload-button {
+  appearance: auto;
+
+  font: inherit;
+}
+
+:where(
+    button,
+    input:is(
+        [type='button' i],
+        [type='color' i],
+        [type='reset' i],
+        [type='submit' i]
+      )
+  )::-moz-focus-inner {
+  padding: 0;
+  border-style: none;
+}
+
+:where(
+    button,
+    input:is(
+        [type='button' i],
+        [type='color' i],
+        [type='reset' i],
+        [type='submit' i]
+      )
+  )::-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+:where(:-moz-ui-invalid) {
+  box-shadow: none;
+}
+
+:where(dialog) {
+  position: absolute;
+  right: 0;
+  left: 0;
+  width: fit-content;
+  height: fit-content;
+
+  margin: auto;
+  padding: 1em;
+  border: solid;
+  background-color: white;
+  color: black;
+}
+
+:where(dialog:not([open])) {
+  display: none;
+}
+
+:where(summary) {
+  display: list-item;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+}
+
+:root {
+  /* --rt-color-white: black !important; */
+  --rt-color-dark: black !important;
+  --rt-opacity: 0.9;
+  --rt-transition-show-delay: 0.15s;
+  --rt-transition-closing-delay: 0.15s;
+}
+
+.ant-form-item-explain-error {
+  white-space: pre-wrap;
+}
+
+.top-drawer .ant-drawer-body {
+  padding: 0 !important;
+}

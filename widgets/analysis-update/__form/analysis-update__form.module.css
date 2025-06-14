@@ -1,0 +1,16 @@
+.analysisUpdateForm {
+  position: relative;
+  max-width: 600px;
+  border: 1px solid rgba(5, 5, 5, 0.12);
+  margin: 0 auto;
+  width: 100%;
+  border-radius: 4px;
+  padding: 12px;
+  margin-top: 10px;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.analysisUpdateFormButton {
+  margin-top: 10px;
+}
