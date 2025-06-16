@@ -1,35 +1,46 @@
+'use client';
+import { GroupId } from '@/@types/GroupId';
 import { Progress, Table, TableProps } from 'antd';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useMediaQuery } from 'react-responsive';
 
-import { GroupIdType } from '../startup-widget.types';
+type SmallGroupId = Pick<
+  GroupId,
+  'groupId' | 'name' | 'target' | 'currentCount'
+>;
 
 interface StartupWidgetProps {
   loading: boolean;
 
-  groupId: GroupIdType[];
+  groupIds: SmallGroupId[];
 
-  onClickStartupId: (startupId: string) => void;
+  onClickGroupId: (startupId: string) => void;
 }
 
 export const StartupWidgetTable = (props: StartupWidgetProps) => {
-  const { groupId, loading, onClickStartupId } = props;
+  const { loading, groupIds, onClickGroupId } = props;
 
-  const columns: TableProps<GroupIdType>['columns'] = [
+  const isMobile = useMediaQuery({ maxWidth: 768 });
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
+  const columns: TableProps<SmallGroupId>['columns'] = [
     {
       title: 'GroupId',
       dataIndex: 'groupId',
       render: (_, { groupId }) => {
         return (
-          <a key={groupId} onClick={() => onClickStartupId(groupId)}>
+          <a key={groupId} onClick={() => onClickGroupId(groupId)}>
             {groupId}
           </a>
         );
       },
+      width: 200,
     },
     {
       title: 'Name',
       dataIndex: 'name',
+      width: 250,
+      ellipsis: true,
     },
     {
       title: 'Current / Target',
@@ -41,6 +52,7 @@ export const StartupWidgetTable = (props: StartupWidgetProps) => {
           </p>
         );
       },
+      width: 150,
     },
     {
       title: 'Progress',
@@ -54,13 +66,13 @@ export const StartupWidgetTable = (props: StartupWidgetProps) => {
             percent={Math.round((v.currentCount / v.target) * 100)}
             trailColor="rgba(0, 0, 0, 0.06)"
             strokeWidth={10}
-            {...(v.stopped && { status: 'exception' })}
+            {...(v.target === 0 && { status: 'exception' })}
           />
         );
       },
+      width: 150,
     },
   ];
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 
   useEffect(() => {
     const handleResize = () => {
@@ -76,14 +88,24 @@ export const StartupWidgetTable = (props: StartupWidgetProps) => {
   }, []);
 
   return (
-    <Table
-      size="middle"
-      scroll={{ y: windowHeight - 70 - 76 - 104 }}
-      columns={columns as any}
-      loading={loading}
-      dataSource={groupId}
-      bordered={true}
-      rowKey="groupId"
-    />
+    <div style={{ overflowX: 'auto' }}>
+      <Table
+        rowKey="groupId"
+        size={isMobile ? 'small' : 'middle'}
+        columns={columns}
+        loading={loading}
+        dataSource={groupIds}
+        bordered={true}
+        scroll={{
+          y: windowHeight - (isMobile ? 305 : 250),
+          x: isMobile ? 500 : '100%',
+        }}
+        pagination={{
+          size: isMobile ? 'small' : 'default',
+          pageSize: 10,
+          showSizeChanger: false,
+        }}
+      />
+    </div>
   );
 };

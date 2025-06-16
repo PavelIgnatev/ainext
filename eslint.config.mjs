@@ -24,9 +24,12 @@ const eslintConfig = [
             // Side effect imports (например, импорты полифиллов)
             ['^\\u0000'],
             // Node.js модули
-            ['^(assert|buffer|child_process|cluster|console|constants|crypto|dgram|dns|domain|events|fs|http|https|module|net|os|path|punycode|querystring|readline|repl|stream|string_decoder|sys|timers|tls|tty|url|util|vm|zlib|freelist|v8|process)(/.*|$)'],
+            [
+              '^(assert|buffer|child_process|cluster|console|constants|crypto|dgram|dns|domain|events|fs|http|https|module|net|os|path|punycode|querystring|readline|repl|stream|string_decoder|sys|timers|tls|tty|url|util|vm|zlib|freelist|v8|process)(/.*|$)',
+            ],
             // Внешние пакеты
             ['^@?\\w'],
+            ['^@/*'],
             // Внутренние модули (относительные импорты)
             ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
             ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],

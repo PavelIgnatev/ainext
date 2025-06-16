@@ -20,6 +20,20 @@
   text-decoration: underline;
 }
 
+.telegramContainer {
+  margin-left: auto;
+  padding-right: 36px;
+}
+
+.telegramContainer svg {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.telegramContainer svg:hover {
+  transform: scale(1.1);
+}
+
 @media (max-width: 768px) {
   .header {
     height: 50px;
@@ -31,18 +45,11 @@
   .channelLink {
     font-size: 18px;
   }
-}
 
-.telegramContainer {
-  margin-left: auto;
-  padding-right: 20px;
-}
-
-.telegramContainer svg {
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.telegramContainer svg:hover {
-  transform: scale(1.1);
+  .telegramContainer {
+    margin-left: auto;
+    padding-right: 0;
+    margin-right: -2px;
+  }
+  
 }

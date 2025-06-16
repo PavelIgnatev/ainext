@@ -4,146 +4,251 @@ import {
   Drawer,
   Form,
   Input,
+  notification,
   Row,
   Select,
   Space,
   Spin,
 } from 'antd';
 import React from 'react';
-import { toast } from 'react-toastify';
 
 import { checkRandomString } from '../../../utils/checkRandomString';
-import { FullFroupIdType } from '../startup-widget.types';
+import { GroupId } from '@/@types/GroupId';
 
 const { Option } = Select;
 
+const EXCLUDED_GROUP_IDS = [
+  '13529023516',
+  '15141603549-prefix-ukraine-documents',
+];
+
 interface StartupWidgetDrawerProps {
-  startupId: string | null;
-  startupIdLoading: boolean;
-  startupIdData: FullFroupIdType | null;
+  loading: boolean;
 
-  onCloseStartupWidgetDrawer: () => void;
-  onSubmitStartupWidget: (data: FullFroupIdType) => void;
+  groupId: string | null;
+  groupIdData: GroupId | null;
+  groupIdDatabase: Array<string>;
 
-  onExportLeads: () => void;
-  onExportSent: () => void;
-  onExportUnsent: () => void;
+  onCloseDrawer: () => void;
+  onSumbitDrawer: ({
+    data,
+    database,
+  }: {
+    data: GroupId;
+    database: Array<string>;
+  }) => void;
 }
 
 export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
   const {
-    startupId,
-    startupIdLoading,
-    startupIdData,
-    onCloseStartupWidgetDrawer,
-    onSubmitStartupWidget,
-    onExportLeads,
-    onExportSent,
-    onExportUnsent,
+    groupId,
+    loading,
+    groupIdData,
+    groupIdDatabase,
+    onCloseDrawer,
+    onSumbitDrawer,
   } = props;
 
-  if (!startupId) {
+  if (!groupId) {
     return null;
   }
 
   const [form] = Form.useForm();
 
+  const validateField = (
+    value: string | undefined | null,
+    fieldName: string,
+    pattern: RegExp,
+    errorMessage: string
+  ): boolean => {
+    if (!value) return true;
+    if (pattern.test(value)) {
+      notification.error({
+        message: `Ошибка в поле "${fieldName}"`,
+        description: errorMessage,
+      });
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      values.database = values.database
-        .split('\n')
-        .map((line: string) => line.trim())
-        .filter((line: string) => line !== '');
 
       const {
-        aiRole = '',
-        goal = '',
-        part = '',
-        secondMessagePrompt = '',
-        addedQuestion = '',
-        companyDescription = '',
-        flowHandling = '',
-        addedInformation = '',
-      } = values || {};
+        groupId,
+        name,
+        target,
+        currentCount,
+        messagesCount,
+        language,
+        aiRole,
+        goal,
+        part,
+        secondMessagePrompt,
+        addedQuestion,
+        companyDescription,
+        flowHandling,
+        addedInformation,
+        firstMessagePrompt,
+      } = values;
 
       if (
         part &&
-        (!goal ||
-          !goal.toLowerCase().trim().includes(part.toLowerCase().trim()))
+        !goal.toLowerCase().trim().includes(part.toLowerCase().trim())
       ) {
-        toast.error(
-          'Значение секции *Уникальная часть* не найдено внутри секции *Целевое действие*'
-        );
+        notification.error({
+          message: 'Ошибка в поле "Уникальная часть"',
+          description: 'Значение не найдено внутри поля "Целевое действие"',
+        });
         return;
       }
 
-      const datas: Record<string, string> = {
-        'Роль AI менеджера': aiRole,
-        'Целевое действие': goal,
-        'Описание компании': companyDescription,
-        'Обработка сценариев': flowHandling,
-        'Дополнительная информация': addedInformation,
-      };
-      for (const str of Object.keys(datas)) {
-        const value = datas[str];
+      const fieldValidations = [
+        {
+          value: aiRole,
+          name: 'Роль AI менеджера',
+          pattern: /[?!]/,
+          message: 'Поле содержит недопустимые символы: ? или !',
+        },
+        {
+          value: goal,
+          name: 'Целевое действие',
+          pattern: /[?!]/,
+          message: 'Поле содержит недопустимые символы: ? или !',
+        },
+        {
+          value: companyDescription,
+          name: 'Описание компании',
+          pattern: /[?!]/,
+          message: 'Поле содержит недопустимые символы: ? или !',
+        },
+        {
+          value: flowHandling,
+          name: 'Обработка сценариев',
+          pattern: /[?!]/,
+          message: 'Поле содержит недопустимые символы: ? или !',
+        },
+        {
+          value: addedInformation,
+          name: 'Дополнительная информация',
+          pattern: /[?!]/,
+          message: 'Поле содержит недопустимые символы: ? или !',
+        },
+        {
+          value: firstMessagePrompt,
+          name: 'Первое приветствие',
+          pattern: /[?:]/,
+          message: 'Поле содержит недопустимые символы: ? или :',
+        },
+        {
+          value: secondMessagePrompt,
+          name: 'Первый вопрос',
+          pattern: /[!:]/,
+          message: 'Поле содержит недопустимые символы: ! или :',
+        },
+        {
+          value: addedQuestion,
+          name: 'Дополнительный вопрос',
+          pattern: /[!.:]/,
+          message: 'Поле содержит недопустимые символы: !, : или .',
+        },
+      ];
 
-        if (/[?!]/.test(value)) {
-          toast.error(`Поле "${str}" содержит недопустимые символы: ? или !`);
+      for (const validation of fieldValidations) {
+        if (
+          !validateField(
+            validation.value,
+            validation.name,
+            validation.pattern,
+            validation.message
+          )
+        ) {
           return;
         }
       }
 
-      const datas2: Record<string, string> = {
-        'Дополнительный вопрос после первого автоответа': addedQuestion || '',
-      };
-      for (const str of Object.keys(datas2)) {
-        const value = datas2[str];
+      const questions = [
+        { value: secondMessagePrompt, name: 'Первый вопрос' },
+        ...(addedQuestion
+          ? [{ value: addedQuestion, name: 'Дополнительный вопрос' }]
+          : []),
+      ];
 
-        if (/[!.:]/.test(value)) {
-          toast.error(
-            `Поле "${str}" содержит недопустимые символы: !, : или .`
-          );
-          return;
-        }
-      }
+      const questionsWithoutMark = questions
+        .filter(({ value }) => !value.includes('?'))
+        .map(({ name }) => name);
 
-      const datas3: Record<string, string> = {
-        'Первый вопрос': secondMessagePrompt,
-      };
-      for (const str of Object.keys(datas3)) {
-        const value = datas3[str];
-
-        if (/[!:]/.test(value)) {
-          toast.error(`Поле "${str}" содержит недопустимые символы: ! или :`);
-          return;
-        }
-      }
-
-      if (
-        ![secondMessagePrompt, addedQuestion || '?'].every((e) =>
-          e.includes('?')
-        )
-      ) {
-        toast.error(`Не во всех вопросах есть знак "?" :)`);
+      if (questionsWithoutMark.length > 0) {
+        notification.error({
+          message: 'Отсутствует знак "?"',
+          description: `Добавьте знак "?" в следующих вопросах: ${questionsWithoutMark.join(', ')}`,
+        });
         return;
       }
 
-      onSubmitStartupWidget({ ...values, part: part.trim() });
-    } catch {}
+      const numericFields = {
+        'Целевое значение отправок': target,
+        'Текущее значение отправок': currentCount,
+        'Количество сообщений': messagesCount,
+      };
+
+      const invalidNumericFields = Object.entries(numericFields)
+        .filter(([_, value]) => isNaN(Number(value)) || Number(value) < 0)
+        .map(([fieldName]) => fieldName);
+
+      if (invalidNumericFields.length > 0) {
+        notification.error({
+          message: 'Некорректные числовые значения',
+          description: `Следующие поля должны быть положительными числами: ${invalidNumericFields.join(', ')}`,
+        });
+        return;
+      }
+
+      if (!['ENGLISH', 'RUSSIAN', 'UKRAINIAN'].includes(language)) {
+        notification.error({
+          message: 'Ошибка в поле "Язык"',
+          description:
+            'Выберите корректный язык: ENGLISH, RUSSIAN или UKRAINIAN',
+        });
+        return;
+      }
+
+      const data: GroupId = {
+        groupId,
+        name,
+        target: Number(target),
+        currentCount: Number(currentCount),
+        messagesCount: Number(messagesCount),
+        language,
+        aiRole,
+        companyDescription,
+        goal,
+        firstMessagePrompt,
+        secondMessagePrompt,
+        part: part?.trim() || null,
+        flowHandling: flowHandling?.trim() || null,
+        addedInformation: addedInformation?.trim() || null,
+        addedQuestion: addedQuestion?.trim() || null,
+        dateUpdated: new Date(),
+      };
+
+      onSumbitDrawer({ data, database: values.database.split('\n') });
+    } catch {
+      notification.error({
+        message: 'Ошибка в полях',
+        description: 'Проверьте правильность заполнения всех полей',
+      });
+    }
   };
-
-  const database = (startupIdData ? startupIdData.database || [] : [])
-    .map((line: string) => line.trim())
-    .filter((line: string) => line !== '')
-    .join('\n');
 
   return (
     <Drawer
-      title={`${!startupIdData ? 'Создание' : 'Обновление'} запуска`}
+      title={`${!groupIdData ? 'Создание' : 'Обновление'} запуска`}
       width={820}
-      onClose={onCloseStartupWidgetDrawer}
-      open={Boolean(startupId)}
+      onClose={onCloseDrawer}
+      open={Boolean(groupId)}
       styles={{
         body: {
           paddingBottom: 80,
@@ -151,46 +256,25 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
       }}
       extra={
         <Space>
-          <Button
-            loading={startupIdLoading}
-            onClick={onCloseStartupWidgetDrawer}
-          >
-            Отмена
-          </Button>
-          <Button
-            loading={startupIdLoading}
-            onClick={handleSubmit}
-            type="primary"
-          >
-            {!startupIdData ? 'Создать' : 'Обновить'}
+          <Button loading={loading} onClick={handleSubmit} type="primary">
+            {!groupIdData ? 'Создать' : 'Обновить'}
           </Button>
         </Space>
       }
     >
-      <Spin spinning={startupIdLoading}>
-        {!startupIdLoading && (
+      <Spin spinning={loading}>
+        {!loading && groupId && (
           <Form
             form={form}
             layout="vertical"
-            initialValues={
-              startupIdData
-                ? {
-                    messagesCount: 4,
-                    //@ts-ignore
-                    language: 'RUSSIAN',
-                    //@ts-ignore
-                    ...(startupIdData?.offer || {}),
-                    ...startupIdData,
-                    database,
-                  }
-                : {
-                    database,
-                    groupId: startupId,
-                    language: 'RUSSIAN',
-                    currentCount: 0,
-                    messagesCount: 4,
-                  }
-            }
+            initialValues={{
+              ...groupIdData,
+              groupId,
+              database: groupIdDatabase.join('\n'),
+              language: groupIdData?.language || 'RUSSIAN',
+              messagesCount: groupIdData?.messagesCount || 4,
+              currentCount: groupIdData?.currentCount || 0,
+            }}
           >
             <Row gutter={16}>
               <Col span={12}>
@@ -243,7 +327,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
                     },
                     {
                       validator: (_, value) => {
-                        const minValue = startupIdData?.currentCount ?? 0;
+                        const minValue = groupIdData?.currentCount ?? 0;
                         if (value !== undefined && value < minValue) {
                           return Promise.reject(
                             new Error(
@@ -262,33 +346,6 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
                     placeholder="Целевое значение отправок"
                   />
                 </Form.Item>
-              </Col>
-            </Row>
-
-            <Row gutter={16}>
-              <Col span={24}>
-                <div
-                  style={{
-                    borderTop: '1px solid #f0f0f0',
-                    marginBottom: '16px',
-                  }}
-                />
-                <Space>
-                  {startupIdData && (
-                    <>
-                      <Button onClick={onExportLeads}>Выгрузить "лидов"</Button>
-                      <Button onClick={onExportSent}>
-                        Выгрузить "успешных"
-                      </Button>
-                      <Button onClick={onExportUnsent}>
-                        Выгрузить "ошибочных"
-                      </Button>
-                    </>
-                  )}
-                </Space>
-                <div
-                  style={{ borderTop: '1px solid #f0f0f0', margin: '16px 0' }}
-                />
               </Col>
             </Row>
 
@@ -331,11 +388,13 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
                     { required: true, message: 'Обязательное поле' },
                     {
                       validator: (_, value) => {
-                        const invalidCharacters = value
+                        const lines = value
                           .split('\n')
-                          .filter((line: string) =>
-                            /[^a-zA-Z0-9_+]/.test(line)
-                          );
+                          .map((line: string) => line.trim())
+                          .filter(Boolean);
+                        const invalidCharacters = lines.filter((line: string) =>
+                          /[^a-zA-Z0-9_+]/.test(line)
+                        );
                         if (invalidCharacters.length > 0) {
                           return Promise.reject(
                             new Error(
@@ -423,14 +482,6 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
                   <Input placeholder="@aisenderOfficial_bot" />
                 </Form.Item>
               </Col>
-              {/* <Col span={24}>
-                <Form.Item name="styleGuide" label="Стайл гайд">
-                  <Input.TextArea
-                    rows={1}
-                    placeholder="Вы  - опытный коммунникатор ..."
-                  />
-                </Form.Item>
-              </Col> */}
 
               <Col span={24}>
                 <Form.Item name="flowHandling" label="Обработка сценариев">
@@ -465,10 +516,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
                     {
                       validator: async (_, value) => {
                         try {
-                          if (
-                            startupId === '13529023516' ||
-                            startupId === '15141603549-prefix-ukraine-documents'
-                          ) {
+                          if (EXCLUDED_GROUP_IDS.includes(groupId)) {
                             return Promise.resolve();
                           }
 
@@ -492,15 +540,12 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
               <Col span={24}>
                 <Form.Item
                   name="addedQuestion"
-                  label="Дополнительный вопрос после первого автоответа"
+                  label="Дополнительный вопрос"
                   rules={[
                     {
                       validator: async (_, value) => {
                         try {
-                          if (
-                            startupId === '13529023516' ||
-                            startupId === '15141603549-prefix-ukraine-documents'
-                          ) {
+                          if (EXCLUDED_GROUP_IDS.includes(groupId)) {
                             return Promise.resolve();
                           }
 

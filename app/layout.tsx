@@ -1,10 +1,11 @@
 import { config as dotenvConfig } from 'dotenv';
 import type { Metadata, Viewport } from 'next';
 
+import { ysText } from '@/assets/fonts';
+
 import Providers from './providers';
 
-import './fonts.css';
-import './normalize.css';
+import '@/assets/normalize.css';
 
 dotenvConfig();
 
@@ -40,8 +41,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru">
-      <body>
+    <html lang="ru" className={ysText.variable}>
+      <body className={ysText.className} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

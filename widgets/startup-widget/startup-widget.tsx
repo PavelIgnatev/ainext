@@ -1,39 +1,58 @@
-import { Button, Typography } from 'antd';
+import { Button, Typography, Input } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 
 import { StartupWidgetDrawer } from './__draver/startup-widget__drawer';
 import { StartupWidgetTable } from './__table/startup-widget__table';
 import classes from './startup-widget.module.css';
-import { FullFroupIdType, GroupIdType } from './startup-widget.types';
+import { GroupId } from '@/@types/GroupId';
 
 interface StartupWidgetProps {
-  loading: boolean;
-  startupId: string | null;
-  startupIdData: FullFroupIdType | null;
-  startupIdLoading: boolean;
-  groupId: GroupIdType[];
+  search: string;
 
-  onClickStartupId: (startupId: string) => void;
-  onCloseStartupWidgetDrawer: () => void;
-  onSubmitStartupWidget: (data: FullFroupIdType) => void;
+  groupId: string | null;
+  groupIdData: GroupId | null;
+  groupIdLoading: boolean;
 
-  onExportLeads: () => void;
-  onExportSent: () => void;
-  onExportUnsent: () => void;
+  groupIdDatabase: Array<string>;
+  groupIdDatabaseLoading: boolean;
+
+  isSubmitLoading: boolean;
+
+  groupIds: Pick<GroupId, 'groupId' | 'name' | 'target' | 'currentCount'>[];
+  groupIdsloading: boolean;
+
+  onClickGroupId: (groupId: string) => void;
+  onCloseDrawer: () => void;
+  onSumbitDrawer: ({
+    data,
+    database,
+  }: {
+    data: GroupId;
+    database: Array<string>;
+  }) => void;
+  onSearchGroupId: (search: string) => void;
 }
 
 export const StartupWidget = (props: StartupWidgetProps) => {
   const {
+    search,
+
     groupId,
-    loading,
-    startupId,
-    startupIdData,
-    startupIdLoading,
-    onClickStartupId,
-    onSubmitStartupWidget,
-    onCloseStartupWidgetDrawer,
-    onExportLeads,
-    onExportSent,
-    onExportUnsent,
+    groupIdData,
+    groupIdLoading,
+
+    groupIds,
+    groupIdsloading,
+
+    groupIdDatabase,
+    groupIdDatabaseLoading,
+
+    isSubmitLoading,
+
+    onClickGroupId,
+    onSumbitDrawer,
+    onCloseDrawer,
+    onSearchGroupId,
   } = props;
 
   return (
@@ -41,38 +60,47 @@ export const StartupWidget = (props: StartupWidgetProps) => {
       <div className={classes.startupWidgetWrapper}>
         <Typography.Title
           level={1}
-          style={{ margin: '10px 0', marginBottom: '20px' }}
+          style={{ margin: '0' }}
           className={classes.head}
         >
           Запуски 🚀
         </Typography.Title>
-        <Button
-          type="primary"
-          size="large"
-          onClick={() =>
-            onClickStartupId(
-              String(Math.floor(Math.random() * 10 ** 10) + 10 ** 10)
-            )
-          }
-        >
-          Создать
-        </Button>
+
+        <div className={classes.searchAndButtonWrapper}>
+          <Input
+            placeholder="Поиск по запускам..."
+            value={search}
+            onChange={(e) => onSearchGroupId(e.target.value)}
+            prefix={<SearchOutlined />}
+            allowClear
+            className={classes.searchInput}
+          />
+          <Button
+            type="primary"
+            size="middle"
+            onClick={() =>
+              onClickGroupId(
+                String(Math.floor(Math.random() * 10 ** 10) + 10 ** 10)
+              )
+            }
+          >
+            Создать
+          </Button>
+        </div>
       </div>
 
       <StartupWidgetTable
-        onClickStartupId={onClickStartupId}
-        groupId={groupId}
-        loading={loading}
+        groupIds={groupIds}
+        loading={groupIdsloading}
+        onClickGroupId={onClickGroupId}
       />
       <StartupWidgetDrawer
-        startupIdData={startupIdData}
-        startupIdLoading={startupIdLoading}
-        startupId={startupId}
-        onCloseStartupWidgetDrawer={onCloseStartupWidgetDrawer}
-        onSubmitStartupWidget={onSubmitStartupWidget}
-        onExportLeads={onExportLeads}
-        onExportSent={onExportSent}
-        onExportUnsent={onExportUnsent}
+        groupId={groupId}
+        groupIdData={groupIdData}
+        groupIdDatabase={groupIdDatabase}
+        loading={groupIdLoading || groupIdDatabaseLoading || isSubmitLoading}
+        onCloseDrawer={onCloseDrawer}
+        onSumbitDrawer={onSumbitDrawer}
       />
     </div>
   );

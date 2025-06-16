@@ -1,8 +1,11 @@
 import Link from 'next/link';
 
 import classes from './header.module.css';
+import { useMediaQuery } from 'react-responsive';
 
 export const Header = ({ href, target }: { href: string; target: string }) => {
+  const isMobile = useMediaQuery({ maxWidth: 768 });
+
   return (
     <header className={`${classes.header} ${classes.blueBackground}`}>
       <Link href={href} target={target}>
@@ -12,7 +15,11 @@ export const Header = ({ href, target }: { href: string; target: string }) => {
           viewBox="0 0 246 26"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          style={{ transform: 'scale(0.7)', marginBottom: '0' }}
+          style={{
+            transform: 'scale(0.7)',
+            marginBottom: '0',
+            marginLeft: isMobile ? -37 : 0,
+          }}
           aria-label="AiSender Logo"
           role="img"
         >

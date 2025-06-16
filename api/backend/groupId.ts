@@ -1,5 +1,3 @@
-import { FullFroupIdType } from '../../widgets/startup-widget/startup-widget.types';
-
 const { MongoClient, Db, Collection } = require('mongodb');
 
 const removeDuplicates = (arr: any) => {
@@ -123,7 +121,7 @@ class BackendGroupIdService {
     };
   }
 
-  async updateGroupID(ip: string, data: FullFroupIdType) {
+  async updateGroupID(ip: string, data: any) {
     await this.connect();
 
     const { groupId, database, ...rest } = data;

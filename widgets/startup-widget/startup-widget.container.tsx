@@ -1,135 +1,135 @@
-import { notification } from 'antd';
-import { useCallback, useState } from 'react';
-import { QueryClient, useMutation, useQuery } from 'react-query';
-import { dehydrate } from 'react-query/hydration';
+'use client';
+import { useState } from 'react';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 
-import FrontendApi from '../../api/frontend/frontend';
 import { StartupWidget } from './startup-widget';
-import { FullFroupIdType } from './startup-widget.types';
-
-function getFormattedDate() {
-  const now = new Date();
-  const day = String(now.getDate()).padStart(2, '0');
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const year = now.getFullYear();
-
-  return `${day}/${month}/${year}`;
-}
+import { GroupId } from '@/@types/GroupId';
+import { getGroupId, getGroupIds, updateGroupId } from '@/db/groupId';
+import { useNotifications } from '@/hooks/useNotifications';
+import { getGroupIdUsers, updateGroupIdUsers } from '@/db/groupIdUsers';
 
 export const StartupWidgetContainer = () => {
-  const [api, context] = notification.useNotification();
-  const [startupId, setStartupId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const { contextHolder, showError, showSuccess } = useNotifications();
+  const [groupId, setGroupId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
 
-  const toastError = useCallback((description: string) => {
-    api['error']({
-      message: 'Произошла ошибка.',
-      description,
-      duration: 5,
-    });
-  }, []);
+  const { data: groupIds = [], isLoading: isGroupIdsLoading } = useQuery({
+    queryKey: ['groupIds', search],
+    queryFn: async () => {
+      try {
+        const result = await getGroupIds(search);
 
-  const { data: groupIds = [], isLoading: groupIdLoading } = useQuery(
-    'groupIds',
-    () => FrontendApi.getAllGroupId(),
-    {
-      onError: () =>
-        toastError('Произошла ошибка. Обновите страницу и попробуйте снова.'),
-      refetchInterval: 60000,
-    }
-  );
+        if (!result) {
+          showError('Произошла ошибка при загрузке всех запусков');
+          return [];
+        }
 
-  const { data: startupIdData = null, isFetching: startupIdLoading } = useQuery(
-    ['groupId', startupId],
-    () =>
-      startupId
-        ? FrontendApi.getGroupId(String(startupId))
-        : Promise.resolve(null),
-    {
-      onError: () =>
-        toastError('Произошла ошибка. Обновите страницу и попробуйте снова.'),
-      enabled: !!startupId,
-      keepPreviousData: false,
-      staleTime: 0,
+        return result;
+      } catch (error) {
+        showError('Произошла ошибка. Обновите страницу и попробуйте снова.');
+        return [];
+      }
+    },
+    refetchInterval: 60000,
+  });
+
+  const { data: groupIdData = null, isLoading: isGroupIdLoading } = useQuery({
+    queryKey: ['groupId', groupId],
+    queryFn: async () => {
+      try {
+        if (!groupId) return null;
+
+        const result = await getGroupId(groupId);
+
+        if (!result) {
+          return null;
+        }
+
+        return result;
+      } catch (error) {
+        showError('Произошла ошибка. Обновите страницу и попробуйте снова.');
+        return null;
+      }
+    },
+    enabled: !!groupId,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
+  const { data: groupIdDatabase = [], isLoading: isGroupIdDatabaseLoading } =
+    useQuery({
+      queryKey: ['groupIdDatabse', groupId],
+      queryFn: async () => {
+        try {
+          if (!groupId) return [];
+
+          const result = await getGroupIdUsers(groupId);
+
+          if (!result) {
+            showError(
+              'Произошла ошибка при загрузке базы данных конкретного запуска'
+            );
+            return [];
+          }
+
+          return result;
+        } catch (error) {
+          showError('Произошла ошибка. Обновите страницу и попробуйте снова.');
+          return [];
+        }
+      },
+      enabled: !!groupIdData,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
-    }
-  );
+      staleTime: 0,
+      gcTime: 0,
+    });
 
-  const { mutate: startupUpdateMutation, isLoading: startupUpdateLoading } =
-    useMutation(
-      (data: FullFroupIdType) => FrontendApi.updateGroupIDInfo(data),
-      {
-        onError: () =>
-          toastError('Произошла ошибка. Обновите страницу и попробуйте снова.'),
-      }
-    );
-
-  const { mutate: exportData } = useMutation(
-    async ({
-      type,
-      startupId,
+  const { mutate: handleSubmit, isPending: isSubmitLoading } = useMutation({
+    mutationFn: async ({
+      data,
+      database,
     }: {
-      type: 'leads' | 'sent' | 'unsent';
-      startupId: string;
+      data: GroupId;
+      database: Array<string>;
     }) => {
-      const response = await fetch(
-        `/api/export?type=${type}&groupId=${startupId}`
-      );
-      if (!response.ok) {
-        toastError(
-          'Произошла ошибка при скачивании файла. Обновите страницу и попробуйте снова.'
-        );
-        throw new Error('Failed to export data');
-      }
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${startupId}_${type}_${getFormattedDate()}.csv`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-  );
-
-  const handleDataExport = useCallback(
-    (type: 'leads' | 'sent' | 'unsent') => {
-      if (!startupId) return;
-
-      exportData({ type, startupId });
+      await updateGroupIdUsers(data.groupId, database);
+      await updateGroupId(data);
     },
-    [exportData, startupId]
-  );
+    onSuccess: () => {
+      showSuccess('Информация успешно обновлена');
+      queryClient.invalidateQueries({ queryKey: ['groupId', groupId] });
+      queryClient.invalidateQueries({ queryKey: ['groupIdDatabse', groupId] });
+      queryClient.invalidateQueries({ queryKey: ['groupIds'] });
+    },
+    onError: () => {
+      showError('Произошла ошибка. Обновите страницу и попробуйте снова.');
+    },
+  });
 
   return (
     <>
-      {context}
+      {contextHolder}
       <StartupWidget
-        startupId={startupId}
-        startupIdData={startupIdData}
-        startupIdLoading={startupIdLoading || startupUpdateLoading}
-        groupId={groupIds}
-        loading={groupIdLoading}
-        onClickStartupId={(startupId: string) => {
-          setStartupId(startupId);
+        search={search}
+        groupId={groupId}
+        groupIds={groupIds}
+        groupIdData={groupIdData}
+        groupIdDatabase={groupIdDatabase}
+        groupIdDatabaseLoading={isGroupIdDatabaseLoading}
+        groupIdLoading={isGroupIdLoading}
+        groupIdsloading={isGroupIdsLoading}
+        isSubmitLoading={isSubmitLoading}
+        onSearchGroupId={setSearch}
+        onCloseDrawer={() => setGroupId(null)}
+        onSumbitDrawer={handleSubmit}
+        onClickGroupId={(groupId: string) => {
+          setGroupId(groupId);
         }}
-        onCloseStartupWidgetDrawer={() => setStartupId(null)}
-        onSubmitStartupWidget={(e) => startupUpdateMutation(e)}
-        onExportLeads={() => handleDataExport('leads')}
-        onExportSent={() => handleDataExport('sent')}
-        onExportUnsent={() => handleDataExport('unsent')}
       />
-      ;
     </>
   );
-};
-
-export const getServerSideProps = async () => {
-  const queryClient = new QueryClient();
-  await queryClient.prefetchQuery('groupId', () => FrontendApi.getAllGroupId());
-
-  return {
-    props: {
-      dehydratedState: dehydrate(queryClient),
-    },
-  };
 };

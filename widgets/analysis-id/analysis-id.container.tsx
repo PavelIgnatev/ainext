@@ -181,8 +181,7 @@ export const AnalysisIdContainer = () => {
         });
 
         const datas2: Record<string, string> = {
-          'Дополнительный вопрос после первого автоответа':
-            analysisData.addedQuestion || '',
+          'Дополнительный вопрос': analysisData.addedQuestion || '',
         };
         Object.keys(datas2).forEach((str) => {
           const value = datas2[str];

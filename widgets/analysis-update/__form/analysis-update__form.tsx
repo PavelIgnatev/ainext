@@ -223,7 +223,7 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
       </Form.Item>
       <Form.Item
         style={{ marginBottom: '10px' }}
-        label="Дополнительный вопрос после первого автоответа"
+        label="Дополнительный вопрос"
         name="addedQuestion"
       >
         <TextArea style={{ height: 30 }} maxLength={1000} />

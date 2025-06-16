@@ -1,22 +1,24 @@
-import { useRouter } from 'next/router';
+'use client';
+
+import { usePathname, useSearchParams } from 'next/navigation';
 
 import { Header } from './header';
 
 export const HeaderContainer = () => {
-  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const isAnalysis = router.asPath.includes('/analysis/');
+  const isAnalysis = pathname.includes('/analysis/');
 
   const getHref = () => {
     if (isAnalysis) {
-      const url = new URL(router.asPath, 'https://aisender.ru');
-      const params = new URLSearchParams(url.search);
+      const params = new URLSearchParams(searchParams);
 
       if (!params.has('debug')) {
         params.append('debug', 'true');
       }
 
-      return `${url.pathname}?${params.toString()}`;
+      return `${pathname}?${params.toString()}`;
     } else {
       return 'https://t.me/aisendercases';
     }

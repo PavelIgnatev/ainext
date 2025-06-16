@@ -1,11 +1,6 @@
-'use client';
-
 import type { Metadata } from 'next';
 
 import { ViewDialogContainer } from '../widgets/view-dialog/view-dialog.container';
-
-import 'react-tooltip/dist/react-tooltip.css';
-import 'semantic-ui-css/semantic.min.css';
 
 export const metadata: Metadata = {
   title: 'AiSender - Лидогенерация с искусственным интеллектом',
