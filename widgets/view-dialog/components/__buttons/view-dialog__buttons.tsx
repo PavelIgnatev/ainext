@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Modal } from 'semantic-ui-react';
+import { Button, Modal } from 'antd';
 
 import { Dialogue } from '../../../../@types/Dialogue';
 import { ViewDialogSendSvg } from '../__send-svg/view-dialog__send-svg';

@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { useDebounce } from 'use-debounce';
 
 import { StartupWidget } from './startup-widget';
 import { GroupId } from '@/@types/GroupId';
@@ -8,17 +9,20 @@ import { getGroupId, getGroupIds, updateGroupId } from '@/db/groupId';
 import { useNotifications } from '@/hooks/useNotifications';
 import { getGroupIdUsers, updateGroupIdUsers } from '@/db/groupIdUsers';
 
+const DEBOUNCE_DELAY = 300;
+
 export const StartupWidgetContainer = () => {
   const queryClient = useQueryClient();
   const { contextHolder, showError, showSuccess } = useNotifications();
   const [groupId, setGroupId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, DEBOUNCE_DELAY);
 
   const { data: groupIds = [], isLoading: isGroupIdsLoading } = useQuery({
-    queryKey: ['groupIds', search],
+    queryKey: ['groupIds', debouncedSearch],
     queryFn: async () => {
       try {
-        const result = await getGroupIds(search);
+        const result = await getGroupIds(debouncedSearch);
 
         if (!result) {
           showError('Произошла ошибка при загрузке всех запусков');

@@ -1,3 +1,5 @@
+'use client';
+
 import { Button, Drawer, Input, List, Popconfirm } from 'antd';
 import React, { useState } from 'react';
 

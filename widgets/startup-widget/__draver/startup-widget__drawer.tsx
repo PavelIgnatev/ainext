@@ -12,8 +12,9 @@ import {
 } from 'antd';
 import React from 'react';
 
-import { checkRandomString } from '../../../utils/checkRandomString';
+import { checkRandomString } from '@/utils/checkRandomString';
 import { GroupId } from '@/@types/GroupId';
+import { validateField } from '@/helpers/validateField';
 
 const { Option } = Select;
 
@@ -54,23 +55,6 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
   }
 
   const [form] = Form.useForm();
-
-  const validateField = (
-    value: string | undefined | null,
-    fieldName: string,
-    pattern: RegExp,
-    errorMessage: string
-  ): boolean => {
-    if (!value) return true;
-    if (pattern.test(value)) {
-      notification.error({
-        message: `Ошибка в поле "${fieldName}"`,
-        description: errorMessage,
-      });
-      return false;
-    }
-    return true;
-  };
 
   const handleSubmit = async () => {
     try {
@@ -125,18 +109,6 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
           message: 'Поле содержит недопустимые символы: ? или !',
         },
         {
-          value: flowHandling,
-          name: 'Обработка сценариев',
-          pattern: /[?!]/,
-          message: 'Поле содержит недопустимые символы: ? или !',
-        },
-        {
-          value: addedInformation,
-          name: 'Дополнительная информация',
-          pattern: /[?!]/,
-          message: 'Поле содержит недопустимые символы: ? или !',
-        },
-        {
           value: firstMessagePrompt,
           name: 'Первое приветствие',
           pattern: /[?:]/,
@@ -145,8 +117,8 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
         {
           value: secondMessagePrompt,
           name: 'Первый вопрос',
-          pattern: /[!:]/,
-          message: 'Поле содержит недопустимые символы: ! или :',
+          pattern: /[!.:]/,
+          message: 'Поле содержит недопустимые символы: !, : или .',
         },
         {
           value: addedQuestion,

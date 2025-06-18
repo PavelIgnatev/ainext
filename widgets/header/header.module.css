@@ -3,6 +3,8 @@
   align-items: center;
   justify-content: flex-start;
   height: 60px;
+  min-height: 60px;
+  max-height: 60px;
   margin-bottom: 10px;
 }
 
@@ -31,12 +33,14 @@
 }
 
 .telegramContainer svg:hover {
-  transform: scale(1.1);
+  transform: scale(1.12);
 }
 
 @media (max-width: 768px) {
   .header {
     height: 50px;
+    min-height: 50px;
+    max-height: 50px;
     padding: 0 16px;
     margin-bottom: 5px;
     justify-content: center;

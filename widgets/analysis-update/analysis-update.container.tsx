@@ -1,5 +1,5 @@
 import { notification } from 'antd';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import { useMutation } from 'react-query';
 

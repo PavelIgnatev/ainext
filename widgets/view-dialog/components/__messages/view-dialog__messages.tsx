@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Tooltip } from 'react-tooltip';
+import { Tooltip } from 'antd';
 
 import classes from './view-dialog__messages.module.css';
 
@@ -80,13 +80,11 @@ export const ViewDialogMessages: React.FC<ViewDialogMessagesProps> = ({
               ? classes.messageLeft
               : classes.messageRight;
 
-          return (
+          const messageContent = (
             <div
-              key={index}
               className={`${classes.message} ${messageStyle} ${
                 managerMessage === dialog.text ? classes.aiMessage : ''
               }`}
-              id={`prosm${index}`}
             >
               <p style={{ display: 'inline' }}>
                 {reduceSpaces(capitalizeFirstLetter(dialog.text))}
@@ -96,16 +94,25 @@ export const ViewDialogMessages: React.FC<ViewDialogMessagesProps> = ({
                   {formatDate(dialog?.date * 1000)}
                 </div>
               )}
-              {dialog.id === Infinity && (
-                <Tooltip
-                  anchorSelect={`#prosm${index}`}
-                  style={{ zIndex: 100000000 }}
-                >
+            </div>
+          );
+
+          return dialog.id === Infinity ? (
+            <Tooltip
+              key={index}
+              title={
+                <>
                   Сообщение на данный момент находится в очереди отправок.{' '}
                   <br />В ближайшее время мы отправим его собеседнику.
-                </Tooltip>
-              )}
-            </div>
+                </>
+              }
+              placement="top"
+              zIndex={100000000}
+            >
+              {messageContent}
+            </Tooltip>
+          ) : (
+            <div key={index}>{messageContent}</div>
           );
         })}
         {messageLoading && (

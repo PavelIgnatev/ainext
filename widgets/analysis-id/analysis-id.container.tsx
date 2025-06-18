@@ -1,5 +1,5 @@
 import { notification } from 'antd';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
@@ -12,7 +12,9 @@ import { AnalysisId } from '../analysis-id/analysis-id';
 
 export const AnalysisIdContainer = () => {
   const router = useRouter();
-  const { id: companyId, dialogId: queryDialogId } = router.query;
+  const searchParams = useSearchParams();
+  const companyId = searchParams.get('id');
+  const queryDialogId = searchParams.get('dialogId');
   const [api, contextHolder] = notification.useNotification();
   const [messages, setMessages] = useState<
     Array<{ role: 'user' | 'assistant' | 'system'; content: string }>[]
@@ -296,7 +298,7 @@ export const AnalysisIdContainer = () => {
       },
 
       {
-        onSuccess: (content) => {
+        onSuccess: (content: string) => {
           setMessages((p) => {
             const lastQuestion = extractLastQuestion(content);
 
@@ -352,18 +354,9 @@ export const AnalysisIdContainer = () => {
         setDialogId(analysisData.dialogs.length - 1);
 
         setMessages(analysisData.dialogs);
-        router.replace(
-          {
-            query: {
-              ...router.query,
-              dialogId: analysisData.dialogs.length,
-            },
-          },
-          undefined,
-          {
-            shallow: true,
-          }
-        );
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('dialogId', String(analysisData.dialogs.length));
+        router.replace(`${window.location.pathname}?${newParams.toString()}`);
       }
     }
   }, [analysisData, dialogId]);
@@ -394,13 +387,9 @@ export const AnalysisIdContainer = () => {
       });
 
       setDialogId(messages.length);
-      router.replace(
-        { query: { ...router.query, dialogId: messages.length + 1 } },
-        undefined,
-        {
-          shallow: true,
-        }
-      );
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('dialogId', String(messages.length + 1));
+      router.replace(`${window.location.pathname}?${newParams.toString()}`);
     }
   };
   const handleSaveMessage = (message: string) => {
@@ -418,13 +407,9 @@ export const AnalysisIdContainer = () => {
   };
   const handleHistoryDialogClick = (dialogId: number) => {
     setDialogId(dialogId);
-    router.replace(
-      { query: { ...router.query, dialogId: dialogId + 1 } },
-      undefined,
-      {
-        shallow: true,
-      }
-    );
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('dialogId', String(dialogId + 1));
+    router.replace(`${window.location.pathname}?${newParams.toString()}`);
   };
   return (
     <>

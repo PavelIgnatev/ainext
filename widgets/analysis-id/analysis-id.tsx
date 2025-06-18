@@ -1,5 +1,5 @@
 import { Spin, Typography } from 'antd';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { AnalysisUpdateContainer } from '../analysis-update/analysis-update.container';
 import { AnalysisIdDialogue } from './__dialogue/analysis-id__dialogue';
@@ -34,6 +34,7 @@ interface AnalysisIdProps {
 
 export const AnalysisId = (props: AnalysisIdProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     analysisData,
     analysisLoading,
@@ -56,7 +57,7 @@ export const AnalysisId = (props: AnalysisIdProps) => {
     );
   }
 
-  const { debug } = router.query;
+  const debug = searchParams.get('debug');
 
   return (
     <div className={classes.analysisId}>

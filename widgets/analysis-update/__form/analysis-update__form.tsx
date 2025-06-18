@@ -191,13 +191,6 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
           maxLength={1000}
         />
       </Form.Item>
-      {/* <Form.Item
-        style={{ marginBottom: "10px" }}
-        label="Стайл гайд"
-        name="styleGuide"
-      >
-        <TextArea style={{ height: 30 }} maxLength={1500} />
-      </Form.Item> */}
 
       <Form.Item
         style={{ marginBottom: '10px' }}

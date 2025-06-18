@@ -1,27 +1,14 @@
 import { Typography } from 'antd';
+import React from 'react';
 
-import { Header } from '../header/header';
+import type { Analysis } from '@/@types/Analysis';
 import { AnalysisCreateForm } from './__form/analysis-create__form';
+
 import classes from './analysis-create.module.css';
 
 interface AnalysisCreateProps {
   loading?: boolean;
-
-  onFinish: (data: {
-    aiRole: string;
-    messagesCount: number;
-    companyName: string;
-    companyDescription: string;
-    goal: string;
-    language: 'ENGLISH' | 'RUSSIAN' | 'UKRAINIAN';
-
-    addedInformation?: string;
-    styleGuide?: string;
-    addedQuestion?: string;
-    flowHandling?: string;
-    part?: string;
-    firstQuestion?: string;
-  }) => void;
+  onFinish: (data: Omit<Analysis, 'dialogs' | 'companyId'>) => void;
   onFinishFailed: () => void;
 }
 
@@ -32,9 +19,10 @@ export const AnalysisCreate = (props: AnalysisCreateProps) => {
     <div className={classes.analysisCreate}>
       <Typography.Title
         level={1}
-        style={{ margin: '1em 0', textAlign: 'center' }}
+        className={classes.head}
+        style={{ margin: 0 }}
       >
-        Создание разбора под компанию
+        Разборы 🤖
       </Typography.Title>
       <AnalysisCreateForm
         loading={loading}

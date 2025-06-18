@@ -1,57 +1,68 @@
-import { notification } from 'antd';
-import { useRouter } from 'next/router';
-import { useCallback } from 'react';
-import { useMutation } from 'react-query';
+'use client';
+import { useRouter } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
 
-import FrontendAnalysisApi from '../../api/frontend/analysis';
+import type { Analysis } from '@/@types/Analysis';
+import { useNotifications } from '@/hooks/useNotifications';
+
 import { AnalysisCreate } from './analysis-create';
-
-type analysisCreateData = {
-  companyName: string;
-  aiRole: string;
-  companyDescription: string;
-  goal: string;
-  language: 'ENGLISH' | 'RUSSIAN' | 'UKRAINIAN';
-
-  styleGuide?: string;
-  addedQuestion?: string;
-  part?: string;
-  firstQuestion?: string;
-};
-
-const errorText = 'Неизвестная ошибка, попробуйте еще раз.';
-const validationErrorText =
-  'Ошибка валидации. Проверьте, пожалуйста, заполненные поля.';
+import { updateAnalysis } from '@/db/analysis';
 
 export const AnalysisCreateContainer = () => {
   const router = useRouter();
-  const [api, contextHolder] = notification.useNotification();
+  const { contextHolder, showError } = useNotifications();
 
-  const toastError = useCallback((description: string) => {
-    api['error']({
-      message: 'Произошла ошибка.',
-      description,
-    });
-  }, []);
+  const { mutate: handleCreate, isPending: isCreateLoading } = useMutation({
+    mutationFn: (data: Omit<Analysis, 'dialogs' | 'companyId'>) => {
+      const getGreeting = (
+        language: Analysis['language'],
+        userName: string
+      ) => {
+        switch (language) {
+          case 'UKRAINIAN':
+            return `Вiтаю, ${userName}.`;
+          case 'ENGLISH':
+            return `Hello, ${userName}.`;
+          default:
+            return `Здравствуйте, ${userName}.`;
+        }
+      };
 
-  const {
-    mutate: analysisCreateMutation,
-    isLoading: analysisCreateMutationLoading,
-  } = useMutation(
-    (data: analysisCreateData) => FrontendAnalysisApi.createAnalysis(data),
-    {
-      onSuccess: ({ data }) => router.push(`/analysis/${data}`),
-      onError: () => toastError(errorText),
-    }
-  );
+      const analysisData: Analysis = {
+        ...data,
+        companyId: String(Math.random()).substring(2, 12),
+        dialogs: [
+          [
+            {
+              role: 'assistant',
+              content: getGreeting(data.language, data.userName),
+            },
+            {
+              role: 'assistant',
+              content: data.firstQuestion,
+            },
+          ],
+        ],
+      };
+
+      return updateAnalysis(analysisData);
+    },
+    onSuccess: (data) => router.push(`/analysis/${data}`),
+    onError: (error) =>
+      showError(error.message || 'Неизвестная ошибка, попробуйте еще раз.'),
+  });
 
   return (
     <>
       {contextHolder}
       <AnalysisCreate
-        loading={analysisCreateMutationLoading}
-        onFinish={analysisCreateMutation}
-        onFinishFailed={() => toastError(validationErrorText)}
+        loading={isCreateLoading}
+        onFinish={handleCreate}
+        onFinishFailed={() =>
+          showError(
+            'Ошибка валидации. Проверьте, пожалуйста, заполненные поля.'
+          )
+        }
       />
     </>
   );
