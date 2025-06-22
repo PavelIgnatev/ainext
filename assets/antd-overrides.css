@@ -90,6 +90,30 @@
   cursor: not-allowed !important;
 }
 
+.ant-btn:disabled:hover,
+.ant-btn:disabled:focus,
+.ant-btn:disabled:active {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+/* Дополнительные правила для обычных disabled кнопок */
+.ant-btn.ant-btn:disabled:hover,
+.ant-btn.ant-btn:disabled:focus,
+.ant-btn.ant-btn:disabled:active,
+.ant-btn.ant-btn[disabled]:hover,
+.ant-btn.ant-btn[disabled]:focus,
+.ant-btn.ant-btn[disabled]:active {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
 .ant-btn-dashed {
   border: 1px solid #000000 !important;
   background: #ffffff !important;
@@ -113,6 +137,30 @@
 }
 
 .ant-btn-dashed:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+.ant-btn-dashed:disabled:hover,
+.ant-btn-dashed:disabled:focus,
+.ant-btn-dashed:disabled:active {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+/* Дополнительные правила для disabled кнопок с более высокой специфичностью */
+.ant-btn.ant-btn-dashed:disabled:hover,
+.ant-btn.ant-btn-dashed:disabled:focus,
+.ant-btn.ant-btn-dashed:disabled:active,
+.ant-btn.ant-btn-dashed[disabled]:hover,
+.ant-btn.ant-btn-dashed[disabled]:focus,
+.ant-btn.ant-btn-dashed[disabled]:active {
   opacity: 0.5 !important;
   cursor: not-allowed !important;
   background: #ffffff !important;
@@ -772,4 +820,89 @@
 .ant-popover .ant-popconfirm-buttons .ant-btn-primary:active *,
 .ant-popconfirm .ant-popconfirm-buttons .ant-btn-primary:active * {
   color: #ffffff !important;
+}
+
+/* =============== КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА ДЛЯ DISABLED КНОПОК =============== */
+/* Максимальная специфичность для disabled кнопок - должно быть в самом конце файла */
+
+/* Все возможные комбинации для disabled dashed кнопок */
+.ant-btn.ant-btn-dashed:disabled,
+.ant-btn.ant-btn-dashed[disabled],
+button.ant-btn.ant-btn-dashed:disabled,
+button.ant-btn.ant-btn-dashed[disabled] {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.ant-btn.ant-btn-dashed:disabled:hover,
+.ant-btn.ant-btn-dashed:disabled:focus,
+.ant-btn.ant-btn-dashed:disabled:active,
+.ant-btn.ant-btn-dashed[disabled]:hover,
+.ant-btn.ant-btn-dashed[disabled]:focus,
+.ant-btn.ant-btn-dashed[disabled]:active,
+button.ant-btn.ant-btn-dashed:disabled:hover,
+button.ant-btn.ant-btn-dashed:disabled:focus,
+button.ant-btn.ant-btn-dashed:disabled:active,
+button.ant-btn.ant-btn-dashed[disabled]:hover,
+button.ant-btn.ant-btn-dashed[disabled]:focus,
+button.ant-btn.ant-btn-dashed[disabled]:active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* Все возможные комбинации для disabled обычных кнопок */
+.ant-btn:disabled,
+.ant-btn[disabled],
+button.ant-btn:disabled,
+button.ant-btn[disabled] {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.ant-btn:disabled:hover,
+.ant-btn:disabled:focus,
+.ant-btn:disabled:active,
+.ant-btn[disabled]:hover,
+.ant-btn[disabled]:focus,
+.ant-btn[disabled]:active,
+button.ant-btn:disabled:hover,
+button.ant-btn:disabled:focus,
+button.ant-btn:disabled:active,
+button.ant-btn[disabled]:hover,
+button.ant-btn[disabled]:focus,
+button.ant-btn[disabled]:active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* Правила для дочерних элементов disabled кнопок */
+.ant-btn:disabled *,
+.ant-btn:disabled:hover *,
+.ant-btn:disabled:focus *,
+.ant-btn:disabled:active *,
+.ant-btn[disabled] *,
+.ant-btn[disabled]:hover *,
+.ant-btn[disabled]:focus *,
+.ant-btn[disabled]:active *,
+.ant-btn.ant-btn-dashed:disabled *,
+.ant-btn.ant-btn-dashed:disabled:hover *,
+.ant-btn.ant-btn-dashed:disabled:focus *,
+.ant-btn.ant-btn-dashed:disabled:active *,
+.ant-btn.ant-btn-dashed[disabled] *,
+.ant-btn.ant-btn-dashed[disabled]:hover *,
+.ant-btn.ant-btn-dashed[disabled]:focus *,
+.ant-btn.ant-btn-dashed[disabled]:active * {
+  color: #000000 !important;
 }

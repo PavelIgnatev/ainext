@@ -1,5 +1,5 @@
 import { useEffect, useRef, useMemo, useState, KeyboardEvent } from 'react';
-import { BaseMessage } from './analysis-id.types';
+import { BaseMessage, MessagePositionInGroup } from './analysis-id.types';
 import { formatMessageText } from '@/utils/textFormatters';
 
 interface UseAnalysisMessageInputProps {
@@ -17,10 +17,35 @@ export function useAnalysisMessages(messages: BaseMessage[]) {
   }, [messages]);
 
   const formattedMessages = useMemo<BaseMessage[]>(() => {
-    return messages.map((message) => ({
-      ...message,
-      text: formatMessageText(message.text),
-    }));
+    return messages
+      .map((message) => ({
+        ...message,
+        text: formatMessageText(message.text),
+      }))
+      .map((message, index, array) => {
+        const prevMessage = array[index - 1];
+        const nextMessage = array[index + 1];
+
+        const isFirstInGroup =
+          !prevMessage || prevMessage.fromId !== message.fromId;
+        const isLastInGroup =
+          !nextMessage || nextMessage.fromId !== message.fromId;
+
+        let positionInGroup: MessagePositionInGroup = 'single';
+
+        if (isFirstInGroup && !isLastInGroup) {
+          positionInGroup = 'top';
+        } else if (!isFirstInGroup && !isLastInGroup) {
+          positionInGroup = 'middle';
+        } else if (!isFirstInGroup && isLastInGroup) {
+          positionInGroup = 'bottom';
+        }
+
+        return {
+          ...message,
+          positionInGroup,
+        };
+      });
   }, [messages]);
 
   return {

@@ -91,26 +91,6 @@ export const AnalysisIdContainer = () => {
     [searchParams, router]
   );
 
-  useEffect(() => {
-    if (!dialogs && analysisData?.dialogs) {
-      setDialogs(analysisData.dialogs);
-
-      const queryDialogIndex = queryDialogId
-        ? parseInt(queryDialogId, 10) - 1
-        : null;
-
-      const targetDialogId =
-        queryDialogIndex !== null &&
-        queryDialogIndex >= 0 &&
-        queryDialogIndex < analysisData.dialogs.length
-          ? queryDialogIndex
-          : analysisData.dialogs.length - 1;
-
-      setCurrentDialogId(targetDialogId);
-      updateUrlDialogId(targetDialogId);
-    }
-  }, [analysisData, queryDialogId, dialogs, updateUrlDialogId]);
-
   const handleNewDialog = useCallback(async () => {
     if (!analysisData) {
       showError('Данные разбора недоступны');
@@ -200,12 +180,32 @@ export const AnalysisIdContainer = () => {
     [currentDialogId, updateUrlDialogId]
   );
 
-  const getMessages = () => {
+  const getMessages = useCallback(() => {
     if (!dialogs || !dialogs[currentDialogId]) {
       return [];
     }
     return dialogs[currentDialogId];
-  };
+  }, [dialogs, currentDialogId]);
+
+  useEffect(() => {
+    if (!dialogs && analysisData?.dialogs) {
+      setDialogs(analysisData.dialogs);
+
+      const queryDialogIndex = queryDialogId
+        ? parseInt(queryDialogId, 10) - 1
+        : null;
+
+      const targetDialogId =
+        queryDialogIndex !== null &&
+        queryDialogIndex >= 0 &&
+        queryDialogIndex < analysisData.dialogs.length
+          ? queryDialogIndex
+          : analysisData.dialogs.length - 1;
+
+      setCurrentDialogId(targetDialogId);
+      updateUrlDialogId(targetDialogId);
+    }
+  }, [analysisData, queryDialogId, dialogs, updateUrlDialogId]);
 
   return (
     <>

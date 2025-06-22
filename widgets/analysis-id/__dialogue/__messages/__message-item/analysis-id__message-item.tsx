@@ -6,27 +6,17 @@ interface AnalysisIdMessageItemProps {
   message: BaseMessage;
 }
 
-const getAuthorName = (fromId: string): string => {
-  const authorMap: Record<string, string> = {
-    клиент: 'Клиент',
-    менеджер: 'Менеджер',
-  };
-  return authorMap[fromId] || 'Менеджер';
-};
-
 export const AnalysisIdMessageItem: React.FC<AnalysisIdMessageItemProps> = ({
   message,
 }) => {
   const messageStyle =
     message.fromId === 'клиент' ? classes.messageRight : classes.messageLeft;
+  const positionClass = message.positionInGroup
+    ? classes[message.positionInGroup]
+    : '';
 
   return (
-    <div className={`${classes.message} ${messageStyle}`}>
-      <div className={classes.messageHeader}>
-        <span className={classes.messageAuthor}>
-          {getAuthorName(message.fromId)}
-        </span>
-      </div>
+    <div className={`${classes.message} ${messageStyle} ${positionClass}`}>
       <div className={classes.messageContent}>{message.text}</div>
     </div>
   );
