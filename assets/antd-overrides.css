@@ -62,8 +62,6 @@
   color: #ffffff !important;
 }
 
-
-
 .ant-btn-primary:disabled {
   background: #ffffff !important;
   border-color: #000000 !important;
@@ -86,8 +84,6 @@
   background: #000000 !important;
   color: #ffffff !important;
 }
-
-
 
 .ant-btn:disabled {
   opacity: 0.5 !important;
@@ -508,8 +504,6 @@
   border-color: #000000 !important;
 }
 
-
-
 .ant-popconfirm-buttons .ant-btn:active {
   background: #000000 !important;
   color: #ffffff !important;
@@ -526,8 +520,6 @@
   background: #000000 !important;
   color: #ffffff !important;
 }
-
-
 
 .ant-popconfirm-buttons .ant-btn-primary:active {
   background: #000000 !important;

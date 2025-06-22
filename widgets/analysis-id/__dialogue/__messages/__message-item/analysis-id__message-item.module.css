@@ -1,5 +1,5 @@
 .message {
-  max-width: 70%;
+  max-width: 100%;
   margin-bottom: 4px;
   display: flex;
   flex-direction: column;
@@ -71,7 +71,7 @@
 .messageLeft .messageContent::before {
   content: '';
   position: absolute;
-  top: -1px;
+  top: 9px;
   left: -8px;
   width: 0;
   height: 0;
@@ -83,7 +83,7 @@
 .messageLeft .messageContent::after {
   content: '';
   position: absolute;
-  top: 0px;
+  top: 10px;
   left: -7px;
   width: 0;
   height: 0;
@@ -95,7 +95,7 @@
 .messageRight .messageContent::before {
   content: '';
   position: absolute;
-  top: -1px;
+  top: 9px;
   right: -8px;
   width: 0;
   height: 0;
@@ -107,7 +107,7 @@
 .messageRight .messageContent::after {
   content: '';
   position: absolute;
-  top: 0px;
+  top: 10px;
   right: -7px;
   width: 0;
   height: 0;

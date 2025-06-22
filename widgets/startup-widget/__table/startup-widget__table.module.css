@@ -31,7 +31,7 @@
 }
 
 .headerCell {
-  padding: 16px 20px;
+  padding: 12px 16px;
   text-align: left;
   font-weight: 600;
   color: #374151;
@@ -65,7 +65,7 @@
 }
 
 .tableCell {
-  padding: 16px 20px;
+  padding: 12px 16px;
   vertical-align: middle;
   border: none;
 }
@@ -263,12 +263,12 @@
   }
 
   .headerCell {
-    padding: 12px 16px;
+    padding: 10px 14px;
     font-size: 11px;
   }
 
   .tableCell {
-    padding: 12px 16px;
+    padding: 10px 14px;
   }
 
   .pagination {

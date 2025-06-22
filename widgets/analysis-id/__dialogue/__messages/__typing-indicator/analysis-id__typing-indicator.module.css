@@ -88,7 +88,9 @@
 }
 
 @keyframes typingDot {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0.8);
     opacity: 0.5;
   }
@@ -103,14 +105,14 @@
   .message {
     max-width: 85%;
   }
-  
+
   .messageHeader {
     padding: 6px 12px;
     font-size: 11px;
   }
-  
+
   .messageContent {
     padding: 10px 12px;
     font-size: 13px;
   }
-} 
+}

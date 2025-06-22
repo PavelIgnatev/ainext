@@ -50,7 +50,9 @@
 }
 
 @keyframes bounce {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0.8);
     opacity: 0.5;
   }
@@ -74,4 +76,4 @@
   color: #666666;
   line-height: 1.4;
   opacity: 0.8;
-} 
+}

@@ -29,12 +29,12 @@
     max-width: 100% !important;
     flex: 0 0 100% !important;
   }
-  
+
   .drawerBody :global(.ant-row) {
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
-  
+
   .drawerBody :global(.ant-col) {
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -45,9 +45,8 @@
   .drawerBody {
     padding: 10px 10px 60px 10px !important;
   }
-  
+
   .drawerBody :global(.ant-form-item) {
     margin-bottom: 16px !important;
   }
-} 
-
+}
