@@ -1,0 +1,25 @@
+.title {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: rgba(0, 0, 0, 0.88);
+  margin: 12px 0;
+}
+
+@media (max-width: 768px) {
+  .title {
+    text-align: center;
+    padding: 0 16px;
+    font-size: 1.875rem;
+    margin: 8px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    padding: 0 8px;
+    font-size: 1.5rem;
+    margin: 6px 0;
+  }
+}

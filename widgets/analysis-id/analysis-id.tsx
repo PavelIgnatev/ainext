@@ -1,95 +1,76 @@
-import { Spin, Typography } from 'antd';
-import { useRouter, useSearchParams } from 'next/navigation';
+'use client';
 
-import { AnalysisUpdateContainer } from '../analysis-update/analysis-update.container';
+import { useState } from 'react';
+
+import { Analysis, DialogMessage } from '../../@types/Analysis';
 import { AnalysisIdDialogue } from './__dialogue/analysis-id__dialogue';
+import { AnalysisIdLoadingPage } from './__loading-page/analysis-id__loading-page';
+import { AnalysisIdEmptyPage } from './__empty-page/analysis-id__empty-page';
+import { AnalysisIdEditDrawer } from './__edit-drawer/analysis-id__edit-drawer';
+import { Title } from '@/components/title/title';
 import classes from './analysis-id.module.css';
 
-type analysisCreateData = {
-  language: 'ENGLISH' | 'RUSSIAN' | 'UKRAINIAN';
-  styleGuide?: string;
-  addedQuestion?: string;
-  messagesCount: number;
-  flowHandling?: string;
-  part?: string;
-  firstQuestion?: string;
-  aiRole: string;
-  companyName: string;
-  companyDescription: string;
-  goal: string;
-  dialogs: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>[];
-};
-
 interface AnalysisIdProps {
-  analysisData?: analysisCreateData | null;
-  companyId: string;
-  analysisLoading: boolean;
-  messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>;
-  messageLoading: boolean;
+  analysisId: string;
+  analysis: Analysis | null;
+  messages: DialogMessage[];
+  isAnalysisLoading: boolean;
+  isMessageLoading: boolean;
+  isAdmin: boolean;
+  currentDialogId: number;
 
   onNewDialog: () => void;
   onSaveMessage: (message: string) => void;
-  onHistoryDialogClick: (dialogName: number) => void;
+  onDialogSelect: (dialogId: number) => void;
 }
 
 export const AnalysisId = (props: AnalysisIdProps) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const [isEditMode, setIsEditMode] = useState(false);
+
   const {
-    analysisData,
-    analysisLoading,
+    analysis,
+    analysisId,
+    isAnalysisLoading,
     messages,
+    isMessageLoading,
+    isAdmin,
+    currentDialogId,
     onNewDialog,
     onSaveMessage,
-    onHistoryDialogClick,
-    messageLoading,
-    companyId,
+    onDialogSelect,
   } = props;
 
-  if (analysisLoading) {
-    return (
-      <div
-        className={classes.analysisId}
-        style={{ justifyContent: 'space-around' }}
-      >
-        <Spin tip="Loading" size="large"></Spin>
-      </div>
-    );
+  if (isAnalysisLoading) {
+    return <AnalysisIdLoadingPage />;
   }
 
-  const debug = searchParams.get('debug');
+  if (!analysis) {
+    return <AnalysisIdEmptyPage analysisId={analysisId} />;
+  }
 
   return (
     <div className={classes.analysisId}>
-      <div className={classes.group}>
-        {debug && analysisData && (
-          <AnalysisUpdateContainer
-            initialValues={analysisData}
-            companyId={companyId}
-          />
-        )}
-        <div>
-          <Typography.Title
-            level={2}
-            style={{
-              marginTop: '0.5em',
-              marginBottom: 'calc(0.5em + 10px)',
-              textAlign: 'center',
-            }}
-            className={classes.head}
-          >
-            Эмуляция диалогов для компании {analysisData?.companyName}
-          </Typography.Title>
-          <AnalysisIdDialogue
-            messages={messages}
-            dialogs={analysisData?.dialogs}
-            messageLoading={messageLoading}
-            onNewDialog={onNewDialog}
-            onSaveMessage={onSaveMessage}
-            onHistoryDialogClick={onHistoryDialogClick}
-          />
-        </div>
-      </div>
+      <Title className={classes.head}>
+        Разбор {analysis.companyName} / Диалог {currentDialogId + 1}
+      </Title>
+      <AnalysisIdDialogue
+        isAdmin={isAdmin}
+        messages={messages}
+        messageLoading={isMessageLoading}
+        dialogsLength={analysis.dialogs.length}
+        onNewDialog={onNewDialog}
+        onSaveMessage={onSaveMessage}
+        onDialogSelect={onDialogSelect}
+        onToggleEditMode={() => setIsEditMode((prev) => !prev)}
+      />
+
+      {analysis && (
+        <AnalysisIdEditDrawer
+          isOpen={isEditMode}
+          analysis={analysis}
+          onClose={() => setIsEditMode(false)}
+        />
+      )}
     </div>
   );
 };

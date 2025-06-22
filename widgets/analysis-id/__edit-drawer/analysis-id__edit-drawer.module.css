@@ -1,0 +1,33 @@
+
+.editDrawer :global(.ant-drawer-body) {
+  padding: 0;
+  overflow: hidden;
+}
+
+.editDrawer :global(.ant-drawer-content) {
+  overflow: hidden;
+  border-radius: 0;
+}
+
+.editDrawer :global(.ant-drawer-content-wrapper) {
+  border-radius: 0;
+}
+
+.drawerForm {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+@media (max-height: 650px) {
+  .editDrawer :global(.ant-drawer-body) {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .editDrawer :global(.ant-drawer-content) {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+}

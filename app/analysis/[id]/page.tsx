@@ -1,16 +1,18 @@
 import type { NextPage } from 'next';
 
 import { AnalysisIdContainer } from '@/widgets/analysis-id/analysis-id.container';
-import { HeaderContainer } from '@/widgets/header/header.container';
 
 import classes from './index.module.css';
+import { Header } from '@/components/header/header';
 
 const AnalysisIdPage: NextPage = () => {
   return (
     <main className={classes.main}>
-      <HeaderContainer />
+      <Header href="https://t.me/aisendercases" target="_blank" />
 
-      <AnalysisIdContainer />
+      <div className={classes.content}>
+        <AnalysisIdContainer />
+      </div>
     </main>
   );
 };

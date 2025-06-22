@@ -3,31 +3,45 @@
 import { Button, Drawer, Input, List, Popconfirm } from 'antd';
 import React, { useState } from 'react';
 
-import { ViewDialogMessages } from '../../view-dialog/components/__messages/view-dialog__messages';
+import { DialogMessage } from '../../../@types/Analysis';
+import { AnalysisIdMessages } from './__messages/analysis-id__messages';
+import { useAnalysisMessageInput } from '../analysis-id.hooks';
 import classes from './analysis-id__dialogue.module.css';
 
 interface AnalysisIdDialogueProps {
-  messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>;
-  dialogs?: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>[];
+  isAdmin: boolean;
   messageLoading: boolean;
+  dialogsLength: number;
+  messages: DialogMessage[];
 
   onNewDialog: () => void;
   onSaveMessage: (message: string) => void;
-  onHistoryDialogClick: (dialogName: number) => void;
+  onDialogSelect: (dialogId: number) => void;
+  onToggleEditMode: () => void;
 }
 
-export const AnalysisIdDialogue = (props: AnalysisIdDialogueProps) => {
-  const {
-    messages,
-    dialogs,
-    messageLoading,
-    onNewDialog,
-    onSaveMessage,
-    onHistoryDialogClick,
-  } = props;
-  const [value, setValue] = useState('');
-
+export const AnalysisIdDialogue = ({
+  messages,
+  dialogsLength,
+  messageLoading,
+  isAdmin,
+  onNewDialog,
+  onSaveMessage,
+  onDialogSelect,
+  onToggleEditMode,
+}: AnalysisIdDialogueProps) => {
   const [visibleSavedDialog, setVisibleSavedDialog] = useState(false);
+
+  const messageInput = useAnalysisMessageInput({
+    onSend: onSaveMessage,
+    disabled: messageLoading,
+  });
+
+  const formattedMessages = messages.map((message, id) => ({
+    id,
+    text: message.content,
+    fromId: message.role === 'user' ? 'клиент' : 'менеджер',
+  }));
 
   return (
     <div className={classes.analysisIdDialogue}>
@@ -39,15 +53,15 @@ export const AnalysisIdDialogue = (props: AnalysisIdDialogueProps) => {
             className={classes.button}
             disabled={messageLoading}
           >
-            История всех диалогов
+            История диалогов
           </Button>
 
           <Popconfirm
             title="Начать новый диалог?"
             description="История данного диалога будет сохранена."
-            onConfirm={() => onNewDialog()}
-            okText="Да"
-            cancelText="Нет"
+            onConfirm={onNewDialog}
+            okText="Начать"
+            cancelText="Отменить"
           >
             <Button
               type="dashed"
@@ -57,40 +71,43 @@ export const AnalysisIdDialogue = (props: AnalysisIdDialogueProps) => {
               Начать новый диалог
             </Button>
           </Popconfirm>
+
+          {isAdmin && (
+            <Button
+              type="dashed"
+              onClick={onToggleEditMode}
+              className={classes.button}
+              disabled={messageLoading}
+            >
+              Изменить разбор
+            </Button>
+          )}
         </div>
 
-        <ViewDialogMessages
-          messages={messages.map((message, id) => ({
-            id,
-            text: message.content,
-            date: null,
-            fromId: message.role === 'user' ? 'клиент' : 'менеджер',
-          }))}
-          recipientId="менеджер"
-          className={classes.viewDialogMessages}
+        <AnalysisIdMessages
+          messages={formattedMessages}
           messageLoading={messageLoading}
         />
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSaveMessage(value);
-            setValue('');
-          }}
+          onSubmit={messageInput.handleSubmit}
           className={classes.viewDialogInputWrapper}
         >
-          <Input
-            value={value}
-            onChange={(e) => setValue(e.currentTarget.value)}
+          <Input.TextArea
+            value={messageInput.value}
+            onChange={messageInput.handleChange}
+            onPressEnter={messageInput.handleKeyPress}
             placeholder="Введите сообщение..."
             className={classes.viewDialogInput}
             size="large"
+            autoSize={{ minRows: 1, maxRows: 4 }}
+            disabled={messageLoading}
           />
           <Button
             type="primary"
             htmlType="submit"
             size="large"
-            disabled={messageLoading}
+            disabled={!messageInput.canSend}
           >
             Отправить
           </Button>
@@ -100,35 +117,34 @@ export const AnalysisIdDialogue = (props: AnalysisIdDialogueProps) => {
       <Drawer
         title="История диалогов"
         placement="right"
-        closable={true}
+        closable
         onClose={() => setVisibleSavedDialog(false)}
         open={visibleSavedDialog}
-        styles={{
-          body: {
-            padding: 0,
-          },
-        }}
+        styles={{ body: { padding: 0 } }}
       >
         <List
           dataSource={Array.from(
-            { length: Object.keys(dialogs || {}).length },
+            { length: dialogsLength },
             (_, index) => index
           ).reverse()}
-          renderItem={(dialogueId) => (
-            <List.Item
-              key={dialogueId}
-              onClick={() => {
-                setVisibleSavedDialog(false);
-                onHistoryDialogClick(dialogueId);
-              }}
-              className={classes.dialogueListItem}
-            >
-              <List.Item.Meta
-                title={`Диалог ${dialogueId + 1}`}
-                className={classes.meta}
-              />
-            </List.Item>
-          )}
+          renderItem={(dialogueId, listIndex) => {
+            const actualDialogId = (dialogsLength || 0) - 1 - listIndex;
+            return (
+              <List.Item
+                key={dialogueId}
+                onClick={() => {
+                  setVisibleSavedDialog(false);
+                  onDialogSelect(actualDialogId);
+                }}
+                className={classes.dialogueListItem}
+              >
+                <List.Item.Meta
+                  title={`Диалог ${actualDialogId + 1}`}
+                  className={classes.meta}
+                />
+              </List.Item>
+            );
+          }}
         />
       </Drawer>
     </div>

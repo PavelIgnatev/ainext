@@ -121,7 +121,7 @@ export const ViewDialogScreen = (props: ViewDialogScreenProps) => {
         </div>
         <div className={classes.viewDialogScreenDefaultMessageSubTitle}>
           Уникальный идентификатор - это специальный код, который позволяет
-          системе отслеживать и анализировать конкретную рассылку.
+          системе отслеживать и разборировать конкретную рассылку.
         </div>
       </div>
     );

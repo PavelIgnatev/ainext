@@ -1,8 +1,14 @@
 'use client';
 import { GroupId } from '@/@types/GroupId';
-import { Progress, Table, TableProps } from 'antd';
-import { useEffect, useState } from 'react';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  createColumnHelper,
+  flexRender,
+} from '@tanstack/react-table';
 import { useMediaQuery } from 'react-responsive';
+import classes from './startup-widget__table.module.css';
 
 type SmallGroupId = Pick<
   GroupId,
@@ -11,101 +17,239 @@ type SmallGroupId = Pick<
 
 interface StartupWidgetProps {
   loading: boolean;
-
   groupIds: SmallGroupId[];
-
   onClickGroupId: (startupId: string) => void;
 }
+
+const columnHelper = createColumnHelper<SmallGroupId>();
 
 export const StartupWidgetTable = (props: StartupWidgetProps) => {
   const { loading, groupIds, onClickGroupId } = props;
 
   const isMobile = useMediaQuery({ maxWidth: 768 });
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  const pageSize = 10;
 
-  const columns: TableProps<SmallGroupId>['columns'] = [
-    {
-      title: 'GroupId',
-      dataIndex: 'groupId',
-      render: (_, { groupId }) => {
-        return (
-          <a key={groupId} onClick={() => onClickGroupId(groupId)}>
-            {groupId}
-          </a>
-        );
-      },
-      width: 200,
-    },
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      width: 250,
-      ellipsis: true,
-    },
-    {
-      title: 'Current / Target',
-      dataIndex: 'currentCount',
-      render: (_, v) => {
-        return (
-          <p key={v.groupId}>
-            {v.currentCount} / {v.target}
-          </p>
-        );
-      },
-      width: 150,
-    },
-    {
-      title: 'Progress',
-      render: (_, v) => {
-        return (
-          <Progress
-            key={v.groupId}
-            size="small"
-            type="dashboard"
-            steps={8}
-            percent={Math.round((v.currentCount / v.target) * 100)}
-            trailColor="rgba(0, 0, 0, 0.06)"
-            strokeWidth={10}
-            {...(v.target === 0 && { status: 'exception' })}
+  const ProgressCircle = ({
+    percent,
+    target,
+  }: {
+    percent: number;
+    target: number;
+  }) => {
+    const size = isMobile ? 36 : 48;
+    const strokeWidth = 4;
+    const radius = (size - strokeWidth) / 2;
+    const circumference = radius * 2 * Math.PI;
+    const offset = circumference - (percent / 100) * circumference;
+
+    const getColor = () => {
+      if (target === 0) return '#ef4444'; // красный для ошибки
+      if (percent >= 100) return '#22c55e'; // зеленый для 100%
+      return '#3b82f6'; // синий для всех остальных случаев
+    };
+
+    return (
+      <div
+        className={`${classes.progressContainer} ${target === 0 ? classes.errorProgress : ''}`}
+      >
+        <svg width={size} height={size} className={classes.progressSvg}>
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={target === 0 ? '#ef4444' : '#e0e0e0'}
+            strokeWidth={strokeWidth}
+            fill="none"
           />
-        );
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={getColor()}
+            strokeWidth={strokeWidth}
+            fill="none"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            className={classes.progressCircle}
+          />
+        </svg>
+        <div className={classes.progressText}>
+          {target === 0 ? '✕' : `${percent}%`}
+        </div>
+      </div>
+    );
+  };
+
+  const columns = [
+    columnHelper.accessor('groupId', {
+      header: 'Group ID',
+      cell: (info) => (
+        <div className={classes.groupIdCell}>
+          <span className={classes.groupIdText} title={info.getValue()}>
+            {info.getValue()}
+          </span>
+        </div>
+      ),
+      size: isMobile ? 120 : 200,
+    }),
+    columnHelper.accessor('name', {
+      header: 'Name',
+      cell: (info) => (
+        <div className={classes.nameCell}>
+          <span title={info.getValue()}>{info.getValue()}</span>
+        </div>
+      ),
+      size: isMobile ? 150 : 250,
+    }),
+    columnHelper.display({
+      id: 'count',
+      header: 'Current / Target',
+      cell: (info) => (
+        <div className={classes.countCell}>
+          <span className={classes.currentCount}>
+            {info.row.original.currentCount}
+          </span>
+          <span className={classes.divider}>/</span>
+          <span className={classes.targetCount}>
+            {info.row.original.target}
+          </span>
+        </div>
+      ),
+      size: isMobile ? 100 : 130,
+    }),
+    columnHelper.display({
+      id: 'progress',
+      header: 'Progress',
+      cell: (info) => {
+        const { currentCount, target } = info.row.original;
+        const percent =
+          target > 0
+            ? currentCount >= target
+              ? 100
+              : Math.floor((currentCount / target) * 100)
+            : 0;
+
+        return <ProgressCircle percent={percent} target={target} />;
       },
-      width: 150,
-    },
+      size: isMobile ? 80 : 100,
+    }),
   ];
 
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowHeight(window.innerHeight);
-    };
+  const table = useReactTable({
+    data: groupIds,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize,
+      },
+    },
+  });
 
-    setWindowHeight(window.innerHeight);
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+  // Лоадер теперь обрабатывается на уровне StartupWidget
 
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <Table
-        rowKey="groupId"
-        size={isMobile ? 'small' : 'middle'}
-        columns={columns}
-        loading={loading}
-        dataSource={groupIds}
-        bordered={true}
-        scroll={{
-          y: windowHeight - (isMobile ? 305 : 250),
-          x: isMobile ? 500 : '100%',
-        }}
-        pagination={{
-          size: isMobile ? 'small' : 'default',
-          pageSize: 10,
-          showSizeChanger: false,
-        }}
-      />
+    <div className={classes.tableContainer}>
+      <div className={classes.tableWrapper}>
+        <table className={classes.modernTable}>
+          <thead className={classes.tableHead}>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className={classes.headerRow}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className={classes.headerCell}
+                    style={{ width: header.getSize() }}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody className={classes.tableBody}>
+            {table.getRowModel().rows.map((row) => (
+              <tr
+                key={row.id}
+                className={classes.tableRow}
+                onClick={() => onClickGroupId(row.original.groupId)}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className={classes.tableCell}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Пагинация */}
+      <div className={classes.pagination}>
+        <div className={classes.paginationInfo}>
+          Показано {table.getState().pagination.pageIndex * pageSize + 1}-
+          {Math.min(
+            (table.getState().pagination.pageIndex + 1) * pageSize,
+            groupIds.length
+          )}{' '}
+          из {groupIds.length} записей
+        </div>
+        <div className={classes.paginationControls}>
+          <div className={classes.pageNumbers}>
+            {Array.from({ length: table.getPageCount() }, (_, i) => i + 1)
+              .filter((page) => {
+                const current = table.getState().pagination.pageIndex + 1;
+                return (
+                  Math.abs(page - current) <= 2 ||
+                  page === 1 ||
+                  page === table.getPageCount()
+                );
+              })
+              .map((page, index, array) => {
+                if (index > 0 && array[index - 1] !== page - 1) {
+                  return [
+                    <span key={`dots-${page}`} className={classes.dots}>
+                      ...
+                    </span>,
+                    <button
+                      key={page}
+                      className={`${classes.pageNumber} ${
+                        table.getState().pagination.pageIndex === page - 1
+                          ? classes.pageNumberActive
+                          : ''
+                      }`}
+                      onClick={() => table.setPageIndex(page - 1)}
+                    >
+                      {page}
+                    </button>,
+                  ];
+                }
+                return (
+                  <button
+                    key={page}
+                    className={`${classes.pageNumber} ${
+                      table.getState().pagination.pageIndex === page - 1
+                        ? classes.pageNumberActive
+                        : ''
+                    }`}
+                    onClick={() => table.setPageIndex(page - 1)}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

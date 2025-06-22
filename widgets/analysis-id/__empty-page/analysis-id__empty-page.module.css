@@ -1,0 +1,111 @@
+.emptyContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  min-height: 500px;
+  padding: 40px 20px;
+  position: relative;
+}
+
+.emptyContent {
+  text-align: center;
+  max-width: 480px;
+  z-index: 1;
+}
+
+.iconContainer {
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.emptyIcon {
+  font-size: 80px;
+  color: #d9d9d9;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.emptyTitle {
+  color: #262626 !important;
+  margin-bottom: 16px !important;
+  font-size: 24px !important;
+  font-weight: 600 !important;
+}
+
+.emptyDescription {
+  color: #8c8c8c;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.analysisId {
+  background: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #d4380d;
+  margin: 0 4px;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.primaryButton {
+  height: 40px;
+  padding: 0 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.secondaryButton {
+  height: 40px;
+  padding: 0 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.backgroundPattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.03;
+  background-image: radial-gradient(circle at 25% 25%, #1890ff 2px, transparent 2px),
+                    radial-gradient(circle at 75% 75%, #1890ff 2px, transparent 2px);
+  background-size: 50px 50px;
+  background-position: 0 0, 25px 25px;
+}
+
+.suggestion {
+  margin-top: 24px;
+  padding: 16px 20px;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 8px;
+  color: #389e0d;
+  font-size: 14px;
+}
+
+.suggestionIcon {
+  margin-right: 8px;
+  font-size: 16px;
+} 

@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 
 import { Account } from '../../@types/Account';
 import { Dialogue } from '../../@types/Dialogue';
-import { HeaderContainer } from '../header/header.container';
 import { ViewDialogScreen } from './components/__screen/view-dialog__screen';
 import { ViewDialogSearch } from './components/__search/view-dialog__search';
 import { ViewDialogSettings } from './components/__settings/view-dialog__settings';
 import { ViewDialogStatistics } from './components/__statistics/view-dialog__statistics';
 import { ViewDialogTopButtons } from './components/__top-buttons/view-dialog__buttons';
 import classes from './view-dialog.module.css';
+import { Header } from '../header/header';
 
 export interface ViewDialogProps {
   activeTab:
@@ -154,7 +154,7 @@ export const ViewDialog = (props: ViewDialogProps) => {
 
   return (
     <div className={classes.viewDialog}>
-      <HeaderContainer />
+      <Header href="https://t.me/aisendercases" target="_blank" />
       <ViewDialogSearch
         onSearch={onChangeGroupId}
         search={search}

@@ -10,9 +10,12 @@
 }
 
 .content {
+  padding: 0 35px;
+}
+
+.createContent {
   display: flex;
   gap: 24px;
-  padding: 0 35px;
 }
 
 @media (max-width: 768px) {
@@ -21,12 +24,14 @@
   }
 
   .content {
+    padding: 0 16px;
+  }
+
+  .createContent {
     flex-direction: column;
     gap: 16px;
-    padding: 0 16px;
     overflow-y: auto;
     margin-bottom: 16px;
-
   }
 }
 
@@ -35,5 +40,12 @@
     padding: 0 8px;
     gap: 12px;
     margin-bottom: 8px;
+  }
+}
+
+@media (max-height: 860px) {
+  .main {
+    max-height: initial;
+    overflow-y: auto;
   }
 }

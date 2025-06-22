@@ -1,20 +1,18 @@
 .startupWidget {
-  width: 100vw;
+  width: 100%;
   max-width: 100vw;
-  min-height: 100vh;
-  overflow: hidden;
+  flex: 1;
   display: flex;
   flex-direction: column;
   padding: 0 35px;
+  min-height: 0;
 }
 
 .startupWidgetWrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 15px;
   flex-wrap: wrap;
-  gap: 16px;
 }
 
 .searchAndButtonWrapper {
@@ -28,17 +26,57 @@
 .searchInput {
   max-width: 300px;
   min-width: 200px;
+  height: 40px !important;
+  border: 1px solid #000000 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  font-size: 14px !important;
+  transition: all 0.15s ease !important;
+}
+
+.searchInput:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.searchInput .ant-input-prefix {
+  color: #9ca3af !important;
+}
+
+.createButton {
+  height: 40px;
+  background-color: #000000 !important;
+  border-color: #000000 !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  min-width: 140px;
+  transition: all 0.15s ease !important;
+}
+
+.createButton:hover {
+  background-color: #1f2937 !important;
+  border-color: #1f2937 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 41, 55, 0.15) !important;
+}
+
+.createButton:focus {
+  background-color: #1f2937 !important;
+  border-color: #1f2937 !important;
+  box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1) !important;
 }
 
 @media (max-width: 768px) {
   .startupWidget {
-    padding: 0 12px;
+    gap: 8px;
+    padding: 0 16px;
   }
 
   .startupWidgetWrapper {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: 0;
   }
 
   .searchAndButtonWrapper {
@@ -53,7 +91,8 @@
     width: 100%;
   }
 
-  .searchAndButtonWrapper button {
+  .createButton {
     width: 100%;
+    min-width: auto;
   }
 }

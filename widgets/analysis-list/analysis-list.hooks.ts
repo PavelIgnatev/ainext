@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useDebounce } from 'use-debounce';
 import type { Analysis } from '@/@types/Analysis';
-import { getAnalysis } from '@/db/analysis';
+import { getAnalysis } from '@/actions/db/analysis';
 
 const ITEMS_PER_PAGE = 20;
 const DEBOUNCE_DELAY = 300;

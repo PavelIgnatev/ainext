@@ -120,9 +120,7 @@
   width: 100%;
 }
 
-.datePicker :global(.ant-picker-input) > input {
-  font-size: 14px;
-}
+
 
 .clearDateButton {
   padding: 0;

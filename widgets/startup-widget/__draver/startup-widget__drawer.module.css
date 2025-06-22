@@ -1,0 +1,53 @@
+.drawerBody {
+  padding: 10px 20px 60px 20px !important;
+}
+
+/* Стили для disabled инпутов - делаем их похожими на обычные */
+.drawerBody :global(.ant-input[disabled]) {
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+  color: rgba(0, 0, 0, 0.88) !important;
+  cursor: text !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+}
+
+.drawerBody :global(.ant-input[disabled]:hover) {
+  border-color: #000000 !important;
+}
+
+.drawerBody :global(.ant-input[disabled]:focus) {
+  border-color: #000000 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+/* Медиазапросы для мобильных устройств */
+@media (max-width: 768px) {
+  .drawerBody :global(.ant-col) {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+  
+  .drawerBody :global(.ant-row) {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  .drawerBody :global(.ant-col) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .drawerBody {
+    padding: 10px 10px 60px 10px !important;
+  }
+  
+  .drawerBody :global(.ant-form-item) {
+    margin-bottom: 16px !important;
+  }
+} 
+

@@ -1,69 +1,75 @@
-import { notification } from 'antd';
+'use client';
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 
-import FrontendAnalysisApi from '../../api/frontend/analysis';
+import type { Analysis } from '@/@types/Analysis';
+import { useNotifications } from '@/hooks/useNotifications';
+
 import { AnalysisUpdate } from './analysis-update';
+import { updateAnalysis } from '@/actions/db/analysis';
+import { getGreeting } from '@/utils/getGreeting';
 
-type analysisUpdateData = {
-  aiRole: string;
-  companyName: string;
-  companyDescription: string;
-  goal: string;
-  messagesCount: number;
-  language: 'ENGLISH' | 'RUSSIAN' | 'UKRAINIAN';
+interface AnalysisUpdateContainerProps {
+  analysis: Analysis | null;
 
-  addedInformation?: string;
-  styleGuide?: string;
-  addedQuestion?: string;
-  flowHandling?: string;
-  part?: string;
-  firstQuestion?: string;
-};
-
-type analysisUpdateContainerProps = {
-  initialValues: analysisUpdateData;
-  companyId: string;
-};
-
-const errorText = 'Неизвестная ошибка, попробуйте еще раз.';
-const validationErrorText =
-  'Ошибка валидации. Проверьте, пожалуйста, заполненные поля.';
+  className?: string;
+}
 
 export const AnalysisUpdateContainer = (
-  props: analysisUpdateContainerProps
+  props: AnalysisUpdateContainerProps
 ) => {
+  const { analysis = null, className } = props;
   const router = useRouter();
-  const [api, contextHolder] = notification.useNotification();
-  const companyId = props.companyId;
-  const toastError = useCallback((description: string) => {
-    api['error']({
-      message: 'Произошла ошибка.',
-      description,
-    });
-  }, []);
+  const { showError, showSuccess, contextHolder } = useNotifications();
 
-  const {
-    mutate: analysisUpdateMutation,
-    isLoading: analysisUpdateMutationLoading,
-  } = useMutation(
-    (data: analysisUpdateData) =>
-      FrontendAnalysisApi.updateAnalysis({ ...data, companyId }),
-    {
-      onSuccess: () => router.reload(),
-      onError: () => toastError(errorText),
-    }
-  );
+  const { mutate: handleUpdate, isPending: isCreateLoading } = useMutation({
+    mutationFn: (data: Omit<Analysis, 'dialogs' | 'companyId'>) => {
+      const randomCompanyId = String(Math.random()).substring(2, 12);
+      const analysisData: Analysis = {
+        ...data,
+        companyId: analysis?.companyId || randomCompanyId,
+        dialogs: analysis?.dialogs || [
+          [
+            {
+              role: 'assistant',
+              content: getGreeting(data.language, data.userName),
+            },
+            {
+              role: 'assistant',
+              content: data.firstQuestion,
+            },
+          ],
+        ],
+      };
+
+      return updateAnalysis(analysisData);
+    },
+    onSuccess: (id) => {
+      if (!analysis?.companyId) {
+        router.push(`/analysis/${id}`);
+      } else {
+        showSuccess('Разбор успешно обновлен. Перезагружаем страницу...');
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
+      }
+    },
+    onError: () => showError('Неизвестная ошибка, попробуйте еще раз.'),
+  });
 
   return (
     <>
       {contextHolder}
       <AnalysisUpdate
-        initialValues={props.initialValues}
-        loading={analysisUpdateMutationLoading}
-        onFinish={analysisUpdateMutation}
-        onFinishFailed={() => toastError(validationErrorText)}
+        loading={isCreateLoading}
+        analysis={analysis}
+        onFinish={handleUpdate}
+        onFinishFailed={() =>
+          showError(
+            'Ошибка валидации. Проверьте, пожалуйста, заполненные поля.'
+          )
+        }
+        className={className}
       />
     </>
   );

@@ -1,57 +1,37 @@
-import { Typography } from 'antd';
+import React from 'react';
 
+import type { Analysis } from '@/@types/Analysis';
 import { AnalysisUpdateForm } from './__form/analysis-update__form';
 
+import classes from './analysis-update.module.css';
+
 interface AnalysisUpdateProps {
-  initialValues: {
-    companyName: string;
-    aiRole: string;
-    companyDescription: string;
-    goal: string;
-    language: 'ENGLISH' | 'RUSSIAN' | 'UKRAINIAN';
+  loading: boolean;
+  analysis: Analysis | null;
 
-    styleGuide?: string;
-    addedQuestion?: string;
-    flowHandling?: string;
-    part?: string;
-    firstQuestion?: string;
-  };
-  loading?: boolean;
+  className?: string;
 
-  onFinish: (data: {
-    aiRole: string;
-    companyName: string;
-    companyDescription: string;
-    goal: string;
-    messagesCount: number;
-    language: 'ENGLISH' | 'RUSSIAN' | 'UKRAINIAN';
-
-    addedInformation?: string;
-    styleGuide?: string;
-    addedQuestion?: string;
-    flowHandling?: string;
-    part?: string;
-    firstQuestion?: string;
-  }) => void;
+  onFinish: (data: Omit<Analysis, 'dialogs' | 'companyId'>) => void;
   onFinishFailed: () => void;
 }
 
 export const AnalysisUpdate = (props: AnalysisUpdateProps) => {
-  const { loading = false, onFinish, onFinishFailed, initialValues } = props;
+  const {
+    loading = false,
+    analysis = null,
+    onFinish,
+    onFinishFailed,
+    className,
+  } = props;
 
   return (
-    <div>
-      <Typography.Title
-        level={1}
-        style={{ margin: '1em 0', textAlign: 'center' }}
-      >
-        Изменение разбора под компанию
-      </Typography.Title>
+    <div className={classes.AnalysisUpdate}>
       <AnalysisUpdateForm
-        initialValues={initialValues}
         loading={loading}
+        analysis={analysis}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
+        className={className}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import { ysText } from '@/assets/fonts';
 import Providers from './providers';
 
 import '@/assets/normalize.css';
+import '@/assets/antd-overrides.css';
 
 dotenvConfig();
 

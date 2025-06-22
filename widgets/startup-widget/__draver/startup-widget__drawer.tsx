@@ -14,7 +14,8 @@ import React from 'react';
 
 import { checkRandomString } from '@/utils/checkRandomString';
 import { GroupId } from '@/@types/GroupId';
-import { validateField } from '@/helpers/validateField';
+import { validateField } from '@/utils/validateField';
+import styles from './startup-widget__drawer.module.css';
 
 const { Option } = Select;
 
@@ -217,24 +218,28 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
 
   return (
     <Drawer
-      title={`${!groupIdData ? 'Создание' : 'Обновление'} запуска`}
+      title={
+        loading ? (
+          <Spin spinning={loading} />
+        ) : (
+          `${!groupIdData ? 'Создание' : 'Обновление'} запуска`
+        )
+      }
       width={820}
       onClose={onCloseDrawer}
       open={Boolean(groupId)}
-      styles={{
-        body: {
-          paddingBottom: 80,
-        },
+      classNames={{
+        body: styles.drawerBody,
       }}
       extra={
         <Space>
           <Button loading={loading} onClick={handleSubmit} type="primary">
-            {!groupIdData ? 'Создать' : 'Обновить'}
+            {loading ? '' : !groupIdData ? 'Создать' : 'Обновить'}
           </Button>
         </Space>
       }
     >
-      <Spin spinning={loading}>
+      <Spin spinning={loading} style={{ marginTop: '50px' }}>
         {!loading && groupId && (
           <Form
             form={form}
@@ -463,7 +468,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
               <Col span={24}>
                 <Form.Item
                   name="addedInformation"
-                  label="Дополнительная информация (появляется на этапе целевого действия)"
+                  label="Дополнительная информация"
                 >
                   <Input.TextArea rows={1} />
                 </Form.Item>

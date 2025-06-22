@@ -1,0 +1,783 @@
+/* 
+ * Глобальные стили для Ant Design компонентов
+ * Строгая черно-белая минималистичная тема
+ */
+
+/* =============== DRAWER СТИЛИ =============== */
+.ant-drawer-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+.ant-drawer-title {
+  color: #000000 !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+}
+
+.ant-drawer-close {
+  color: #000000 !important;
+  font-size: 16px !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-drawer-close:hover {
+  color: #ffffff !important;
+  background-color: #000000 !important;
+}
+
+.ant-drawer-body {
+  background: #ffffff !important;
+  padding: 0 !important;
+}
+
+.ant-drawer-content {
+  background: #ffffff !important;
+}
+
+.ant-drawer-content-wrapper {
+  overflow: hidden !important;
+}
+
+/* =============== КНОПКИ СТИЛИ =============== */
+.ant-btn-primary {
+  background: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-btn-primary:hover {
+  background: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+
+
+.ant-btn-primary:disabled {
+  background: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.ant-btn {
+  border: 1px solid #000000 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-btn:hover {
+  border-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+
+
+.ant-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.ant-btn-dashed {
+  border: 1px solid #000000 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-btn-dashed:hover {
+  border-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.ant-btn-dashed:active {
+  border-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.ant-btn-dashed:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+/* =============== ФОРМЫ СТИЛИ =============== */
+.ant-form-item-label > label {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+.ant-input {
+  border: 1px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-input:hover {
+  border-color: #000000 !important;
+}
+
+.ant-input:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ant-input:disabled {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+  opacity: 0.5 !important;
+}
+
+.ant-input-prefix {
+  color: #000000 !important;
+}
+
+/* =============== TEXTAREA СТИЛИ =============== */
+.ant-input.ant-input-textarea {
+  border: 1px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-input.ant-input-textarea:hover {
+  border-color: #000000 !important;
+}
+
+.ant-input.ant-input-textarea:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* =============== INPUT AFFIX WRAPPER СТИЛИ =============== */
+.ant-input-affix-wrapper {
+  border: 1px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  transition: all 0.2s ease !important;
+  padding: 4px 11px !important;
+}
+
+.ant-input-affix-wrapper:hover {
+  border-color: #000000 !important;
+}
+
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ant-input-affix-wrapper .ant-input {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: #000000 !important;
+  padding: 0 !important;
+}
+
+.ant-input-affix-wrapper .ant-input:focus {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.ant-input-affix-wrapper .ant-input-prefix {
+  color: #000000 !important;
+  margin-right: 8px !important;
+}
+
+/* =============== SELECT СТИЛИ =============== */
+.ant-select .ant-select-selector {
+  border: 1px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-select:hover .ant-select-selector {
+  border-color: #000000 !important;
+}
+
+.ant-select:focus .ant-select-selector,
+.ant-select-focused .ant-select-selector,
+.ant-select-open .ant-select-selector {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ant-select-selection-item {
+  color: #000000 !important;
+}
+
+.ant-select-selection-placeholder {
+  color: #000000 !important;
+  opacity: 0.6 !important;
+}
+
+.ant-select-arrow {
+  color: #000000 !important;
+}
+
+.ant-select-dropdown {
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ant-select-item {
+  color: #000000 !important;
+  background: #ffffff !important;
+}
+
+.ant-select-item:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.ant-select-item-option-selected {
+  background: #000000 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.ant-select-item-option-selected:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* =============== LIST СТИЛИ =============== */
+.ant-list-item {
+  border-bottom: 1px solid #000000 !important;
+  padding: 12px 16px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.ant-list-item:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.ant-list-item-meta-title {
+  color: #000000 !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+}
+
+.ant-list-item-meta-description {
+  color: #000000 !important;
+  font-size: 13px !important;
+}
+
+.ant-list-item:hover .ant-list-item-meta-title,
+.ant-list-item:hover .ant-list-item-meta-description {
+  color: #ffffff !important;
+}
+
+/* =============== TABLE СТИЛИ =============== */
+.ant-table {
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
+  border-radius: 8px !important;
+}
+
+.ant-table-thead > tr > th {
+  background: #000000 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid #000000 !important;
+}
+
+.ant-table-tbody > tr > td {
+  border-bottom: 1px solid #000000 !important;
+  color: #000000 !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.ant-table-row-selected > td {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* =============== PAGINATION СТИЛИ =============== */
+.ant-pagination-item {
+  border: 1px solid #000000 !important;
+  background: #ffffff !important;
+}
+
+.ant-pagination-item:hover {
+  border-color: #000000 !important;
+  background: #000000 !important;
+}
+
+.ant-pagination-item:hover a {
+  color: #ffffff !important;
+}
+
+.ant-pagination-item-active {
+  background: #000000 !important;
+  border-color: #000000 !important;
+}
+
+.ant-pagination-item-active a {
+  color: #ffffff !important;
+}
+
+.ant-pagination-prev:hover .ant-pagination-item-link,
+.ant-pagination-next:hover .ant-pagination-item-link {
+  color: #ffffff !important;
+  border-color: #000000 !important;
+  background: #000000 !important;
+}
+
+/* =============== PROGRESS СТИЛИ =============== */
+.ant-progress-circle-trail {
+  stroke: #ffffff !important;
+}
+
+.ant-progress-circle-path {
+  stroke: #000000 !important;
+}
+
+.ant-progress-bg {
+  background: #000000 !important;
+}
+
+/* =============== PICKER СТИЛИ =============== */
+.ant-picker-input > input {
+  color: #000000 !important;
+}
+
+.ant-picker {
+  border: 1px solid #000000 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+}
+
+.ant-picker:hover {
+  border-color: #000000 !important;
+}
+
+.ant-picker:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* =============== MODAL СТИЛИ =============== */
+.ant-modal-content {
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  border: 1px solid #000000 !important;
+}
+
+.ant-modal-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #000000 !important;
+}
+
+.ant-modal-title {
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+.ant-modal-close {
+  color: #000000 !important;
+}
+
+.ant-modal-close:hover {
+  color: #ffffff !important;
+  background: #000000 !important;
+}
+
+.ant-modal-body {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.ant-modal-footer {
+  background: #ffffff !important;
+  border-top: 1px solid #000000 !important;
+}
+
+/* =============== NOTIFICATION СТИЛИ =============== */
+.ant-notification {
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ant-notification-notice-message {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+.ant-notification-notice-description {
+  color: #000000 !important;
+}
+
+.ant-notification-notice-close {
+  color: #000000 !important;
+}
+
+.ant-notification-notice-close:hover {
+  color: #ffffff !important;
+  background: #000000 !important;
+}
+
+/* =============== MESSAGE СТИЛИ =============== */
+.ant-message-notice-content {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+}
+
+/* =============== TOOLTIP СТИЛИ =============== */
+.ant-tooltip-inner {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-radius: 4px !important;
+}
+
+.ant-tooltip-arrow {
+  border-top-color: #000000 !important;
+}
+
+/* =============== POPOVER СТИЛИ =============== */
+.ant-popover-inner {
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ant-popover-title {
+  color: #000000 !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid #000000 !important;
+}
+
+.ant-popover-inner-content {
+  color: #000000 !important;
+}
+
+/* =============== POPCONFIRM КНОПКИ СТИЛИ =============== */
+.ant-popconfirm-buttons .ant-btn {
+  border: 1px solid #000000 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+.ant-popconfirm-buttons .ant-btn:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+
+
+.ant-popconfirm-buttons .ant-btn:active {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+.ant-popconfirm-buttons .ant-btn-primary {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+.ant-popconfirm-buttons .ant-btn-primary:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+
+
+.ant-popconfirm-buttons .ant-btn-primary:active {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* =============== TABS СТИЛИ =============== */
+.ant-tabs-tab {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+.ant-tabs-tab:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.ant-tabs-tab-active {
+  color: #000000 !important;
+}
+
+.ant-tabs-ink-bar {
+  background: #000000 !important;
+}
+
+.ant-tabs-content-holder {
+  background: #ffffff !important;
+}
+
+/* =============== CHECKBOX СТИЛИ =============== */
+.ant-checkbox-wrapper {
+  color: #000000 !important;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+.ant-checkbox:hover .ant-checkbox-inner {
+  border-color: #000000 !important;
+}
+
+.ant-checkbox-input:focus + .ant-checkbox-inner {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* =============== RADIO СТИЛИ =============== */
+.ant-radio-wrapper {
+  color: #000000 !important;
+}
+
+.ant-radio-checked .ant-radio-inner {
+  border-color: #000000 !important;
+}
+
+.ant-radio-checked .ant-radio-inner::after {
+  background-color: #000000 !important;
+}
+
+.ant-radio:hover .ant-radio-inner {
+  border-color: #000000 !important;
+}
+
+.ant-radio-input:focus + .ant-radio-inner {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* =============== SWITCH СТИЛИ =============== */
+.ant-switch-checked {
+  background-color: #000000 !important;
+}
+
+.ant-switch:hover:not(.ant-switch-disabled) {
+  background-color: #000000 !important;
+}
+
+.ant-switch:focus {
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* =============== SLIDER СТИЛИ =============== */
+.ant-slider-track {
+  background-color: #000000 !important;
+}
+
+.ant-slider-handle {
+  border: 2px solid #000000 !important;
+  background-color: #ffffff !important;
+}
+
+.ant-slider-handle:hover {
+  border-color: #000000 !important;
+}
+
+.ant-slider-handle:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* =============== RATE СТИЛИ =============== */
+.ant-rate-star {
+  color: #ffffff !important;
+}
+
+.ant-rate-star-focused,
+.ant-rate-star-full {
+  color: #000000 !important;
+}
+
+.ant-rate-star:hover {
+  color: #000000 !important;
+}
+
+/* =============== ОБЩИЕ СТИЛИ ДЛЯ УБИРАНИЯ СИНИХ ЦВЕТОВ =============== */
+*:focus {
+  outline: none !important;
+}
+
+/* Убираем все возможные синие цвета */
+.ant-btn:focus,
+.ant-btn:active,
+.ant-input:focus,
+.ant-select:focus,
+.ant-picker:focus,
+.ant-checkbox-input:focus,
+.ant-radio-input:focus,
+.ant-switch:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* =============== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ТЕМЫ =============== */
+.ant-spin-dot-item {
+  background-color: #000000 !important;
+}
+
+.ant-empty-description {
+  color: #000000 !important;
+}
+
+.ant-divider {
+  border-color: #000000 !important;
+}
+
+.ant-card {
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
+  border-radius: 8px !important;
+}
+
+.ant-card-head {
+  background: #000000 !important;
+  border-bottom: 1px solid #000000 !important;
+}
+
+.ant-card-head-title {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.ant-card-body {
+  color: #000000 !important;
+}
+
+/* =============== ДОПОЛНИТЕЛЬНЫЕ ПРАВИЛА ДЛЯ HOVER/ACTIVE ТЕКСТА =============== */
+.ant-btn:hover,
+.ant-btn-primary:hover,
+.ant-btn-dashed:hover,
+.ant-btn:active,
+.ant-btn-primary:active,
+.ant-btn-dashed:active,
+.ant-btn:hover span,
+.ant-btn-primary:hover span,
+.ant-btn-dashed:hover span,
+.ant-btn:active span,
+.ant-btn-primary:active span,
+.ant-btn-dashed:active span,
+.ant-btn:hover *,
+.ant-btn-primary:hover *,
+.ant-btn-dashed:hover *,
+.ant-btn:active *,
+.ant-btn-primary:active *,
+.ant-btn-dashed:active * {
+  color: #ffffff !important;
+}
+
+.ant-select-item:hover,
+.ant-select-item:hover *,
+.ant-list-item:hover,
+.ant-list-item:hover *,
+.ant-table-tbody > tr:hover > td,
+.ant-table-tbody > tr:hover > td *,
+.ant-pagination-item:hover,
+.ant-pagination-item:hover *,
+.ant-tabs-tab:hover,
+.ant-tabs-tab:hover * {
+  color: #ffffff !important;
+}
+
+/* =============== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ POPCONFIRM КНОПОК =============== */
+.ant-popover .ant-popconfirm-buttons .ant-btn,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+
+.ant-popover .ant-popconfirm-buttons .ant-btn:hover,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn:hover,
+.ant-popover .ant-popconfirm-buttons .ant-btn:active,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn:active {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+.ant-popover .ant-popconfirm-buttons .ant-btn-primary,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn-primary {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+.ant-popover .ant-popconfirm-buttons .ant-btn-primary:hover,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn-primary:hover,
+.ant-popover .ant-popconfirm-buttons .ant-btn-primary:active,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn-primary:active {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+/* Усиленные правила для всех дочерних элементов */
+.ant-popover .ant-popconfirm-buttons .ant-btn *,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn * {
+  color: inherit !important;
+}
+
+.ant-popover .ant-popconfirm-buttons .ant-btn:hover *,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn:hover *,
+.ant-popover .ant-popconfirm-buttons .ant-btn:active *,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn:active *,
+.ant-popover .ant-popconfirm-buttons .ant-btn-primary *,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn-primary *,
+.ant-popover .ant-popconfirm-buttons .ant-btn-primary:hover *,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn-primary:hover *,
+.ant-popover .ant-popconfirm-buttons .ant-btn-primary:active *,
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn-primary:active * {
+  color: #ffffff !important;
+}

@@ -8,7 +8,6 @@ export const checkRandomString = (template: string): Promise<void> => {
     let openBraces = 0;
     let totalCombinations = 1;
 
-    // Проверка на корректность фигурных скобок
     for (let i = 0; i < template.length; i++) {
       if (template[i] === '{') {
         openBraces++;
@@ -31,7 +30,6 @@ export const checkRandomString = (template: string): Promise<void> => {
     const regexBetweenBraces = /}(.*?)\{/g;
     let matchBetweenBraces;
 
-    // Проверка текста между подстановками
     while ((matchBetweenBraces = regexBetweenBraces.exec(template)) !== null) {
       const braces = matchBetweenBraces[1].replace(/[.,?!;()]/g, ' ').trim();
       const wBraces = braces.replace(/ /g, '');
@@ -43,7 +41,7 @@ export const checkRandomString = (template: string): Promise<void> => {
       }
     }
 
-    const optionsLengthArray: any = []; // Массив массивов для длин элементов в скобках
+    const optionsLengthArray: any = [];
 
     while ((match = regex.exec(template)) !== null) {
       const braces = template

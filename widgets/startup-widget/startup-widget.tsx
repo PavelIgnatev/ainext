@@ -1,8 +1,10 @@
-import { Button, Typography, Input } from 'antd';
+import { Button, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 import { StartupWidgetDrawer } from './__draver/startup-widget__drawer';
 import { StartupWidgetTable } from './__table/startup-widget__table';
+import { StartupWidgetLoading } from './__loading/startup-widget__loading';
+import { Title } from '@/components/title/title';
 import classes from './startup-widget.module.css';
 import { GroupId } from '@/@types/GroupId';
 
@@ -55,16 +57,14 @@ export const StartupWidget = (props: StartupWidgetProps) => {
     onSearchGroupId,
   } = props;
 
+  if (groupIdsloading) {
+    return <StartupWidgetLoading />;
+  }
+
   return (
     <div className={classes.startupWidget}>
       <div className={classes.startupWidgetWrapper}>
-        <Typography.Title
-          level={1}
-          style={{ margin: '0' }}
-          className={classes.head}
-        >
-          Запуски 🚀
-        </Typography.Title>
+        <Title className={classes.head}>Запуски 🚀</Title>
 
         <div className={classes.searchAndButtonWrapper}>
           <Input
@@ -78,20 +78,21 @@ export const StartupWidget = (props: StartupWidgetProps) => {
           <Button
             type="primary"
             size="middle"
+            className={classes.createButton}
             onClick={() =>
               onClickGroupId(
                 String(Math.floor(Math.random() * 10 ** 10) + 10 ** 10)
               )
             }
           >
-            Создать
+            Создать запуск
           </Button>
         </div>
       </div>
 
       <StartupWidgetTable
         groupIds={groupIds}
-        loading={groupIdsloading}
+        loading={false}
         onClickGroupId={onClickGroupId}
       />
       <StartupWidgetDrawer
