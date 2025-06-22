@@ -55,8 +55,8 @@
 }
 
 .submitBtn:hover {
-  background-color: #1f2937  !important;
-  border-color: #1f2937  !important;
+  background-color: #1f2937 !important;
+  border-color: #1f2937 !important;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(31, 41, 55, 0.15) !important;
 }
