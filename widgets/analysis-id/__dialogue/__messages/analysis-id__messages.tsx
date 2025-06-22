@@ -26,7 +26,7 @@ export const AnalysisIdMessages: React.FC<AnalysisIdMessagesProps> = ({
             message={message}
           />
         ))}
-        {messageLoading && <AnalysisIdTypingIndicator authorName="Менеджер" />}
+        {messageLoading && <AnalysisIdTypingIndicator />}
       </div>
     </div>
   );

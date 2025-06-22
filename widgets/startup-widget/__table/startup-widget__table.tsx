@@ -25,7 +25,7 @@ const columnHelper = createColumnHelper<SmallGroupId>();
 
 export const StartupWidgetTable = (props: StartupWidgetProps) => {
   const { loading, groupIds, onClickGroupId } = props;
-
+  console.log(groupIds);
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const pageSize = 10;
 
@@ -196,7 +196,11 @@ export const StartupWidgetTable = (props: StartupWidgetProps) => {
       {/* Пагинация */}
       <div className={classes.pagination}>
         <div className={classes.paginationInfo}>
-          Показано {table.getState().pagination.pageIndex * pageSize + 1}-
+          Показано{' '}
+          {groupIds.length > 0
+            ? table.getState().pagination.pageIndex * pageSize + 1
+            : 0}
+          -
           {Math.min(
             (table.getState().pagination.pageIndex + 1) * pageSize,
             groupIds.length
