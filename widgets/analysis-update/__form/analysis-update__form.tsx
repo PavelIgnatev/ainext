@@ -1,8 +1,7 @@
-import { Button, Col, Form, Input, Row, Select, notification } from 'antd';
+import { Button, Col, Form, Input, Row, Select } from 'antd';
 import React, { useRef } from 'react';
 import type { Analysis } from '@/@types/Analysis';
 import { convertUndefinedToNull } from '@/utils/convertUndefinedToNull';
-import { validateField } from '@/utils/validateField';
 
 import classes from './analysis-update__form.module.css';
 
@@ -54,6 +53,8 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
         addedInformation: analysis.addedInformation,
         firstQuestion: analysis.firstQuestion,
         addedQuestion: analysis.addedQuestion,
+        leadDefinition: analysis.leadDefinition,
+        leadTargetAction: analysis.leadTargetAction,
       };
     }
 
@@ -68,103 +69,6 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
   };
 
   const handleFinish = (values: Omit<Analysis, 'dialogs' | 'companyId'>) => {
-    const {
-      aiRole,
-      goal,
-      companyDescription,
-
-      firstQuestion,
-      part,
-      addedQuestion,
-    } = values;
-
-    if (
-      part &&
-      !goal.toLowerCase().trim().includes(part.toLowerCase().trim())
-    ) {
-      notification.error({
-        message: 'Ошибка в поле "Уникальная часть"',
-        description: 'Значение не найдено внутри поля "Целевое действие"',
-      });
-      return;
-    }
-
-    const fieldValidations = [
-      {
-        value: aiRole,
-        name: 'Роль AI менеджера',
-        pattern: /[?!]/,
-        message: 'Поле содержит недопустимые символы: ? или !',
-      },
-      {
-        value: goal,
-        name: 'Целевое действие',
-        pattern: /[?!]/,
-        message: 'Поле содержит недопустимые символы: ? или !',
-      },
-      {
-        value: companyDescription,
-        name: 'Описание компании',
-        pattern: /[?!]/,
-        message: 'Поле содержит недопустимые символы: ? или !',
-      },
-      {
-        value: firstQuestion,
-        name: 'Первый вопрос',
-        pattern: /[!.:]/,
-        message: 'Поле содержит недопустимые символы: !, : или .',
-      },
-      {
-        value: addedQuestion,
-        name: 'Дополнительный вопрос',
-        pattern: /[!.:]/,
-        message: 'Поле содержит недопустимые символы: !, : или .',
-      },
-    ];
-
-    for (const validation of fieldValidations) {
-      if (
-        !validateField(
-          validation.value,
-          validation.name,
-          validation.pattern,
-          validation.message
-        )
-      ) {
-        return;
-      }
-    }
-
-    const questions = [
-      { value: firstQuestion, name: 'Первый вопрос' },
-      ...(addedQuestion
-        ? [{ value: addedQuestion, name: 'Дополнительный вопрос' }]
-        : []),
-    ];
-    const questionsWithoutMark = questions
-      .filter(({ value }) => value && !value.includes('?'))
-      .map(({ name }) => name);
-    if (questionsWithoutMark.length > 0) {
-      notification.error({
-        message: 'Отсутствует знак "?"',
-        description: `Добавьте знак "?" в следующих вопросах: ${questionsWithoutMark.join(', ')}`,
-      });
-      return;
-    }
-
-    if (part) {
-      const forbiddenEndings = ['.', '?', ',', '!'];
-      const lastChar = part.trim().slice(-1);
-      if (forbiddenEndings.includes(lastChar)) {
-        notification.error({
-          message: 'Ошибка в поле "Уникальная часть"',
-          description:
-            'Значение не должно заканчиваться на ".", "?", "," или "!"',
-        });
-        return;
-      }
-    }
-
     const processedValues = convertUndefinedToNull(values);
     onFinish(processedValues as Omit<Analysis, 'dialogs' | 'companyId'>);
   };
@@ -271,6 +175,7 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
             maxLength={1000}
             placeholder="Введите название компании"
             autoComplete="off"
+            showCount
           />
         </Form.Item>
         <Form.Item
@@ -284,6 +189,7 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
             maxLength={1000}
             placeholder="Представитель компании ..."
             autoComplete="off"
+            showCount
           />
         </Form.Item>
         <Form.Item
@@ -294,9 +200,10 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
         >
           <TextArea
             className={classes.textArea}
-            maxLength={30000}
+            maxLength={3000}
             placeholder="Компания занимается ..."
             autoComplete="off"
+            showCount
           />
         </Form.Item>
         <Form.Item
@@ -310,6 +217,35 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
             maxLength={1000}
             placeholder="Убедить собеседника перейти в информационного ..."
             autoComplete="off"
+            showCount
+          />
+        </Form.Item>
+        <Form.Item
+          className={classes.formItem}
+          label="Критерии лида"
+          name="leadDefinition"
+          rules={rules}
+        >
+          <TextArea
+            className={classes.textArea}
+            maxLength={1000}
+            placeholder="Собеседник согласился на ..."
+            autoComplete="off"
+            showCount
+          />
+        </Form.Item>
+        <Form.Item
+          className={classes.formItem}
+          label="Целевое действие при статусе лид"
+          name="leadTargetAction"
+          rules={rules}
+        >
+          <TextArea
+            className={classes.textArea}
+            maxLength={1000}
+            placeholder="Проверить, что время зума выбрано и ..."
+            autoComplete="off"
+            showCount
           />
         </Form.Item>
         <Form.Item
@@ -322,6 +258,7 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
             className={classes.textArea}
             maxLength={1000}
             autoComplete="off"
+            showCount
           />
         </Form.Item>
         <Form.Item
@@ -331,9 +268,10 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
         >
           <TextArea
             className={classes.textArea}
-            maxLength={50000}
+            maxLength={5000}
             placeholder="В случае, если .. то .."
             autoComplete="off"
+            showCount
           />
         </Form.Item>
         <Form.Item
@@ -343,9 +281,10 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
         >
           <TextArea
             className={classes.textArea}
-            maxLength={50000}
+            maxLength={5000}
             placeholder="Обьемное описание рода деятельности компании"
             autoComplete="off"
+            showCount
           />
         </Form.Item>
         <Form.Item
@@ -359,6 +298,7 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
             maxLength={1000}
             placeholder="Заметил вас в одном из совместных ..."
             autoComplete="off"
+            showCount
           />
         </Form.Item>
         <Form.Item
@@ -371,6 +311,7 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
             maxLength={1000}
             placeholder="Подскажите, вы знакомы с компанией?"
             autoComplete="off"
+            showCount
           />
         </Form.Item>
       </div>

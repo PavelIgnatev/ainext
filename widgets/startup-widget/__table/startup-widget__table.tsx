@@ -24,8 +24,8 @@ interface StartupWidgetProps {
 const columnHelper = createColumnHelper<SmallGroupId>();
 
 export const StartupWidgetTable = (props: StartupWidgetProps) => {
-  const { loading, groupIds, onClickGroupId } = props;
-  console.log(groupIds);
+  const { groupIds, onClickGroupId } = props;
+
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const pageSize = 10;
 

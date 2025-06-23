@@ -8,6 +8,8 @@ import { GroupId } from '@/@types/GroupId';
 import { getGroupId, getGroupIds, updateGroupId } from '@/actions/db/groupId';
 import { useNotifications } from '@/hooks/useNotifications';
 import { getGroupIdUsers, updateGroupIdUsers } from '@/actions/db/groupIdUsers';
+import { validateGroupId } from '@/validations/groupId';
+import { validateGroupIdUsers } from '@/validations/groupIdUsers';
 
 const DEBOUNCE_DELAY = 300;
 
@@ -100,6 +102,9 @@ export const StartupWidgetContainer = () => {
       data: GroupId;
       database: Array<string>;
     }) => {
+      validateGroupId(data);
+      validateGroupIdUsers(data.groupId, database);
+
       await updateGroupIdUsers(data.groupId, database);
       await updateGroupId(data);
     },
@@ -109,9 +114,8 @@ export const StartupWidgetContainer = () => {
       queryClient.invalidateQueries({ queryKey: ['groupIdDatabse', groupId] });
       queryClient.invalidateQueries({ queryKey: ['groupIds'] });
     },
-    onError: () => {
-      showError('Произошла ошибка. Обновите страницу и попробуйте снова.');
-    },
+    onError: (error) =>
+      showError(error instanceof Error ? error.message : 'Неизвестная ошибка'),
   });
 
   return (

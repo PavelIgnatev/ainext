@@ -2,34 +2,9 @@
 
 import type { Analysis } from '@/@types/Analysis';
 import { coreDB } from './db';
-import { z } from 'zod';
+import { validateAnalysis } from '@/validations/analysis';
 
 const DEFAULT_BATCH_SIZE = 20;
-
-const DialogMessageSchema = z.object({
-  role: z.enum(['assistant', 'user']),
-  content: z.string().min(1),
-});
-
-const AnalysisSchema = z.object({
-  companyId: z.string().optional(),
-  aiRole: z.string().min(1),
-  companyDescription: z.string().min(1),
-  companyName: z.string().min(1),
-  goal: z.string().min(1),
-  language: z.enum(['ENGLISH', 'RUSSIAN', 'UKRAINIAN']),
-  meName: z.string().min(1),
-  messagesCount: z.number().min(0),
-  meGender: z.string().min(1),
-  userName: z.string().min(1),
-  userGender: z.string().min(1),
-  firstQuestion: z.string().min(1),
-  dialogs: z.array(z.array(DialogMessageSchema)),
-  addedInformation: z.string().nullable(),
-  addedQuestion: z.string().nullable(),
-  flowHandling: z.string().nullable(),
-  part: z.string().nullable(),
-});
 
 export async function getAnalysis({
   offset = 0,
@@ -86,24 +61,13 @@ export async function updateAnalysis(data: Analysis) {
   const db = await coreDB();
   const collection = db.collection<Analysis>('analysis');
 
-  try {
-    AnalysisSchema.parse(data);
+  validateAnalysis(data);
 
-    await collection.updateOne(
-      { companyId: data.companyId },
-      { $set: data },
-      { upsert: true }
-    );
+  await collection.updateOne(
+    { companyId: data.companyId },
+    { $set: data },
+    { upsert: true }
+  );
 
-    return data.companyId;
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorMessages = error.errors
-        .map((err) => `${err.path.join('.')}: ${err.message}`)
-        .join(', ');
-      throw new Error(`VALIDATION_ERROR: ${errorMessages}`);
-    }
-
-    throw error;
-  }
+  return data.companyId;
 }

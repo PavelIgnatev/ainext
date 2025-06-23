@@ -2,6 +2,7 @@
 
 import { coreDB } from './db';
 import { GroupIdUsers } from '@/@types/GroupIdUsers';
+import { validateGroupIdUsers } from '@/validations/groupIdUsers';
 
 const filterDatabase = (database: string[]): string[] => {
   return [
@@ -50,6 +51,8 @@ export const updateGroupIdUsers = async (
   database: string[]
 ) => {
   try {
+    validateGroupIdUsers(groupId, database);
+
     const db = await coreDB();
     const collection = db.collection('groupIdUsers');
 

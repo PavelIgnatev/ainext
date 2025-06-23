@@ -15,10 +15,11 @@ export type GroupId = {
 
   language: 'ENGLISH' | 'RUSSIAN' | 'UKRAINIAN';
 
+  leadDefinition: string;
+  leadTargetAction: string;
+
   part: string | null;
   flowHandling: string | null;
   addedInformation: string | null;
   addedQuestion: string | null;
-
-  dateUpdated: Date;
 };

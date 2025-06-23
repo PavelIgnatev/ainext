@@ -10,6 +10,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { getAutoResponse } from '@/actions/llm/getAutoResponse';
 import { getGreeting } from '@/utils/getGreeting';
 import { checkAdmin } from '@/actions/admin/checkAdmin';
+import { validateAnalysis } from '@/validations/analysis';
 
 export const AnalysisIdContainer = () => {
   const router = useRouter();
@@ -46,6 +47,12 @@ export const AnalysisIdContainer = () => {
   const { mutate: autoResponseMutation, isPending: isAutoResponseLoading } =
     useMutation({
       mutationFn: async (dialogue: DialogMessage[]) => {
+        if (!analysisData) {
+          throw new Error('Данные разбора недоступны');
+        }
+
+        validateAnalysis(analysisData);
+
         const response = await getAutoResponse();
 
         const assistantMessage: DialogMessage = {
@@ -62,10 +69,6 @@ export const AnalysisIdContainer = () => {
           index === currentDialogId ? finalDialog : dialog
         );
 
-        if (!analysisData) {
-          throw new Error('Данные разбора недоступны для обновления');
-        }
-
         await updateAnalysis({
           ...analysisData,
           dialogs: finalDialogs,
@@ -74,7 +77,7 @@ export const AnalysisIdContainer = () => {
         return finalDialogs;
       },
       onSuccess: (dialogs) => setDialogs(dialogs),
-      onError: (error) => showError(`Ошибка: ${error.message}`),
+      onError: (error) => showError(error.message),
     });
 
   const updateUrlDialogId = useCallback(
@@ -122,7 +125,11 @@ export const AnalysisIdContainer = () => {
         dialogs: updatedDialogs,
       });
     } catch (error) {
-      showError('Ошибка при создании нового диалога');
+      showError(
+        error instanceof Error
+          ? error.message
+          : 'Ошибка при создании нового диалога'
+      );
       return;
     }
 

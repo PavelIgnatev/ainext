@@ -54,7 +54,7 @@ export const AnalysisUpdateContainer = (
         }, 2500);
       }
     },
-    onError: () => showError('Неизвестная ошибка, попробуйте еще раз.'),
+    onError: (error) => showError(error.message),
   });
 
   return (

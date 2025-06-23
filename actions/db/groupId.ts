@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import { getClientIp } from 'request-ip';
 import { coreDB } from './db';
 import { Collection } from 'mongodb';
+import { validateGroupId } from '@/validations/groupId';
 
 export async function getGroupIds(search?: string) {
   try {
@@ -57,6 +58,8 @@ export async function getGroupId(gId: string): Promise<GroupId | null> {
 
 export async function updateGroupId(groupIdData: GroupId) {
   try {
+    validateGroupId(groupIdData);
+
     const headersList = await headers();
     const headersObj = Object.fromEntries(headersList.entries());
 

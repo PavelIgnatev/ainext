@@ -21,6 +21,8 @@ export type Analysis = {
   flowHandling: string | null;
   addedInformation: string | null;
   addedQuestion: string | null;
+  leadDefinition: string;
+  leadTargetAction: string;
 
   dialogs: DialogMessage[][];
 };

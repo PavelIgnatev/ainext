@@ -12,17 +12,11 @@ import {
 } from 'antd';
 import React from 'react';
 
-import { checkRandomString } from '@/utils/checkRandomString';
 import { GroupId } from '@/@types/GroupId';
-import { validateField } from '@/utils/validateField';
+
 import styles from './startup-widget__drawer.module.css';
 
 const { Option } = Select;
-
-const EXCLUDED_GROUP_IDS = [
-  '13529023516',
-  '15141603549-prefix-ukraine-documents',
-];
 
 interface StartupWidgetDrawerProps {
   loading: boolean;
@@ -61,157 +55,38 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
     try {
       const values = await form.validateFields();
 
-      const {
-        groupId,
-        name,
-        target,
-        currentCount,
-        messagesCount,
-        language,
-        aiRole,
-        goal,
-        part,
-        secondMessagePrompt,
-        addedQuestion,
-        companyDescription,
-        flowHandling,
-        addedInformation,
-        firstMessagePrompt,
-      } = values;
-
-      if (
-        part &&
-        !goal.toLowerCase().trim().includes(part.toLowerCase().trim())
-      ) {
-        notification.error({
-          message: 'Ошибка в поле "Уникальная часть"',
-          description: 'Значение не найдено внутри поля "Целевое действие"',
-        });
-        return;
-      }
-
-      const fieldValidations = [
-        {
-          value: aiRole,
-          name: 'Роль AI менеджера',
-          pattern: /[?!]/,
-          message: 'Поле содержит недопустимые символы: ? или !',
-        },
-        {
-          value: goal,
-          name: 'Целевое действие',
-          pattern: /[?!]/,
-          message: 'Поле содержит недопустимые символы: ? или !',
-        },
-        {
-          value: companyDescription,
-          name: 'Описание компании',
-          pattern: /[?!]/,
-          message: 'Поле содержит недопустимые символы: ? или !',
-        },
-        {
-          value: firstMessagePrompt,
-          name: 'Первое приветствие',
-          pattern: /[?:]/,
-          message: 'Поле содержит недопустимые символы: ? или :',
-        },
-        {
-          value: secondMessagePrompt,
-          name: 'Первый вопрос',
-          pattern: /[!.:]/,
-          message: 'Поле содержит недопустимые символы: !, : или .',
-        },
-        {
-          value: addedQuestion,
-          name: 'Дополнительный вопрос',
-          pattern: /[!.:]/,
-          message: 'Поле содержит недопустимые символы: !, : или .',
-        },
-      ];
-
-      for (const validation of fieldValidations) {
-        if (
-          !validateField(
-            validation.value,
-            validation.name,
-            validation.pattern,
-            validation.message
-          )
-        ) {
-          return;
-        }
-      }
-
-      const questions = [
-        { value: secondMessagePrompt, name: 'Первый вопрос' },
-        ...(addedQuestion
-          ? [{ value: addedQuestion, name: 'Дополнительный вопрос' }]
-          : []),
-      ];
-
-      const questionsWithoutMark = questions
-        .filter(({ value }) => !value.includes('?'))
-        .map(({ name }) => name);
-
-      if (questionsWithoutMark.length > 0) {
-        notification.error({
-          message: 'Отсутствует знак "?"',
-          description: `Добавьте знак "?" в следующих вопросах: ${questionsWithoutMark.join(', ')}`,
-        });
-        return;
-      }
-
-      const numericFields = {
-        'Целевое значение отправок': target,
-        'Текущее значение отправок': currentCount,
-        'Количество сообщений': messagesCount,
-      };
-
-      const invalidNumericFields = Object.entries(numericFields)
-        .filter(([_, value]) => isNaN(Number(value)) || Number(value) < 0)
-        .map(([fieldName]) => fieldName);
-
-      if (invalidNumericFields.length > 0) {
-        notification.error({
-          message: 'Некорректные числовые значения',
-          description: `Следующие поля должны быть положительными числами: ${invalidNumericFields.join(', ')}`,
-        });
-        return;
-      }
-
-      if (!['ENGLISH', 'RUSSIAN', 'UKRAINIAN'].includes(language)) {
-        notification.error({
-          message: 'Ошибка в поле "Язык"',
-          description:
-            'Выберите корректный язык: ENGLISH, RUSSIAN или UKRAINIAN',
-        });
-        return;
-      }
-
       const data: GroupId = {
-        groupId,
-        name,
-        target: Number(target),
-        currentCount: Number(currentCount),
-        messagesCount: Number(messagesCount),
-        language,
-        aiRole,
-        companyDescription,
-        goal,
-        firstMessagePrompt,
-        secondMessagePrompt,
-        part: part?.trim() || null,
-        flowHandling: flowHandling?.trim() || null,
-        addedInformation: addedInformation?.trim() || null,
-        addedQuestion: addedQuestion?.trim() || null,
-        dateUpdated: new Date(),
+        groupId: values.groupId,
+        name: values.name,
+        target: Number(values.target),
+        currentCount: Number(values.currentCount),
+        messagesCount: Number(values.messagesCount),
+        language: values.language,
+        aiRole: values.aiRole,
+        companyDescription: values.companyDescription,
+        goal: values.goal,
+        leadDefinition: values.leadDefinition,
+        leadTargetAction: values.leadTargetAction,
+        firstMessagePrompt: values.firstMessagePrompt,
+        secondMessagePrompt: values.secondMessagePrompt,
+        part: values.part?.trim() || null,
+        flowHandling: values.flowHandling?.trim() || null,
+        addedInformation: values.addedInformation?.trim() || null,
+        addedQuestion: values.addedQuestion?.trim() || null,
       };
 
-      onSumbitDrawer({ data, database: values.database.split('\n') });
-    } catch {
+      const database = values.database
+        .split('\n')
+        .map((line: string) => line.trim())
+        .filter((line: string) => line.length > 0);
+
+      onSumbitDrawer({ data, database });
+    } catch (error) {
+      console.log(error);
       notification.error({
-        message: 'Ошибка в полях',
-        description: 'Проверьте правильность заполнения всех полей',
+        message: 'Ошибка при сохранении запуска',
+        description:
+          error instanceof Error ? error.message : 'Ошибка валидации',
       });
     }
   };
@@ -302,19 +177,6 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
                       required: true,
                       message: 'Обязательное поле',
                     },
-                    {
-                      validator: (_, value) => {
-                        const minValue = groupIdData?.currentCount ?? 0;
-                        if (value !== undefined && value < minValue) {
-                          return Promise.reject(
-                            new Error(
-                              `Текущее значение не может быть меньше, чем текущее значение отправок (${minValue})`
-                            )
-                          );
-                        }
-                        return Promise.resolve();
-                      },
-                    },
                   ]}
                   normalize={(v) => (v === '' ? null : Number(v))}
                 >
@@ -361,30 +223,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
                 <Form.Item
                   label="База данных"
                   name="database"
-                  rules={[
-                    { required: true, message: 'Обязательное поле' },
-                    {
-                      validator: (_, value) => {
-                        const lines = value
-                          .split('\n')
-                          .map((line: string) => line.trim())
-                          .filter(Boolean);
-                        const invalidCharacters = lines.filter((line: string) =>
-                          /[^a-zA-Z0-9_+]/.test(line)
-                        );
-                        if (invalidCharacters.length > 0) {
-                          return Promise.reject(
-                            new Error(
-                              `Некорректные юзернеймы: ${invalidCharacters.join(
-                                ', '
-                              )}. Проверьте, что в юзернеймах содержатся только английские буквы, цифры или символ подчеркивания (_). Каждый новый юзернейм должен находиться в отдельной строке.`
-                            )
-                          );
-                        }
-                        return Promise.resolve();
-                      },
-                    },
-                  ]}
+                  rules={[{ required: true, message: 'Обязательное поле' }]}
                 >
                   <Input.TextArea rows={6} />
                 </Form.Item>
@@ -431,30 +270,34 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
 
               <Col span={24}>
                 <Form.Item
+                  name="leadDefinition"
+                  label="Критерии лида"
+                  rules={[{ required: true, message: 'Обязательное поле' }]}
+                >
+                  <Input.TextArea
+                    rows={1}
+                    placeholder="Человек, который заинтересован в услуге..."
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col span={24}>
+                <Form.Item
+                  name="leadTargetAction"
+                  label="Целевое действие при статусе лид"
+                  rules={[{ required: true, message: 'Обязательное поле' }]}
+                >
+                  <Input.TextArea
+                    rows={1}
+                    placeholder="Отправить контакты менеджера..."
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col span={24}>
+                <Form.Item
                   name="part"
                   label="Уникальная часть (ссылка на бота, сайт, etc)"
-                  rules={[
-                    {
-                      validator: (_, value) => {
-                        if (!value) {
-                          return Promise.resolve();
-                        }
-
-                        const forbiddenEndings = ['.', '?', ',', '!'];
-                        const lastChar = value.trim().slice(-1);
-
-                        if (forbiddenEndings.includes(lastChar)) {
-                          return Promise.reject(
-                            new Error(
-                              'Значение не должно заканчиваться на ".", "?", "," или "!"'
-                            )
-                          );
-                        }
-
-                        return Promise.resolve();
-                      },
-                    },
-                  ]}
                 >
                   <Input placeholder="@aisenderOfficial_bot" />
                 </Form.Item>
@@ -488,22 +331,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
                 <Form.Item
                   name="secondMessagePrompt"
                   label="Первый вопрос"
-                  rules={[
-                    { required: true, message: 'Обязательное поле' },
-                    {
-                      validator: async (_, value) => {
-                        try {
-                          if (EXCLUDED_GROUP_IDS.includes(groupId)) {
-                            return Promise.resolve();
-                          }
-
-                          await checkRandomString(value);
-                        } catch (error) {
-                          return Promise.reject(error);
-                        }
-                      },
-                    },
-                  ]}
+                  rules={[{ required: true, message: 'Обязательное поле' }]}
                 >
                   <Input.TextArea
                     rows={1}
@@ -515,25 +343,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
 
             <Row gutter={16}>
               <Col span={24}>
-                <Form.Item
-                  name="addedQuestion"
-                  label="Дополнительный вопрос"
-                  rules={[
-                    {
-                      validator: async (_, value) => {
-                        try {
-                          if (EXCLUDED_GROUP_IDS.includes(groupId)) {
-                            return Promise.resolve();
-                          }
-
-                          await checkRandomString(value);
-                        } catch (error) {
-                          return Promise.reject(error);
-                        }
-                      },
-                    },
-                  ]}
-                >
+                <Form.Item name="addedQuestion" label="Дополнительный вопрос">
                   <Input.TextArea
                     rows={1}
                     placeholder="Подскажите, вы знакомы с компанией?"
