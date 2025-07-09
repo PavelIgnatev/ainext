@@ -148,8 +148,14 @@
   max-height: 2.6em !important;
 }
 
-.analysisListScrollable :global(.ant-list-item:hover) .meta :global(.ant-list-item-meta-title),
-.analysisListScrollable :global(.ant-list-item:hover) .meta :global(.ant-list-item-meta-description) {
+.analysisListScrollable
+  :global(.ant-list-item:hover)
+  .meta
+  :global(.ant-list-item-meta-title),
+.analysisListScrollable
+  :global(.ant-list-item:hover)
+  .meta
+  :global(.ant-list-item-meta-description) {
   color: #ffffff !important;
 }
 

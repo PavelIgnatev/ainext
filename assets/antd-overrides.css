@@ -47,7 +47,7 @@
   overflow: hidden !important;
 }
 
-@media  (max-width: 800px) {
+@media (max-width: 800px) {
   .ant-drawer-content-wrapper {
     width: 100% !important;
   }
