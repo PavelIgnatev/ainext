@@ -12,6 +12,7 @@ interface AnalysisListProps {
   >[];
   analysisLoading: boolean;
   hasMore: boolean;
+  loadingItemId?: string;
 
   onLoadMore: () => void;
   onSearch: (value: string) => void;
@@ -26,6 +27,7 @@ export const AnalysisList = (props: AnalysisListProps) => {
     onLoadMore,
     onAnalysisClick,
     onSearch,
+    loadingItemId,
   } = props;
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -94,12 +96,18 @@ export const AnalysisList = (props: AnalysisListProps) => {
             <List.Item
               key={String(item.companyId)}
               onClick={() => onAnalysisClick(item.companyId)}
+              className={`${classes.listItem} ${loadingItemId === item.companyId ? classes.loading : ''}`}
             >
               <List.Item.Meta
                 title={item.companyName}
                 description={item.companyDescription}
                 className={classes.meta}
               />
+              {loadingItemId === item.companyId && (
+                <div className={classes.itemLoadingOverlay}>
+                  <Skeleton.Input active size="small" />
+                </div>
+              )}
             </List.Item>
           )}
         />

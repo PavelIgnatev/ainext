@@ -8,9 +8,11 @@ import { AnalysisId } from '../analysis-id/analysis-id';
 import { getAnalysisById, updateAnalysis } from '@/actions/db/analysis';
 import { useNotifications } from '@/hooks/useNotifications';
 import { getAutoResponse } from '@/actions/llm/getAutoResponse';
+import { getDialogueAnalysis } from '@/actions/llm/getDialogueAnalysis';
+import { type DialogueAnalysisResult as LLMDialogueAnalysisResult } from '@/actions/llm/schemas/llmDialogueAnalysis';
 import { getGreeting } from '@/utils/getGreeting';
 import { checkAdmin } from '@/actions/admin/checkAdmin';
-import { validateAnalysis } from '@/validations/analysis';
+import { validateAnalysis } from '@/schemas/analysis';
 
 export const AnalysisIdContainer = () => {
   const router = useRouter();
@@ -53,13 +55,74 @@ export const AnalysisIdContainer = () => {
 
         validateAnalysis(analysisData);
 
-        const response = await getAutoResponse();
+        const isCurrentDialogLead = analysisData.leadDialogs?.[currentDialogId];
+        let analysisResult: LLMDialogueAnalysisResult | null = null;
 
-        const assistantMessage: DialogMessage = {
-          role: 'assistant',
-          content: response,
-        };
-        const finalDialog = [...dialogue, assistantMessage];
+        if (!isCurrentDialogLead) {
+          analysisResult = await getDialogueAnalysis(
+            {
+              leadDefinition: analysisData.leadDefinition,
+              language: analysisData.language,
+            },
+            {
+              llmParams: {
+                model: 'command-a-03-2025',
+                temperature: 0.1,
+                k: 1,
+                messages: dialogue,
+              },
+              onLogger: (logName, data) => {
+                console.log(`[${logName}]`, data);
+              },
+            }
+          );
+        }
+
+        const isLead = isCurrentDialogLead || analysisResult?.status === 'lead';
+
+        const response = await getAutoResponse(
+          {
+            aiRole: analysisData.aiRole,
+            companyDescription: analysisData.companyDescription,
+            companyName: analysisData.companyName,
+            goal: analysisData.goal,
+            language: analysisData.language,
+            meName: analysisData.meName,
+            messagesCount: analysisData.messagesCount,
+            meGender: analysisData.meGender,
+            userName: analysisData.userName,
+            userGender: analysisData.userGender,
+            firstQuestion: analysisData.firstQuestion,
+            leadGoal: analysisData.leadGoal,
+            part: analysisData.part,
+            flowHandling: analysisData.flowHandling,
+            addedInformation: analysisData.addedInformation,
+            addedQuestion: analysisData.addedQuestion,
+          },
+          {
+            options: { isLead },
+            llmParams: {
+              model: 'command-a-03-2025',
+              k: 30,
+              temperature: 1,
+              presence_penalty: 0.8,
+              p: 0.8,
+              messages: dialogue,
+            },
+            onError: (error) => showError(error),
+            onLogger: (logName, data) => {
+              console.log(`[${logName}]`, data);
+            },
+          }
+        );
+
+        const finalDialog = [
+          ...dialogue,
+          {
+            role: 'assistant' as const,
+            content: response,
+          },
+        ];
 
         if (!dialogs) {
           throw new Error('Диалоги не инициализированы');
@@ -69,9 +132,15 @@ export const AnalysisIdContainer = () => {
           index === currentDialogId ? finalDialog : dialog
         );
 
+        const updatedLeadDialogs = { ...analysisData.leadDialogs };
+        if (isLead && !isCurrentDialogLead) {
+          updatedLeadDialogs[currentDialogId] = true;
+        }
+
         await updateAnalysis({
           ...analysisData,
           dialogs: finalDialogs,
+          leadDialogs: updatedLeadDialogs,
         });
 
         return finalDialogs;

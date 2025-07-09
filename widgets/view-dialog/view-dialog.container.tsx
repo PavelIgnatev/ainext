@@ -1,3 +1,4 @@
+/*
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
@@ -35,7 +36,13 @@ function getFormattedDate() {
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   return dayjs(now).tz(userTimezone).format('DD-MM-YYYY_HH-mm-ss');
 }
+*/
 
+export const ViewDialogContainer = () => {
+  return <div>Компонент пока не работает</div>;
+};
+
+/*
 export const ViewDialogContainer = () => {
   const [groupId, setGroupId] = useState<string | null>(null);
   const [search, setSearch] = useState<string>('');
@@ -611,4 +618,4 @@ export const ViewDialogContainer = () => {
       groupId={groupId}
     />
   );
-};
+*/

@@ -1,26 +1,31 @@
 'use server';
 import { Db, MongoClient } from 'mongodb';
 
-import { delay } from '@/utils/sleep';
+import { sleep } from '@/utils/sleep';
 
 let client: MongoClient | null = null;
 let coreDatabase: Db | null = null;
 let isInitializing = false;
 
-async function tryConnect(attempt: number = 1): Promise<void> {
+async function tryConnect(attempt: number = 1) {
   const maxDelay = 30000;
   const baseDelay = 1000;
 
   try {
-    client = new MongoClient(String(process.env.DATABASE_URL), {
-      heartbeatFrequencyMS: 10000,
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      maxPoolSize: 10,
-      minPoolSize: 1,
-      retryWrites: true,
-    });
+    client = new MongoClient(
+      String(
+        'mongodb://gen_user:35B%3DR9GTC%5Cq.Xv@82.97.255.185:27017/core?authSource=admin&directConnection=true'
+      ),
+      {
+        heartbeatFrequencyMS: 10000,
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 10000,
+        socketTimeoutMS: 45000,
+        maxPoolSize: 10,
+        minPoolSize: 1,
+        retryWrites: true,
+      }
+    );
 
     client.on('serverHeartbeatSucceeded', () => {
       console.log('MONGO_HEARTBEAT_OK');
@@ -49,16 +54,16 @@ async function tryConnect(attempt: number = 1): Promise<void> {
 
     const waitTime = Math.min(Math.pow(2, attempt) * baseDelay, maxDelay);
     console.log(`DB_RETRYING_${waitTime / 1000}_SECONDS...`);
-    await delay(waitTime);
+    await sleep(waitTime);
 
     await tryConnect(attempt + 1);
   }
 }
 
-async function initializeConnection(): Promise<void> {
+async function initializeConnection() {
   if (isInitializing) {
     while (isInitializing) {
-      await delay(100);
+      await sleep(100);
     }
     return;
   }
@@ -100,7 +105,7 @@ async function ensureConnection(dbName: 'core'): Promise<Db> {
         coreDatabase = null;
       }
 
-      await delay(1000);
+      await sleep(1000);
     }
   }
 }

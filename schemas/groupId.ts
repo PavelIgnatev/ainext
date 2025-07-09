@@ -14,7 +14,7 @@ const GroupIdSchema = z.object({
   secondMessagePrompt: z.string().min(1),
   language: z.enum(['ENGLISH', 'RUSSIAN', 'UKRAINIAN']),
   leadDefinition: z.string().min(1),
-  leadTargetAction: z.string().min(1),
+  leadGoal: z.string().min(1),
   part: z.string().nullable(),
   flowHandling: z.string().nullable(),
   addedInformation: z.string().nullable(),
@@ -42,7 +42,7 @@ const FIELD_NAMES: Record<string, string> = {
   secondMessagePrompt: 'Первый вопрос',
   language: 'Язык',
   leadDefinition: 'Критерии лида',
-  leadTargetAction: 'Целевое действие при статусе лид',
+  leadGoal: 'Целевое действие при статусе лид',
   part: 'Уникальная часть',
   flowHandling: 'Обработка сценариев',
   addedInformation: 'Дополнительная информация',
@@ -72,7 +72,7 @@ const EXCLUDED_GROUP_IDS = [
   '15141603549-prefix-ukraine-documents',
 ];
 
-const checkRandomString = (template: string, fieldName?: string): void => {
+const checkRandomString = (template: string, fieldName?: string) => {
   if (!template) return;
 
   const fieldPrefix = fieldName ? `[${fieldName}] ` : '';
@@ -316,14 +316,14 @@ function validateField(
   fieldName: string,
   pattern: RegExp,
   errorMessage: string
-): void {
+) {
   if (!value) return;
   if (pattern.test(value)) {
     throw new Error(`Ошибка в поле "${fieldName}": ${errorMessage}`);
   }
 }
 
-function validateGroupIdFields(data: GroupId): void {
+function validateGroupIdFields(data: GroupId) {
   const {
     aiRole,
     goal,
@@ -332,7 +332,7 @@ function validateGroupIdFields(data: GroupId): void {
     secondMessagePrompt,
     addedQuestion,
     leadDefinition,
-    leadTargetAction,
+    leadGoal,
   } = data;
 
   const fieldValidations = [
@@ -361,7 +361,7 @@ function validateGroupIdFields(data: GroupId): void {
       message: VALIDATION_MESSAGES.FORBIDDEN_BASIC_SYMBOLS,
     },
     {
-      value: leadTargetAction,
+      value: leadGoal,
       name: 'Целевое действие при статусе лид',
       pattern: VALIDATION_PATTERNS.FORBIDDEN_BASIC_SYMBOLS,
       message: VALIDATION_MESSAGES.FORBIDDEN_BASIC_SYMBOLS,
@@ -399,7 +399,7 @@ function validateGroupIdFields(data: GroupId): void {
 function validateQuestionMarks(
   secondMessagePrompt: string,
   addedQuestion?: string | null
-): void {
+) {
   const questions = [
     { value: secondMessagePrompt, name: 'Первый вопрос' },
     ...(addedQuestion
@@ -418,7 +418,7 @@ function validateQuestionMarks(
   }
 }
 
-function validateUniquePart(part: string | null, goal: string): void {
+function validateUniquePart(part: string | null, goal: string) {
   if (!part) return;
 
   if (!goal.toLowerCase().trim().includes(part.toLowerCase().trim())) {
@@ -435,7 +435,7 @@ function validateUniquePart(part: string | null, goal: string): void {
   }
 }
 
-function validateNumericFields(data: GroupId): void {
+function validateNumericFields(data: GroupId) {
   const { target, currentCount, messagesCount } = data;
 
   const numericFields = {
@@ -461,7 +461,7 @@ function validateNumericFields(data: GroupId): void {
   }
 }
 
-function validateRandomStrings(data: GroupId): void {
+function validateRandomStrings(data: GroupId) {
   if (EXCLUDED_GROUP_IDS.includes(data.groupId)) {
     return;
   }
@@ -479,7 +479,7 @@ function validateRandomStrings(data: GroupId): void {
   }
 }
 
-export function validateGroupId(data: GroupId): void {
+export function validateGroupId(data: GroupId) {
   try {
     GroupIdSchema.parse(data);
   } catch (error) {

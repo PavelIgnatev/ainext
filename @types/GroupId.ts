@@ -16,7 +16,7 @@ export type GroupId = {
   language: 'ENGLISH' | 'RUSSIAN' | 'UKRAINIAN';
 
   leadDefinition: string;
-  leadTargetAction: string;
+  leadGoal: string;
 
   part: string | null;
   flowHandling: string | null;

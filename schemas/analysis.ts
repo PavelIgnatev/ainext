@@ -20,7 +20,7 @@ const AnalysisSchema = z.object({
   userGender: z.string().min(1),
   firstQuestion: z.string().min(1),
   leadDefinition: z.string().min(1),
-  leadTargetAction: z.string().min(1),
+  leadGoal: z.string().min(1),
   dialogs: z.array(z.array(DialogMessageSchema)),
   addedInformation: z.string().nullable(),
   addedQuestion: z.string().nullable(),
@@ -55,7 +55,7 @@ const FIELD_NAMES: Record<string, string> = {
   flowHandling: 'Обработка сценариев',
   part: 'Уникальная часть',
   leadDefinition: 'Критерии лида',
-  leadTargetAction: 'Целевое действие при статусе лид',
+  leadGoal: 'Целевое действие при статусе лид',
 };
 
 const VALIDATION_MESSAGES = {
@@ -104,14 +104,14 @@ function validateField(
   fieldName: string,
   pattern: RegExp,
   errorMessage: string
-): void {
+) {
   if (!value) return;
   if (pattern.test(value)) {
     throw new Error(`Ошибка в поле "${fieldName}": ${errorMessage}`);
   }
 }
 
-function validateAnalysisFields(data: Analysis): void {
+function validateAnalysisFields(data: Analysis) {
   const { aiRole, goal, companyDescription, firstQuestion, addedQuestion } =
     data;
 
@@ -161,7 +161,7 @@ function validateAnalysisFields(data: Analysis): void {
 function validateQuestionMarks(
   firstQuestion: string,
   addedQuestion?: string | null
-): void {
+) {
   const questions = [
     { value: firstQuestion, name: 'Первый вопрос' },
     ...(addedQuestion
@@ -180,7 +180,7 @@ function validateQuestionMarks(
   }
 }
 
-function validateUniquePart(part: string | null, goal: string): void {
+function validateUniquePart(part: string | null, goal: string) {
   if (!part) return;
 
   if (!goal.toLowerCase().trim().includes(part.toLowerCase().trim())) {
@@ -197,7 +197,7 @@ function validateUniquePart(part: string | null, goal: string): void {
   }
 }
 
-export function validateAnalysis(data: Analysis): void {
+export function validateAnalysis(data: Analysis) {
   try {
     AnalysisSchema.parse(data);
   } catch (error) {

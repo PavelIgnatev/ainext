@@ -1,9 +1,6 @@
 import { z } from 'zod';
 
-const GroupIdUsersSchema = z.object({
-  groupId: z.string().min(1),
-  database: z.array(z.string().min(1)),
-});
+const GroupIdUsersSchema = z.array(z.string().min(1));
 
 const VALIDATION_PATTERNS = {
   USERNAME_PATTERN: /^[a-zA-Z0-9_+]+$/,
@@ -17,7 +14,7 @@ const VALIDATION_MESSAGES = {
   SHORT_USERNAME: 'Юзернеймы должны содержать минимум 3 символа',
 } as const;
 
-function validateDatabase(database: Array<string>): void {
+function validateDatabase(database: Array<string>) {
   if (!database || database.length === 0) {
     throw new Error(VALIDATION_MESSAGES.EMPTY_DATABASE);
   }
@@ -50,12 +47,9 @@ function validateDatabase(database: Array<string>): void {
   }
 }
 
-export function validateGroupIdUsers(
-  groupId: string,
-  database: Array<string>
-): void {
+export function validateGroupIdUsers(database: Array<string>) {
   try {
-    GroupIdUsersSchema.parse({ groupId, database });
+    GroupIdUsersSchema.parse(database);
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new Error(
@@ -63,10 +57,6 @@ export function validateGroupIdUsers(
       );
     }
     throw error;
-  }
-
-  if (!groupId || groupId.trim().length === 0) {
-    throw new Error(VALIDATION_MESSAGES.INVALID_GROUP_ID);
   }
 
   validateDatabase(database);

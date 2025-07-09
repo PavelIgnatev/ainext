@@ -66,7 +66,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
         companyDescription: values.companyDescription,
         goal: values.goal,
         leadDefinition: values.leadDefinition,
-        leadTargetAction: values.leadTargetAction,
+        leadGoal: values.leadGoal,
         firstMessagePrompt: values.firstMessagePrompt,
         secondMessagePrompt: values.secondMessagePrompt,
         part: values.part?.trim() || null,
@@ -82,11 +82,12 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
 
       onSumbitDrawer({ data, database });
     } catch (error) {
-      console.log(error);
       notification.error({
-        message: 'Ошибка при сохранении запуска',
+        message: 'Произошла ошибка',
         description:
-          error instanceof Error ? error.message : 'Ошибка валидации',
+          error instanceof Error
+            ? error.message
+            : 'Ошибка валидации. Проверьте, пожалуйста, заполненные поля.',
       });
     }
   };
@@ -283,7 +284,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
 
               <Col span={24}>
                 <Form.Item
-                  name="leadTargetAction"
+                  name="leadGoal"
                   label="Целевое действие при статусе лид"
                   rules={[{ required: true, message: 'Обязательное поле' }]}
                 >

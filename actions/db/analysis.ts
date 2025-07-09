@@ -2,7 +2,7 @@
 
 import type { Analysis } from '@/@types/Analysis';
 import { coreDB } from './db';
-import { validateAnalysis } from '@/validations/analysis';
+import { validateAnalysis } from '@/schemas/analysis';
 
 const DEFAULT_BATCH_SIZE = 20;
 

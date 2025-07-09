@@ -15,9 +15,12 @@ export const AnalysisIdMessageItem: React.FC<AnalysisIdMessageItemProps> = ({
     ? classes[message.positionInGroup]
     : '';
 
+  // Преобразуем текстовые \n в реальные переносы строк
+  const formattedText = message.text.replace(/\\n/g, '\n');
+
   return (
     <div className={`${classes.message} ${messageStyle} ${positionClass}`}>
-      <div className={classes.messageContent}>{message.text}</div>
+      <div className={classes.messageContent}>{formattedText}</div>
     </div>
   );
 };

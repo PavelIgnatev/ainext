@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers';
 
 export const validateAdminPassword = async (password: string) => {
-  if (password !== process.env.PASSWORD_GATE_SECRET) return false;
+  if (password !== "G_-N'j*5qzXgd^=8Y~wRem") return false;
 
   const cookie = await cookies();
   cookie.set({

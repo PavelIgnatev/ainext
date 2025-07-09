@@ -34,7 +34,6 @@ export const AnalysisId = (props: AnalysisIdProps) => {
     messages,
     isMessageLoading,
     isAdmin,
-    currentDialogId,
     onNewDialog,
     onSaveMessage,
     onDialogSelect,
@@ -50,9 +49,7 @@ export const AnalysisId = (props: AnalysisIdProps) => {
 
   return (
     <div className={classes.analysisId}>
-      <Title className={classes.head}>
-        Разбор {analysis.companyName} / Диалог {currentDialogId + 1}
-      </Title>
+      <Title className={classes.head}>{analysis.companyName}</Title>
       <AnalysisIdDialogue
         isAdmin={isAdmin}
         messages={messages}

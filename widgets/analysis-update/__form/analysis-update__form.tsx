@@ -54,7 +54,7 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
         firstQuestion: analysis.firstQuestion,
         addedQuestion: analysis.addedQuestion,
         leadDefinition: analysis.leadDefinition,
-        leadTargetAction: analysis.leadTargetAction,
+        leadGoal: analysis.leadGoal,
       };
     }
 
@@ -237,7 +237,7 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
         <Form.Item
           className={classes.formItem}
           label="Целевое действие при статусе лид"
-          name="leadTargetAction"
+          name="leadGoal"
           rules={rules}
         >
           <TextArea

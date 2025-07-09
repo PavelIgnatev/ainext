@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import { getClientIp } from 'request-ip';
 import { coreDB } from './db';
 import { Collection } from 'mongodb';
-import { validateGroupId } from '@/validations/groupId';
+import { validateGroupId } from '@/schemas/groupId';
 
 export async function getGroupIds(search?: string) {
   try {

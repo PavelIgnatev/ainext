@@ -22,7 +22,8 @@ export type Analysis = {
   addedInformation: string | null;
   addedQuestion: string | null;
   leadDefinition: string;
-  leadTargetAction: string;
+  leadGoal: string;
 
   dialogs: DialogMessage[][];
+  leadDialogs?: Record<number, boolean>;
 };

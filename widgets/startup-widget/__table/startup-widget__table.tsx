@@ -8,6 +8,7 @@ import {
   flexRender,
 } from '@tanstack/react-table';
 import { useMediaQuery } from 'react-responsive';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import classes from './startup-widget__table.module.css';
 
 type SmallGroupId = Pick<
@@ -27,7 +28,41 @@ export const StartupWidgetTable = (props: StartupWidgetProps) => {
   const { groupIds, onClickGroupId } = props;
 
   const isMobile = useMediaQuery({ maxWidth: 768 });
-  const pageSize = 10;
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const [pageSize, setPageSize] = useState(10);
+
+  const calculatePageSize = useCallback(() => {
+    if (!tableContainerRef.current) return 10;
+
+    const container = tableContainerRef.current;
+    const containerRect = container.getBoundingClientRect();
+    const availableHeight = window.innerHeight - containerRect.top - 120;
+    const rowHeight = isMobile ? 60 : 72;
+    const calculatedPageSize = Math.floor(availableHeight / rowHeight) - 1;
+
+    return Math.max(5, Math.min(50, calculatedPageSize));
+  }, [isMobile]);
+
+  useEffect(() => {
+    const updatePageSize = () => {
+      const newPageSize = calculatePageSize();
+      setPageSize(newPageSize);
+    };
+
+    updatePageSize();
+    window.addEventListener('resize', updatePageSize);
+    window.addEventListener('orientationchange', updatePageSize);
+
+    return () => {
+      window.removeEventListener('resize', updatePageSize);
+      window.removeEventListener('orientationchange', updatePageSize);
+    };
+  }, [calculatePageSize]);
+
+  useEffect(() => {
+    const newPageSize = calculatePageSize();
+    setPageSize(newPageSize);
+  }, [isMobile, calculatePageSize]);
 
   const ProgressCircle = ({
     percent,
@@ -137,22 +172,34 @@ export const StartupWidgetTable = (props: StartupWidgetProps) => {
     }),
   ];
 
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: pageSize,
+  });
+
+  useEffect(() => {
+    setPagination((prev) => ({
+      ...prev,
+      pageSize: pageSize,
+      pageIndex: 0,
+    }));
+  }, [pageSize]);
+
   const table = useReactTable({
     data: groupIds,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize,
-      },
+    state: {
+      pagination,
     },
+    onPaginationChange: setPagination,
   });
 
   // Лоадер теперь обрабатывается на уровне StartupWidget
 
   return (
-    <div className={classes.tableContainer}>
+    <div className={classes.tableContainer} ref={tableContainerRef}>
       <div className={classes.tableWrapper}>
         <table className={classes.modernTable}>
           <thead className={classes.tableHead}>
@@ -198,11 +245,11 @@ export const StartupWidgetTable = (props: StartupWidgetProps) => {
         <div className={classes.paginationInfo}>
           Показано{' '}
           {groupIds.length > 0
-            ? table.getState().pagination.pageIndex * pageSize + 1
+            ? pagination.pageIndex * pagination.pageSize + 1
             : 0}
           -
           {Math.min(
-            (table.getState().pagination.pageIndex + 1) * pageSize,
+            (pagination.pageIndex + 1) * pagination.pageSize,
             groupIds.length
           )}{' '}
           из {groupIds.length} записей
@@ -211,7 +258,7 @@ export const StartupWidgetTable = (props: StartupWidgetProps) => {
           <div className={classes.pageNumbers}>
             {Array.from({ length: table.getPageCount() }, (_, i) => i + 1)
               .filter((page) => {
-                const current = table.getState().pagination.pageIndex + 1;
+                const current = pagination.pageIndex + 1;
                 return (
                   Math.abs(page - current) <= 2 ||
                   page === 1 ||

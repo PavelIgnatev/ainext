@@ -107,14 +107,14 @@
   }
 }
 
-:global(.ant-list-item) {
+.analysisListScrollable :global(.ant-list-item) {
   padding: 10px 16px !important;
   cursor: pointer !important;
   transition: background-color 0.2s !important;
   border-bottom: 1px solid #000000 !important;
 }
 
-:global(.ant-list-item:hover) {
+.analysisListScrollable :global(.ant-list-item:hover) {
   background-color: #000000 !important;
   color: #ffffff !important;
 }
@@ -148,13 +148,13 @@
   max-height: 2.6em !important;
 }
 
-:global(.ant-list-item:hover) .meta :global(.ant-list-item-meta-title),
-:global(.ant-list-item:hover) .meta :global(.ant-list-item-meta-description) {
+.analysisListScrollable :global(.ant-list-item:hover) .meta :global(.ant-list-item-meta-title),
+.analysisListScrollable :global(.ant-list-item:hover) .meta :global(.ant-list-item-meta-description) {
   color: #ffffff !important;
 }
 
 @media (max-width: 768px) {
-  :global(.ant-list-item) {
+  .analysisListScrollable :global(.ant-list-item) {
     padding: 8px 12px !important;
   }
 
@@ -175,7 +175,7 @@
 }
 
 @media (max-width: 480px) {
-  :global(.ant-list-item) {
+  .analysisListScrollable :global(.ant-list-item) {
     padding: 6px 10px !important;
   }
 

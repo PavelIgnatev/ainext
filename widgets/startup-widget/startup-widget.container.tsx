@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { useDebounce } from 'use-debounce';
 
 import { StartupWidget } from './startup-widget';
@@ -8,13 +8,12 @@ import { GroupId } from '@/@types/GroupId';
 import { getGroupId, getGroupIds, updateGroupId } from '@/actions/db/groupId';
 import { useNotifications } from '@/hooks/useNotifications';
 import { getGroupIdUsers, updateGroupIdUsers } from '@/actions/db/groupIdUsers';
-import { validateGroupId } from '@/validations/groupId';
-import { validateGroupIdUsers } from '@/validations/groupIdUsers';
+import { validateGroupId } from '@/schemas/groupId';
+import { validateGroupIdUsers } from '@/schemas/groupIdUsers';
 
 const DEBOUNCE_DELAY = 300;
 
 export const StartupWidgetContainer = () => {
-  const queryClient = useQueryClient();
   const { showError, showSuccess, contextHolder } = useNotifications();
   const [groupId, setGroupId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -103,16 +102,18 @@ export const StartupWidgetContainer = () => {
       database: Array<string>;
     }) => {
       validateGroupId(data);
-      validateGroupIdUsers(data.groupId, database);
+      validateGroupIdUsers(database);
 
       await updateGroupIdUsers(data.groupId, database);
       await updateGroupId(data);
     },
     onSuccess: () => {
-      showSuccess('Информация успешно обновлена');
-      queryClient.invalidateQueries({ queryKey: ['groupId', groupId] });
-      queryClient.invalidateQueries({ queryKey: ['groupIdDatabse', groupId] });
-      queryClient.invalidateQueries({ queryKey: ['groupIds'] });
+      showSuccess(
+        `Запуск успешно ${groupIdData ? 'обновлен' : 'создан'}. Перезагружаем страницу...`
+      );
+      setTimeout(() => {
+        window.location.reload();
+      }, 2500);
     },
     onError: (error) =>
       showError(error instanceof Error ? error.message : 'Неизвестная ошибка'),
