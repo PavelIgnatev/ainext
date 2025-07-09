@@ -10,14 +10,6 @@ import '@/assets/antd-overrides.css';
 
 dotenvConfig();
 
-if (typeof globalThis !== 'undefined' && typeof process !== 'undefined') {
-  Object.defineProperty(process.env, 'NODE_ENV', {
-    value: 'development',
-    writable: false,
-    configurable: false,
-  });
-}
-
 export const metadata: Metadata = {
   title: 'AiSender - Лидогенерация с AI',
   description:

@@ -8,6 +8,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { AnalysisUpdate } from './analysis-update';
 import { updateAnalysis } from '@/actions/db/analysis';
 import { getGreeting } from '@/utils/getGreeting';
+import { validateAnalysis } from '@/schemas/analysis';
 
 interface AnalysisUpdateContainerProps {
   analysis: Analysis | null;
@@ -22,7 +23,11 @@ export const AnalysisUpdateContainer = (
   const router = useRouter();
   const { showError, showSuccess, contextHolder } = useNotifications();
 
-  const { mutate: handleUpdate, isPending: isCreateLoading } = useMutation({
+  const { mutate: handleUpdate, isPending: isCreateLoading } = useMutation<
+    string | null,
+    Error,
+    Omit<Analysis, 'dialogs' | 'companyId'>
+  >({
     mutationFn: (data: Omit<Analysis, 'dialogs' | 'companyId'>) => {
       const randomCompanyId = String(Math.random()).substring(2, 12);
       const analysisData: Analysis = {
@@ -42,9 +47,18 @@ export const AnalysisUpdateContainer = (
         ],
       };
 
+      try {
+        validateAnalysis(analysisData);
+      } catch (error) {
+        showError(error instanceof Error ? error.message : 'Ошибка валидации');
+        return Promise.resolve(null);
+      }
+
       return updateAnalysis(analysisData);
     },
     onSuccess: (id) => {
+      if (!id) return;
+
       if (!analysis?.companyId) {
         router.push(`/analysis/${id}`);
       } else {
