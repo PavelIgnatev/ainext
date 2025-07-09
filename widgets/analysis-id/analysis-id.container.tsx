@@ -104,7 +104,7 @@ export const AnalysisIdContainer = () => {
             llmParams: {
               model: 'command-a-03-2025',
               k: 45,
-              temperature: 0.75,
+              temperature: 1,
               presence_penalty: 0.8,
               p: 0.95,
               messages: dialogue,
