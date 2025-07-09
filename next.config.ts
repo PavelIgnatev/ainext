@@ -12,14 +12,6 @@ const nextConfig: NextConfig = {
     CUSTOM_ERROR_HANDLING: 'true',
     SHOW_DETAILED_ERRORS: 'true',
   },
-  webpack: (config, { dev, isServer }) => {
-    if (!dev && isServer) {
-      config.resolve.alias['next/dist/lib/is-error'] = require.resolve(
-        './lib/custom-error-handler.js'
-      );
-    }
-    return config;
-  },
 };
 
 export default nextConfig;
