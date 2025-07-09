@@ -5,10 +5,19 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   serverExternalPackages: [],
-  productionBrowserSourceMaps: false,
+  productionBrowserSourceMaps: true, // Включаем source maps для отладки
+  experimental: {
+    serverComponentsHmrCache: false, // Отключаем кеш для лучшей отладки
+  },
+  // Отключаем минификацию в development
+  swcMinify: false,
   env: {
-    CUSTOM_ERROR_HANDLING: 'true',
-    SHOW_DETAILED_ERRORS: 'true',
+    NODE_ENV: 'development', // Принудительно ставим development для детальных ошибок
+  },
+  // Принудительно показываем ошибки в продакшене
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
   },
 };
 
