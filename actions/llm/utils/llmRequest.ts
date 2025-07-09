@@ -6,7 +6,7 @@ import { CohereAIParamsSchema, CohereAIParams } from '../schemas/llmCohereAi';
 const REQUEST_TIMEOUT = 30000;
 
 export async function makeLLMRequest(params: CohereAIParams) {
-  const apiUrl = process.env.LLM_API_URL || 'http://91.198.220.234:2025/chatv2';
+  const apiUrl = process.env.LLM_API_URL || 'http://91.198.220.234/chatv2';
   if (!apiUrl) {
     throw new Error('[SERVER_LEVEL] ENV: LLM_API_URL UNDEFINED');
   }

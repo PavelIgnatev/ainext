@@ -103,10 +103,10 @@ export const AnalysisIdContainer = () => {
             options: { isLead },
             llmParams: {
               model: 'command-a-03-2025',
-              k: 30,
-              temperature: 1,
+              k: 45,
+              temperature: 0.75,
               presence_penalty: 0.8,
-              p: 0.8,
+              p: 0.95,
               messages: dialogue,
             },
             onError: (error) => showError(error),
