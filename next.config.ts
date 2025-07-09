@@ -4,9 +4,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    serverComponentsExternalPackages: [],
-  },
+  serverExternalPackages: [],
   productionBrowserSourceMaps: false,
   env: {
     CUSTOM_ERROR_HANDLING: 'true',
