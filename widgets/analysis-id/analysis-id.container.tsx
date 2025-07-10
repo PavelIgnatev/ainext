@@ -18,7 +18,6 @@ import { llmRestoreLinks } from '@/actions/llm/utils/llmLink';
 const extractLastQuestion = (
   text: string
 ): { mainText: string; question: string | null } => {
-  // Разбиваем текст на предложения, учитывая что они могут заканчиваться на . ! ?
   const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
 
   if (sentences.length === 0) {
@@ -27,13 +26,11 @@ const extractLastQuestion = (
 
   const lastSentence = sentences[sentences.length - 1].trim();
 
-  // Если последнее предложение заканчивается на вопросительный знак
   if (lastSentence.endsWith('?')) {
-    // Объединяем все предложения кроме последнего
     const mainText = sentences.slice(0, -1).join('').trim();
     return {
       mainText,
-      question: lastSentence.charAt(0).toUpperCase() + lastSentence.slice(1), // Первая буква заглавная
+      question: lastSentence.charAt(0).toUpperCase() + lastSentence.slice(1),
     };
   }
 
