@@ -13,6 +13,32 @@ import { type DialogueAnalysisResult as LLMDialogueAnalysisResult } from '@/acti
 import { getGreeting } from '@/utils/getGreeting';
 import { checkAdmin } from '@/actions/admin/checkAdmin';
 import { validateAnalysis } from '@/schemas/analysis';
+import { llmRestoreLinks } from '@/actions/llm/utils/llmLink';
+
+const extractLastQuestion = (
+  text: string
+): { mainText: string; question: string | null } => {
+  // Разбиваем текст на предложения, учитывая что они могут заканчиваться на . ! ?
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+
+  if (sentences.length === 0) {
+    return { mainText: text, question: null };
+  }
+
+  const lastSentence = sentences[sentences.length - 1].trim();
+
+  // Если последнее предложение заканчивается на вопросительный знак
+  if (lastSentence.endsWith('?')) {
+    // Объединяем все предложения кроме последнего
+    const mainText = sentences.slice(0, -1).join('').trim();
+    return {
+      mainText,
+      question: lastSentence.charAt(0).toUpperCase() + lastSentence.slice(1), // Первая буква заглавная
+    };
+  }
+
+  return { mainText: text, question: null };
+};
 
 export const AnalysisIdContainer = () => {
   const router = useRouter();
@@ -123,13 +149,31 @@ export const AnalysisIdContainer = () => {
           }
         );
 
+        const { mainText, question } = extractLastQuestion(response.text);
+
+        const processedMainText = llmRestoreLinks({
+          ...response,
+          text: mainText,
+        });
         const finalDialog = [
           ...dialogue,
           {
             role: 'assistant' as const,
-            content: response,
+            content: processedMainText.replace(/\n/g, '\\n'),
           },
         ];
+
+        if (question) {
+          const processedQuestion = llmRestoreLinks({
+            ...response,
+            text: question,
+          });
+
+          finalDialog.push({
+            role: 'assistant' as const,
+            content: processedQuestion.replace(/\n/g, '\\n'),
+          });
+        }
 
         if (!dialogs) {
           throw new Error('Диалоги не инициализированы');

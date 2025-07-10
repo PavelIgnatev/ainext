@@ -7,11 +7,7 @@ import {
   llmDefaultValidation,
   getValidationRules,
 } from './utils/llmDefaultValidation';
-import {
-  llmExtractLinks,
-  llmRestoreLinks,
-  LlmProcessedText,
-} from './utils/llmLink';
+import { llmExtractLinks, LlmProcessedText } from './utils/llmLink';
 import { llmCustomValidation } from './utils/llmCustomValidation';
 
 import {
@@ -31,7 +27,7 @@ const LLM_CONSTANTS = {
 export async function getAutoResponse(
   context: AutoResponse,
   options: AutoResponseOptions
-): Promise<string> {
+): Promise<LlmProcessedText> {
   AutoResponseSchema.parse(context);
   AutoResponseOptionsSchema.parse(options);
 
@@ -96,18 +92,14 @@ export async function getAutoResponse(
       llmDefaultValidation(normalizedText, stage);
       llmCustomValidation(normalizedText, processedMessage, stage, finalPart);
 
-      message = llmRestoreLinks({
-        ...processedMessage,
-        text: normalizedText,
-      }).replace(/\n/g, '\\n');
-
       onLogger?.('AR_RESPONSE', {
         name: context.companyName,
-        message,
         attempt: i + 1,
+        message: normalizedText,
+        links: processedMessage.links,
       });
 
-      return message;
+      return { ...processedMessage, text: normalizedText };
     } catch (error: any) {
       const errorMessage = error.message || 'UNDEFINED_ERROR';
       errors.push(errorMessage);
@@ -146,7 +138,7 @@ export async function getAutoResponse(
   }
 
   if (generations.length > 0) {
-    return llmRestoreLinks(generations[0]).replace(/\n/g, '\\n');
+    return generations[0];
   }
 
   throw new Error(`** GENERATION_ERROR **
