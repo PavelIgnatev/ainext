@@ -91,6 +91,7 @@ export const AnalysisIdContainer = () => {
         if (!isCurrentDialogLead) {
           analysisResult = await getDialogueAnalysis(
             {
+              companyName: analysisData.companyName,
               leadDefinition: analysisData.leadDefinition,
               language: analysisData.language,
             },

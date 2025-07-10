@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { CohereAIParamsSchema, MessagesSchema } from './llmCohereAi';
 
 export const DialogueAnalysisSchema = z.object({
+  companyName: z.string().min(1),
   leadDefinition: z.string().min(1),
   language: z.enum(['ENGLISH', 'RUSSIAN', 'UKRAINIAN']),
 });

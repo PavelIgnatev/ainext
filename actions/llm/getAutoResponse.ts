@@ -1,4 +1,3 @@
-import { sleep } from '@/utils/sleep';
 import { makeLLMRequest } from './utils/llmRequest';
 import { llmRandomString } from './utils/llmRandomString';
 import { llmDateNow } from './utils/llmDateNow';
@@ -18,6 +17,7 @@ import {
   AutoResponseConfig,
 } from './schemas/llmAutoResponse';
 import { fullNormalize } from './utils/llmNormalize';
+import { sleep } from './utils/llmSleep';
 
 const LLM_CONSTANTS = {
   DEFAULT_MAX_RETRIES: 5,
@@ -57,8 +57,6 @@ export async function getAutoResponse(
     stage,
     finalPart
   );
-
-  console.log(systemPrompt);
 
   let currentParams = {
     ...otherLlmParams,

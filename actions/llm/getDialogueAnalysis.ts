@@ -1,4 +1,3 @@
-import { sleep } from '@/utils/sleep';
 import { makeLLMRequest } from './utils/llmRequest';
 import { extractJsonResponse } from './utils/llmExtractJson';
 import { getCombinedMessages } from './utils/llmCombinedMessages';
@@ -9,6 +8,7 @@ import {
   DialogueAnalysisOptions,
   DialogueAnalysisResult,
 } from './schemas/llmDialogueAnalysis';
+import { sleep } from './utils/llmSleep';
 
 const LLM_CONSTANTS = {
   DEFAULT_MAX_RETRIES: 5,
@@ -22,7 +22,7 @@ export async function getDialogueAnalysis(
   DialogueAnalysisSchema.parse(context);
   DialogueAnalysisOptionsSchema.parse(options);
 
-  const { leadDefinition, language } = context;
+  const { leadDefinition, language, companyName } = context;
   const { llmParams, onRequest, onError, onLogger } = options;
   const { messages, ...otherLlmParams } = llmParams;
   const maxRetries = LLM_CONSTANTS.DEFAULT_MAX_RETRIES;
@@ -43,6 +43,7 @@ export async function getDialogueAnalysis(
   };
 
   onLogger?.('DA_REQUEST', {
+    companyName,
     leadDefinition,
     params,
   });
@@ -59,6 +60,7 @@ export async function getDialogueAnalysis(
       }
 
       onLogger?.('DA_RESPONSE', {
+        companyName,
         ...analysisResult,
       });
 
@@ -68,6 +70,7 @@ export async function getDialogueAnalysis(
 
       onError?.(errorMessage);
       onLogger?.('DA_ERROR', {
+        companyName,
         error: errorMessage,
       });
 
