@@ -49,7 +49,7 @@ function validateCharacters(message: string) {
   }
 
   const allowedCharsRegex =
-    /[^a-zA-Zа-яА-ЯёЁґҐєЄіІїЇ0-9.,!?"'«»\-—:;$€₽%()|\/\\\s]/g;
+    /[^a-zA-Zа-яА-ЯёЁґҐєЄіІїЇ0-9.,!?"'«»\-—:;$€₽%()|\/\\\s@_]/g;
   const invalidChars = [...new Set(message.match(allowedCharsRegex) || [])];
 
   if (invalidChars.length > 0) {
@@ -61,10 +61,10 @@ function validateCharacters(message: string) {
         '- Letters (Latin, Cyrillic): a-z, A-Z, а-я, А-Я, ёЁ, ґҐ, єЄ, іІ, їЇ\n' +
         '- Numbers: 0-9\n' +
         '- Basic punctuation: .,!?"\'«»-—:;/|\\\n' +
-        '- Common symbols: $€₽%\n' +
+        '- Common symbols: $€₽%@_\n' +
         '- Parentheses: ()\n' +
         '- Whitespace characters\n\n' +
-        'REGEX PATTERN: /[^a-zA-Zа-яА-ЯёЁґҐєЄіІїЇ0-9.,!?"\'«»\\-—:;$€₽%()|\/\\\\s]/g\n\n' +
+        'REGEX PATTERN: /[^a-zA-Zа-яА-ЯёЁґҐєЄіІїЇ0-9.,!?"\'«»\\-—:;$€₽%()|\/\\\\s@_]/g\n\n' +
         'HOW TO FIX: Replace these characters with allowed alternatives',
     };
   }
@@ -390,7 +390,7 @@ export function getValidationRules(): string {
     - Letters: Latin (a-z, A-Z), Cyrillic (а-я, А-Я, ёЁ, ґҐ, єЄ, іІ, їЇ)
     - Numbers: 0-9
     - Basic punctuation: . , ! ? " ' « » - — : ; / | \
-    - Currency and special: $ € ₽ %
+    - Currency and special: $ € ₽ % @ _
     - Parentheses: ( )
     - Regular spaces
   [/ALLOWED_CHARACTERS]
