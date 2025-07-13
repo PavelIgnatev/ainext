@@ -15,19 +15,7 @@ function validateEmptyResponse(message: string) {
 }
 
 function validateCharacters(message: string) {
-  const forbiddenPatterns = [
-    '<',
-    '>',
-    '[',
-    ']',
-    '{',
-    '}',
-    '&',
-    '=',
-    '+',
-    'section',
-    'sign',
-  ];
+  const forbiddenPatterns = ['<', '>', '[', ']', '{', '}', 'section', 'sign'];
 
   const foundPatterns = forbiddenPatterns.filter((pattern) =>
     message.includes(pattern)
@@ -41,7 +29,6 @@ function validateCharacters(message: string) {
         'REQUIREMENT: Use only letters, numbers, basic punctuation marks and parentheses\n' +
         'EXAMPLES OF INVALID INPUT:\n' +
         '- "Hello <world>" (contains < >)\n' +
-        '- "1 + 1 = 2" (contains + =)\n' +
         '- "[important]" (contains square brackets)\n' +
         '- "{key: value}" (contains curly braces)\n' +
         'HOW TO FIX: Remove or replace these characters with appropriate alternatives',
@@ -49,7 +36,7 @@ function validateCharacters(message: string) {
   }
 
   const allowedCharsRegex =
-    /[^a-zA-Zа-яА-ЯёЁґҐєЄіІїЇ0-9.,!?"'«»\-—:;$€₽%()|\/\\\s@_]/g;
+    /[^a-zA-Zа-яА-ЯёЁґҐєЄіІїЇ0-9.,!?"'«»\-—:;$€₽%()|\/\\\s@_\+&=]/g;
   const invalidChars = [...new Set(message.match(allowedCharsRegex) || [])];
 
   if (invalidChars.length > 0) {
@@ -61,10 +48,10 @@ function validateCharacters(message: string) {
         '- Letters (Latin, Cyrillic): a-z, A-Z, а-я, А-Я, ёЁ, ґҐ, єЄ, іІ, їЇ\n' +
         '- Numbers: 0-9\n' +
         '- Basic punctuation: .,!?"\'«»-—:;/|\\\n' +
-        '- Common symbols: $€₽%@_\n' +
+        '- Common symbols: $€₽%@_+&=\n' +
         '- Parentheses: ()\n' +
         '- Whitespace characters\n\n' +
-        'REGEX PATTERN: /[^a-zA-Zа-яА-ЯёЁґҐєЄіІїЇ0-9.,!?"\'«»\\-—:;$€₽%()|\/\\\\s@_]/g\n\n' +
+        'REGEX PATTERN: /[^a-zA-Zа-яА-ЯёЁґҐєЄіІїЇ0-9.,!?"\'«»\\-—:;$€₽%()|\/\\\\s@_\\+&=]/g\n\n' +
         'HOW TO FIX: Replace these characters with allowed alternatives',
     };
   }
@@ -317,49 +304,162 @@ function validateApologies(message: string) {
   return { isValid: true };
 }
 
-function validateLength(message: string, stage?: number) {
-  if (typeof stage === 'number' && stage !== 1) {
-    return { isValid: true };
+function validateGreetings(message: string) {
+  const greetings = [
+    'приветствую всех участников',
+    'приветствую всех вас',
+    'приветствую всех',
+    'приветствую, коллеги',
+    'приветствую, друзья',
+    'рад приветствовать',
+    'рад всех видеть',
+    'рад видеть всех',
+    'доброе время суток',
+    'рад вас видеть',
+    'рад видеть',
+    'рада видеть',
+    'привет-привет',
+    'доброго времени суток',
+    'доброго времени',
+    'добрейшего дня',
+    'приветствую',
+    'приветики',
+    'доброе утро',
+    'добрый вечер',
+    'добрый день',
+    'доброго утра',
+    'доброго вечера',
+    'доброго дня',
+    'с добрым утречком',
+    'с добрым утром',
+    'с добрым днем',
+    'с добрым вечером',
+    'добрый полдень',
+    'приветик',
+    'здравствуйте',
+    'здравствуй',
+    'привет',
+    'доброго',
+  ];
+
+  const followUpWords = [
+    'уважаемые коллеги',
+    'дорогие друзья',
+    'господа и дамы',
+    'уважаемые партнеры',
+    'коллеги мои',
+    'друзья мои',
+    'всех вас',
+    'моих коллег',
+    'наших гостей',
+    'дорогие',
+    'уважаемые',
+    'господа',
+    'товарищи',
+    'коллеги',
+    'друзья',
+    'друг',
+    'тебя',
+    'вас',
+    'вам',
+    'тебе',
+    'наши',
+    'дня',
+    'вечера',
+    'утра',
+    'времени',
+    'суток',
+    'благодарю',
+  ];
+
+  // Проверяем составные фразы (приветствие + обращение)
+  for (const greeting of greetings) {
+    for (const followUp of followUpWords) {
+      const combinedPhrase = `${greeting} ${followUp}`;
+      if (message.includes(combinedPhrase)) {
+        return {
+          isValid: false,
+          error:
+            `Greeting phrase found: "${combinedPhrase}"\n\n` +
+            'REASON: Greetings break natural conversation flow and are not allowed\n' +
+            'REQUIREMENT: Start communication directly without greeting phrases\n' +
+            'EXAMPLES OF INVALID INPUT:\n' +
+            '- "Приветствую всех участников, уважаемые коллеги"\n' +
+            '- "Доброе утро, дорогие друзья"\n' +
+            '- "Здравствуйте, товарищи"\n' +
+            'HOW TO FIX: Remove greeting phrases and start directly with the main message',
+        };
+      }
+    }
   }
 
-  const length = message.length;
-  const MIN_LENGTH = 130;
-  const MAX_LENGTH = 450;
-
-  if (length < MIN_LENGTH) {
-    return {
-      isValid: false,
-      error:
-        'Message too short: minimum 200 characters\n\n' +
-        'REASON: Message does not meet minimum length requirement\n' +
-        'REQUIREMENT: Message must be at least 200 characters long\n' +
-        'HOW TO FIX: Expand the message with more meaningful content while maintaining natural flow',
-    };
-  }
-
-  if (length > MAX_LENGTH) {
-    return {
-      isValid: false,
-      error:
-        `Message too long: maximum 450 characters\n\n` +
-        'REASON: Message exceeds maximum length limit\n' +
-        'REQUIREMENT: Message must not exceed 450 characters\n' +
-        'HOW TO FIX: Make the message more concise while preserving key information',
-    };
+  // Проверяем отдельные приветствия
+  for (const greeting of greetings) {
+    if (message.includes(greeting)) {
+      return {
+        isValid: false,
+        error:
+          `Greeting phrase found: "${greeting}"\n\n` +
+          'REASON: Greetings break natural conversation flow and are not allowed\n' +
+          'REQUIREMENT: Start communication directly without greeting phrases\n' +
+          'EXAMPLES OF INVALID INPUT:\n' +
+          '- "Привет! Как дела?"\n' +
+          '- "Приветствую всех участников"\n' +
+          '- "Доброе утро"\n' +
+          '- "Здравствуйте, хочу сказать..."\n' +
+          'HOW TO FIX: Remove greeting phrases and start directly with the main message',
+      };
+    }
   }
 
   return { isValid: true };
 }
-validateLength.validatorName = 'validateLength';
+
+function validateLength(message: string, stage?: number) {
+  if (typeof stage !== 'number') {
+    return { isValid: true };
+  }
+
+  if (stage === 1 || stage === 2) {
+    const length = message.length;
+    const MIN_LENGTH = 130;
+    const MAX_LENGTH = 450;
+
+    if (length < MIN_LENGTH) {
+      return {
+        isValid: false,
+        error:
+          'Message too short: minimum 200 characters\n\n' +
+          'REASON: Message does not meet minimum length requirement\n' +
+          'REQUIREMENT: Message must be at least 200 characters long\n' +
+          'HOW TO FIX: Expand the message with more meaningful content while maintaining natural flow',
+      };
+    }
+
+    if (length > MAX_LENGTH) {
+      return {
+        isValid: false,
+        error:
+          `Message too long: maximum 450 characters\n\n` +
+          'REASON: Message exceeds maximum length limit\n' +
+          'REQUIREMENT: Message must not exceed 450 characters\n' +
+          'HOW TO FIX: Make the message more concise while preserving key information',
+      };
+    }
+  }
+
+  return { isValid: true };
+}
 
 export const DEFAULT_VALIDATION_RULES: Validator[] = [
   validateEmptyResponse,
+  validateLength,
   validateCharacters,
-  validateQuestionMarkers,
   validateHtmlTags,
   validateIdeographicOrArabic,
-  // validateApologies,
-  validateLength,
+  validateGreetings,
+  validateQuestionMarkers,
+  validateApologies,
 ];
 
 export function llmDefaultValidation(message: string, stage?: number) {
@@ -390,16 +490,16 @@ export function getValidationRules(): string {
     - Letters: Latin (a-z, A-Z), Cyrillic (а-я, А-Я, ёЁ, ґҐ, єЄ, іІ, їЇ)
     - Numbers: 0-9
     - Basic punctuation: . , ! ? " ' « » - — : ; / | \
-    - Currency and special: $ € ₽ % @ _
+    - Currency and special: $ € ₽ % @ _ + & =
     - Parentheses: ( )
     - Regular spaces
   [/ALLOWED_CHARACTERS]
 
   [FORBIDDEN_CHARACTERS]
     ** CRITICAL: ANY MESSAGE CONTAINING THESE CHARACTERS WILL BE REJECTED **
-    ** ABSOLUTELY FORBIDDEN: < > [ ] { } & = + **
-    ** THESE CHARACTERS ARE NEVER ALLOWED: < > [ ] { } & = + **
-    ** AUTOMATIC REJECTION IF FOUND: < > [ ] { } & = + **
+    ** ABSOLUTELY FORBIDDEN: < > [ ] { } **
+    ** THESE CHARACTERS ARE NEVER ALLOWED: < > [ ] { } **
+    ** AUTOMATIC REJECTION IF FOUND: < > [ ] { } **
   [/FORBIDDEN_CHARACTERS]
 
   [CONVERSATION_STYLE]
@@ -407,6 +507,7 @@ export function getValidationRules(): string {
     - No formal markers or introductions
     - No service phrases or postscripts
     - No apologies or excuses
+    - No greeting phrases whatsoever
     
     FORBIDDEN MARKERS:
     - Question/answer markers (вопрос:, question:, ответ:, answer:)
@@ -415,6 +516,7 @@ export function getValidationRules(): string {
     - Service phrases (fyi:, nb:, p.s.:, btw:)
     - Formal introductions (для вас:, for you:, к вам:, to you:)
     - Apology phrases (извините, sorry, apologize, прошу прощения)
+    - Greeting phrases (привет, hello, добрый день, good morning, здравствуйте, hi, hey, как дела, how are you)
   [/CONVERSATION_STYLE]
 
   [TEXT_FORMAT]

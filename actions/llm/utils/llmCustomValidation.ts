@@ -32,21 +32,23 @@ function validateMinimumSentences(
   _processedMessage: LlmProcessedText,
   _finalPart: string
 ) {
-  const minSentences = stage <= 2 ? 3 : 2;
+  const minSentences = stage <= 2 ? 3 : stage <= 4 ? 2 : 1;
   const sentences = message
     .split(/[.!?]+/)
     .filter((sentence) => sentence.trim().length > 0);
 
   if (sentences.length < minSentences) {
+    const currentCount = sentences.length;
+    const needed = minSentences - currentCount;
+
     return {
       isValid: false,
       error:
-        `Insufficient number of sentences\n` +
-        `REASON: Stage ${stage} requires minimum ${minSentences} sentences\n` +
-        'REQUIREMENT: Message must contain complete sentences separated by . ! or ?\n' +
-        'EXAMPLES OF VALID INPUT:\n' +
-        '- "First sentence. Second sentence. Third sentence?"\n' +
-        'HOW TO FIX: Add more complete sentences to meet the minimum requirement',
+        `NOT ENOUGH SENTENCES - ADD MORE TEXT!\n` +
+        `CURRENT: ${currentCount} sentences | REQUIRED: ${minSentences} sentences\n` +
+        `ACTION NEEDED: Add ${needed} more complete sentence${needed > 1 ? 's' : ''} to your response\n` +
+        `SOLUTION: Simply write ${needed} additional sentence${needed > 1 ? 's' : ''} with proper punctuation (. ! or ?)\n` +
+        `EXAMPLE: Your current text + "Additional sentence. Another sentence." + more if needed`,
     };
   }
   return { isValid: true };

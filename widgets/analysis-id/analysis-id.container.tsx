@@ -18,7 +18,7 @@ import { llmRestoreLinks } from '@/actions/llm/utils/llmLink';
 const extractLastQuestion = (
   text: string
 ): { mainText: string; question: string | null } => {
-  const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+  const sentences = text.match(/[^.!?\n]+[.!?\n]+/g) || [];
 
   if (sentences.length === 0) {
     return { mainText: text, question: null };
@@ -88,7 +88,7 @@ export const AnalysisIdContainer = () => {
         const isCurrentDialogLead = analysisData.leadDialogs?.[currentDialogId];
         let analysisResult: LLMDialogueAnalysisResult | null = null;
 
-        if (!isCurrentDialogLead) {
+        if (!isCurrentDialogLead && dialogue.length > 3) {
           analysisResult = await getDialogueAnalysis(
             {
               companyName: analysisData.companyName,
@@ -134,7 +134,7 @@ export const AnalysisIdContainer = () => {
             options: { isLead },
             llmParams: {
               model: 'command-a-03-2025',
-              k: 45,
+              k: 30,
               temperature: 1,
               presence_penalty: 0.8,
               p: 0.95,
@@ -194,7 +194,10 @@ export const AnalysisIdContainer = () => {
 
         return finalDialogs;
       },
-      onSuccess: (dialogs) => setDialogs(dialogs),
+      onSuccess: (dialogs) => {
+        setDialogs(dialogs);
+        queryClient.invalidateQueries({ queryKey: ['analysis', analysisId] });
+      },
       onError: (error) => showError(error.message),
     });
 

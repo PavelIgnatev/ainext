@@ -6,6 +6,7 @@ import {
   llmDefaultValidation,
   getValidationRules,
 } from './utils/llmDefaultValidation';
+import { llmLanguageValidation } from './utils/llmLanguageValidation';
 import { llmExtractLinks, LlmProcessedText } from './utils/llmLink';
 import { llmCustomValidation } from './utils/llmCustomValidation';
 
@@ -50,27 +51,46 @@ export async function getAutoResponse(
         ? part.trim()
         : '';
 
-  const systemPrompt = createAutoResponsePrompt(
-    context,
-    combinedMessages,
-    config,
-    stage,
-    finalPart
-  );
-
-  let currentParams = {
-    ...otherLlmParams,
-    messages: [
-      { role: 'system' as const, content: systemPrompt },
-      ...combinedMessages,
-    ],
-  };
-
-  const attempts: Array<{ message: string; error: string }> = [];
   const generations: LlmProcessedText[] = [];
   const errors: string[] = [];
 
   for (let i = 0; i < maxRetries; i++) {
+    const systemPrompt = createAutoResponsePrompt(context, {
+      config,
+      stage,
+      finalPart,
+    });
+
+    let messages = [];
+
+    if (generations.length > 0 && errors.length > 0) {
+      messages = [{ role: 'system', content: systemPrompt }];
+
+      for (let j = 0; j < generations.length; j++) {
+        messages.push({
+          role: 'assistant',
+          content: generations[j].text,
+        });
+
+        if (j < errors.length) {
+          messages.push({
+            role: 'user',
+            content: createRetryPrompt(generations[j].text, errors[j]),
+          });
+        }
+      }
+    } else {
+      messages = [
+        { role: 'system' as const, content: systemPrompt },
+        ...combinedMessages,
+      ];
+    }
+
+    const currentParams = {
+      ...otherLlmParams,
+      messages,
+    };
+
     let message = '';
     try {
       onLogger?.('AR_REQUEST', {
@@ -81,13 +101,27 @@ export async function getAutoResponse(
 
       onRequest?.();
 
-      message = await makeLLMRequest(currentParams);
+      message = await makeLLMRequest(currentParams as any);
 
       const processedMessage = await llmExtractLinks(message);
       const normalizedText = fullNormalize(processedMessage.text);
       generations.push({ ...processedMessage, text: normalizedText });
 
       llmDefaultValidation(normalizedText, stage);
+
+      const { isValid, error } = llmLanguageValidation(
+        normalizedText,
+        [
+          JSON.stringify(context),
+          combinedMessages.map((msg) => msg.content).join(' '),
+        ].join(' '),
+        context.language
+      );
+
+      if (!isValid) {
+        throw new Error(error);
+      }
+
       llmCustomValidation(normalizedText, processedMessage, stage, finalPart);
 
       onLogger?.('AR_RESPONSE', {
@@ -110,25 +144,6 @@ export async function getAutoResponse(
         attempt: i + 1,
       });
 
-      if (message) {
-        attempts.push({ message, error: errorMessage });
-
-        currentParams.messages.push({
-          role: 'assistant',
-          content: message,
-        });
-
-        currentParams.messages.push({
-          role: 'system',
-          content: createRetryPrompt(attempts),
-        });
-
-        currentParams = {
-          ...otherLlmParams,
-          messages: currentParams.messages,
-        };
-      }
-
       if (i < maxRetries - 1) {
         await sleep(LLM_CONSTANTS.DEFAULT_RETRY_DELAY);
       }
@@ -150,11 +165,14 @@ _____________`);
 
 function createAutoResponsePrompt(
   context: AutoResponse,
-  combinedMessages: { role: 'assistant' | 'user'; content: string }[],
-  config: AutoResponseConfig,
-  stage: number,
-  finalPart: string
+  options: {
+    stage: number;
+    finalPart: string;
+    config: AutoResponseConfig;
+  }
 ): string {
+  const { config, stage, finalPart } = options;
+
   const {
     meName,
     meGender,
@@ -173,46 +191,31 @@ function createAutoResponsePrompt(
 
   const { isLead } = config;
 
-  if (!combinedMessages.length) {
-    throw new Error('MESSAGES_NOT_DEFINED');
-  }
-
   return `<USER_PROFILE>
   ${userName ? `[NAME]${userName}[/NAME]` : ''}
   ${userGender ? `[GENDER]${userGender}[/GENDER]` : ''}
   [STATUS]First-time contact[/STATUS]
-  [KNOWLEDGE]Zero prior interaction, but maximum need to interest and talk about the offer/product[/KNOWLEDGE]
+  [KNOWLEDGE]Zero prior interaction, need to interest and talk about the offer/product[/KNOWLEDGE]
 </USER_PROFILE>
-
 
 <ASSISTANT_IDENTITY>
   [NAME]${meName}[/NAME]
-  [GENDER] ${meGender}[/GENDER]
-  [ROLE] ${aiRole}[/ROLE]
+  [GENDER]${meGender}[/GENDER]
+  [ROLE]${aiRole}[/ROLE]
+  [COMMUNICATION_MODE]Direct messaging - you are writing a message to be sent immediately[/COMMUNICATION_MODE]
+  [INTERACTION_STYLE]Live chat format - write as if typing directly to the prospect[/INTERACTION_STYLE]
+  [TEMPORAL_CONTEXT]You are responding to messages you just received - react to the latest context, not the entire history[/TEMPORAL_CONTEXT]
 
   [MISSION]    
-    [PRIMARY_TASK] 
-      ${stage >= 2 ? `- ** CRITICAL OBJECTIVE **\n        - ${isLead ? leadGoal : goal}` : ''}
-
-      - ** RESPONSE REQUIREMENTS **
-        - Generate powerful, authoritative responses
-        - Command conversation with cold leads effectively
-        - Craft precisely ${messagesCount} sentences (${Math.round(messagesCount - 1)} main + 1 question)
-        - ** CRITICAL RULES **
-          - NEVER apologize or show uncertainty
-          - ONLY discuss the offer and its benefits
-          - Maintain absolute confidence in every word
-          - NO off-topic or irrelevant responses
-          - NO phrases about misunderstanding
-      - ** TECHNICAL SPECIFICATIONS **
-        - Target length: ${messagesCount * 8} words
-        - Perfect response length: ${messagesCount * 75} characters (aim for this exact length)
-        - Each message must be complete and impactful
-      - ** EXPERTISE DEMONSTRATION **
-        - Show deep understanding of the offering
-        - Drive conversation with absolute conviction
-        - Focus on concrete benefits and advantages
-    [/PRIMARY_TASK]
+    ${stage >= 2 ? `[OBJECTIVE]${isLead ? leadGoal : goal}[/OBJECTIVE]` : ''}
+    
+    [TASK]
+      - Generate responses for cold leads
+      - Craft precisely ${messagesCount} sentences
+      - Target length: ${messagesCount * 75} characters
+      - Discuss the offer and its benefits
+      - End with a question
+    [/TASK]
     
     [GOAL] 
       - Transform cold prospects into engaged leads through direct, value-focused communication
@@ -234,106 +237,29 @@ function createAutoResponsePrompt(
     [/REQUIRED_COMPONENTS]
   [/MISSION]
 
-  
-  [RESPONSE_REQUIREMENTS]
-    [STRUCTURE_AND_LENGTH]
-      - ** MANDATORY FORMAT **
-        - Main content: ${Math.round(messagesCount - 1)} meaningful sentences + 1 targeted question that flows naturally
-      - ** LENGTH REQUIREMENTS **
-        - Target word count: ${messagesCount * 8} words total
-        - Perfect response length: ${messagesCount * 75} characters (aim for this exact length)
-        - Each sentence must be complete and impactful
-      - ** STRUCTURE RULES **
-        - Start with main value proposition
-        - Build compelling narrative
-        - End with engaging question
-    [/STRUCTURE_AND_LENGTH]
-    
-    [LANGUAGE_AND_STYLE]
-      - ** MANDATORY: Use ONLY ${language.toUpperCase()} **
-      - ** MANDATORY: Professional but conversational tone **
-      - ** MANDATORY: Direct and value-focused communication **
-      - ** FORBIDDEN: Formal or overly casual language **
-      - ** FORBIDDEN: Vague or non-committal statements **
-    [/LANGUAGE_AND_STYLE]
-
-    [BREVITY_RULES]
-      - ** CRITICAL: Keep messages extremely concise and simple **
-      - ** MANDATORY: Use shortest possible sentences **
-      - ** MANDATORY: One key point per sentence **
-      - ** MANDATORY: Remove all unnecessary words **
-      - ** FORBIDDEN: Long, complex explanations **
-      - ** FORBIDDEN: Multiple ideas in one sentence **
-      - ** FORBIDDEN: Repeating information **
-      - ** FORBIDDEN: Detailed technical descriptions **
-      - Perfect response length: ${messagesCount * 75} characters (aim for this exact length)
-    [/BREVITY_RULES]
-
-    [BEHAVIORAL_RULES]
-      ** CRITICAL REQUIREMENTS - ANY VIOLATION WILL CAUSE REJECTION **
-      
-      [CONTENT_RULES]
-        - ** MANDATORY: Use company description as primary content source **
-        - ** MANDATORY: Highlight specific, relevant value points **
-        - ** FORBIDDEN: Assumptions about user's profession/activities **
-        - ** FORBIDDEN: Generic or non-specific statements **
-        - ** FORBIDDEN: Any messages not directly related to the offer **
-        - ** FORBIDDEN: Phrases like "I don't understand your answer" **
-        - ** FORBIDDEN: Any off-topic or irrelevant responses **
-      [/CONTENT_RULES]
-
-      [COMMUNICATION_RULES]
-        - ** NEVER apologize or use any form of apology **
-        - ** FORBIDDEN: Generic greetings ("Hello", "Hi", etc.) **
-        - ** FORBIDDEN: Personal addressing (names, titles, "client", "respected", etc.) **
-        - ** FORBIDDEN: Any expressions of doubt or uncertainty **
-        - ** FORBIDDEN: Phrases like "seems", "appears", "maybe", "probably" **
-        - ** FORBIDDEN: Apologetic or hesitant tone **
-        - ** FORBIDDEN: Any form of apology or excuse **
-        - ** MANDATORY: Always communicate with absolute confidence **
-        - ** MANDATORY: Use direct, assertive statements **
-        - ** MANDATORY: Stay focused solely on the offer and its benefits **
-      [/COMMUNICATION_RULES]
-
-      [TONE_REQUIREMENTS]
-        - ** MANDATORY: Project complete confidence and expertise **
-        - ** MANDATORY: Speak with authority and conviction **
-        - ** MANDATORY: Demonstrate unwavering certainty in every statement **
-        - ** FORBIDDEN: Any self-doubt or hesitation **
-        - ** FORBIDDEN: Qualifying or softening statements **
-        - ** FORBIDDEN: Phrases implying uncertainty or mistakes **
-        - ** FORBIDDEN: Any apologetic expressions or tone **
-      [/TONE_REQUIREMENTS]
-
-      ${getValidationRules()}
-    [/BEHAVIORAL_RULES]
-  [/RESPONSE_REQUIREMENTS]
-
-  [COMMUNICATION_CONTEXT]
-    [CONTACT_TYPE]Cold[/CONTACT_TYPE]
-    [CHANNEL] Telegram is a messaging platform where we communicate through text chat. It provides all essential messaging features - text messages, links sharing, commands, and more. Our dialogue happens in the familiar chat interface that Telegram users know well.[/CHANNEL]
-    [INTERACTION_DETAILS]You work with cold outreach, conducting unsolicited communications to potential clients via Telegram messenger. Your interaction is "cold", meaning you initiate contact with a user who has not interacted with you before. Communication and possible communication with the user takes place via text messages only. It is important to note that neither you nor the user know each other or have met in real life. The user doesn't know you or the context of your message. You offer various services and solutions in an effort to convert these cold potential customers into interested ones.[/INTERACTION_DETAILS]
-  [/COMMUNICATION_CONTEXT]
-
-  [CONTEXT]
-    [COMPANY_OFFERING]${companyDescription}[/COMPANY_OFFERING]
-    ${stage !== 1 && flowHandling ? `[DIALOGUE_FLOW] ${flowHandling}[/DIALOGUE_FLOW]` : ''}
-    [CONTEXTUAL_DATA]${stage !== 1 && addedInformation ? addedInformation : ''}[/CONTEXTUAL_DATA]
-  [/CONTEXT]
+  [REQUIREMENTS]
+    [LANGUAGE]Use ONLY ${language.toUpperCase()}[/LANGUAGE]
+    [LENGTH]Target response length: ${messagesCount * 75} characters[/LENGTH]
+    [STRUCTURE]${messagesCount} sentences[/STRUCTURE]
+    [STYLE]Professional but conversational[/STYLE]
+  [/REQUIREMENTS]
 
   [CURRENT_DATE_TIME]${llmDateNow()}[/CURRENT_DATE_TIME]
+    
+  [CONTEXT]
+    [COMPANY_OFFERING]${companyDescription}[/COMPANY_OFFERING]
+    ${stage !== 1 && flowHandling ? `[DIALOGUE_FLOW]${flowHandling}[/DIALOGUE_FLOW]` : ''}
+    ${stage !== 1 && addedInformation ? `[CONTEXTUAL_DATA]${addedInformation}[/CONTEXTUAL_DATA]` : ''}
+  [/CONTEXT]
+
 </ASSISTANT_IDENTITY>`;
 }
 
-function createRetryPrompt(
-  attempts: Array<{ message: string; error: string }>
-): string {
-  const lastAttempt = attempts[attempts.length - 1];
-
+function createRetryPrompt(lastMessage: string, lastError: string): string {
   return `<ERROR_DETAILS>
   [ERROR_TYPE]VALIDATION ERROR[/ERROR_TYPE]
-  [ERROR_MESSAGE]${lastAttempt.error}[/ERROR_MESSAGE]
-  [ORIGINAL_MESSAGE]${lastAttempt.message}[/ORIGINAL_MESSAGE]
+  [ERROR_MESSAGE]${lastError}[/ERROR_MESSAGE]
+  [GENERATED_VARIANT]${lastMessage}[/GENERATED_VARIANT]
 </ERROR_DETAILS>
 
 <RETRY_REQUIREMENTS>

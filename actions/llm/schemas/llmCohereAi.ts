@@ -10,7 +10,7 @@ export const MessagesSchema = z.array(MessageSchema).min(1);
 export const CohereAIParamsSchema = z.object({
   messages: MessagesSchema,
   model: z.string(),
-  temperature: z.number().min(0.1).max(2),
+  temperature: z.number().min(0.1).max(1),
   k: z.number().int().min(1).max(500).optional(),
   p: z.number().min(0.01).max(0.99).optional(),
   frequency_penalty: z.number().min(0.1).max(1).optional(),

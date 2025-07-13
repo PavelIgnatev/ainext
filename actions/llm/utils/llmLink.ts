@@ -29,7 +29,7 @@ function findPotentialDomains(text: string): string[] {
         } else {
           cur = cur.toLowerCase();
         }
-        return cur;
+        return cur.replace(/\*/g, '');
       })
     )
   );
