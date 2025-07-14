@@ -9,7 +9,6 @@ export function llmLanguageValidation(
 ): { isValid: boolean; error?: string } {
   const contextString =
     allContextData.toLowerCase().replace(/[^а-яёіїєґa-z]/gi, '') + ' link';
-  console.log(contextString);
   const words = message.replace(/[.,!?;:'`"@()«»…—\-/\n]/g, ' ').split(/\s+/);
   const russianUkrainianRegex = /^[а-яёіїєґ]+$/i;
   const englishRegex = /^[a-z]+$/i;
