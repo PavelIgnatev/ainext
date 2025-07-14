@@ -7,7 +7,11 @@ import {
   getValidationRules,
 } from './utils/llmDefaultValidation';
 import { llmLanguageValidation } from './utils/llmLanguageValidation';
-import { llmExtractLinks, LlmProcessedText } from './utils/llmLink';
+import {
+  llmExtractLinks,
+  llmRestoreLinks,
+  LlmProcessedText,
+} from './utils/llmLink';
 import { llmCustomValidation } from './utils/llmCustomValidation';
 
 import {
@@ -67,15 +71,17 @@ export async function getAutoResponse(
       messages = [{ role: 'system', content: systemPrompt }];
 
       for (let j = 0; j < generations.length; j++) {
+        const restoredText = llmRestoreLinks(generations[j]);
+
         messages.push({
           role: 'assistant',
-          content: generations[j].text,
+          content: restoredText,
         });
 
         if (j < errors.length) {
           messages.push({
             role: 'user',
-            content: createRetryPrompt(generations[j].text, errors[j]),
+            content: createRetryPrompt(restoredText, errors[j]),
           });
         }
       }
@@ -101,11 +107,12 @@ export async function getAutoResponse(
 
       onRequest?.();
 
-      message = await makeLLMRequest(currentParams as any);
+      const llmResponse = await makeLLMRequest(currentParams as any);
 
-      const processedMessage = await llmExtractLinks(message);
+      const processedMessage = await llmExtractLinks(llmResponse);
       const normalizedText = fullNormalize(processedMessage.text);
       generations.push({ ...processedMessage, text: normalizedText });
+      message = llmRestoreLinks({ ...processedMessage, text: normalizedText });
 
       llmDefaultValidation(normalizedText, stage);
 
@@ -151,7 +158,7 @@ export async function getAutoResponse(
   }
 
   if (generations.length > 0) {
-    return generations[0];
+    return generations[generations.length - 1];
   }
 
   throw new Error(`** GENERATION_ERROR **

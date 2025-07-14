@@ -97,7 +97,7 @@ function validateNoLinksInFirstStage(
 function validateFinalPart(
   message: string,
   _stage: number,
-  _processedMessage: LlmProcessedText,
+  processedMessage: LlmProcessedText,
   finalPart: string
 ) {
   if (!finalPart) return { isValid: true };
@@ -105,8 +105,16 @@ function validateFinalPart(
   const partForCheck = finalPart.startsWith('@')
     ? finalPart.slice(1)
     : finalPart;
+  const hasLinkInOriginal = Array.from(processedMessage.links.values()).some(
+    (link) => link.toLowerCase().includes(finalPart.toLowerCase())
+  );
 
-  if (!message.toLowerCase().includes(partForCheck.toLowerCase())) {
+  if (
+    !(
+      message.toLowerCase().includes(partForCheck.toLowerCase()) ||
+      hasLinkInOriginal
+    )
+  ) {
     return {
       isValid: false,
       error:
