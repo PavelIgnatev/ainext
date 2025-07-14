@@ -13,15 +13,36 @@ function validateQuestionMarkInEarlyStages(
   _processedMessage: LlmProcessedText,
   _finalPart: string
 ) {
-  if (stage <= 2 && !message.includes('?')) {
-    return {
-      isValid: false,
-      error:
-        'Missing question mark\n' +
-        'REASON: In early dialogue stages (stage <= 2) response must contain a question\n' +
-        'REQUIREMENT: Add a question with a question mark\n' +
-        'HOW TO FIX: Rephrase the response by adding a clarifying question',
-    };
+  if (stage <= 2) {
+    if (!message.includes('?')) {
+      return {
+        isValid: false,
+        error:
+          'Missing question mark\n' +
+          'REASON: In early dialogue stages (stage <= 2) response must contain a question\n' +
+          'REQUIREMENT: Add a question with a question mark\n' +
+          'HOW TO FIX: Rephrase the response by adding a clarifying question',
+      };
+    }
+
+    if (!message.trim().endsWith('?')) {
+      const questionMatch = message.match(/[^.!?]*\?/);
+      const exampleQuestion = questionMatch![0].trim();
+
+      return {
+        isValid: false,
+        error:
+          'Question must be at the end of message\n' +
+          'REASON: In early dialogue stages (stage <= 2) the question must be the very last part\n' +
+          'REQUIREMENT: Move the question to the end of your response\n' +
+          'HOW TO FIX: Restructure your response so it ends with: "' +
+          exampleQuestion +
+          '"\n' +
+          'EXAMPLE: "Your statement text. Your explanation. ' +
+          exampleQuestion +
+          '"',
+      };
+    }
   }
   return { isValid: true };
 }

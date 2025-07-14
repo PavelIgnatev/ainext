@@ -42,7 +42,7 @@ export const AnalysisIdContainer = () => {
   const params = useParams();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
-  const { showError, contextHolder } = useNotifications();
+  const { showError, showInfo, contextHolder } = useNotifications();
   const [dialogs, setDialogs] = useState<DialogMessage[][] | null>(null);
   const [currentDialogId, setCurrentDialogId] = useState<number>(0);
 
@@ -102,6 +102,7 @@ export const AnalysisIdContainer = () => {
                 k: 1,
                 messages: dialogue,
               },
+              onTry: (error) => showInfo(error),
               onLogger: (logName, data) => {
                 console.log(`[${logName}]`, data);
               },
@@ -140,7 +141,7 @@ export const AnalysisIdContainer = () => {
               p: 0.95,
               messages: dialogue,
             },
-            onError: (error) => showError(error),
+            onTry: (error) => showInfo(error),
             onLogger: (logName, data) => {
               console.log(`[${logName}]`, data);
             },

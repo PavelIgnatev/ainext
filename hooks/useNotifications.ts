@@ -15,6 +15,17 @@ export const useNotifications = () => {
     [api]
   );
 
+  const showInfo = useCallback(
+    (description: string) => {
+      api.info({
+        message: 'Повторная попытка...',
+        description,
+        duration: 3,
+      });
+    },
+    [api]
+  );
+
   const showSuccess = useCallback(
     (description: string) => {
       api.success({
@@ -28,6 +39,7 @@ export const useNotifications = () => {
 
   return {
     contextHolder,
+    showInfo,
     showError,
     showSuccess,
   };

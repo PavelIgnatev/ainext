@@ -10,7 +10,7 @@ export const DialogueAnalysisSchema = z.object({
 export const DialogueAnalysisOptionsSchema = z.object({
   llmParams: CohereAIParamsSchema,
   onRequest: z.function().returns(z.void()).optional(),
-  onError: z.function().args(z.string()).returns(z.void()).optional(),
+  onTry: z.function().args(z.string()).returns(z.void()).optional(),
   onLogger: z.function().args(z.string(), z.any()).returns(z.void()).optional(),
 });
 

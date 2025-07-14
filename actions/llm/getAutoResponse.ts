@@ -32,7 +32,7 @@ export async function getAutoResponse(
   AutoResponseSchema.parse(context);
   AutoResponseOptionsSchema.parse(options);
 
-  const { llmParams, options: config, onRequest, onError, onLogger } = options;
+  const { llmParams, options: config, onRequest, onTry, onLogger } = options;
   const { messages, ...otherLlmParams } = llmParams;
   const maxRetries = LLM_CONSTANTS.DEFAULT_MAX_RETRIES;
 
@@ -136,7 +136,7 @@ export async function getAutoResponse(
       const errorMessage = error.message || 'UNDEFINED_ERROR';
       errors.push(errorMessage);
 
-      onError?.(errorMessage);
+      onTry?.(errorMessage);
       onLogger?.('AR_ERROR', {
         name: context.companyName,
         message,

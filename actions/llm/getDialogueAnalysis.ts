@@ -23,7 +23,7 @@ export async function getDialogueAnalysis(
   DialogueAnalysisOptionsSchema.parse(options);
 
   const { leadDefinition, language, companyName } = context;
-  const { llmParams, onRequest, onError, onLogger } = options;
+  const { llmParams, onRequest, onTry, onLogger } = options;
   const { messages, ...otherLlmParams } = llmParams;
   const maxRetries = LLM_CONSTANTS.DEFAULT_MAX_RETRIES;
 
@@ -48,11 +48,15 @@ export async function getDialogueAnalysis(
     params,
   });
 
+  const attempts: string[] = [];
+  const errors: string[] = [];
+
   for (let i = 0; i < maxRetries; i++) {
+    let llmResponse = '';
     try {
       onRequest?.();
 
-      const llmResponse = await makeLLMRequest(params);
+      llmResponse = await makeLLMRequest(params);
       const analysisResult = extractJsonResponse(llmResponse);
 
       if (!analysisResult) {
@@ -67,8 +71,10 @@ export async function getDialogueAnalysis(
       return analysisResult;
     } catch (error: any) {
       const errorMessage = error.message || 'UNDEFINED_ERROR';
+      attempts.push(llmResponse || 'NO_RESPONSE');
+      errors.push(errorMessage);
 
-      onError?.(errorMessage);
+      onTry?.(errorMessage);
       onLogger?.('DA_ERROR', {
         companyName,
         error: errorMessage,
@@ -80,7 +86,13 @@ export async function getDialogueAnalysis(
     }
   }
 
-  throw new Error('Maximum retries exceeded. Please contact support.');
+  throw new Error(`** ANALYSIS_ERROR **
+_____________
+ATTEMPTS:
+${attempts.map((a, i) => `${i + 1}: ${a}`).join('\n')}
+ERRORS:
+${errors.map((e, i) => `${i + 1}: ${e}`).join('\n')}
+_____________`);
 }
 
 function createAnalysisPrompt(
