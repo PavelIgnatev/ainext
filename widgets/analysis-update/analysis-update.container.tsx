@@ -23,12 +23,8 @@ export const AnalysisUpdateContainer = (
   const router = useRouter();
   const { showError, showSuccess, contextHolder } = useNotifications();
 
-  const { mutate: handleUpdate, isPending: isCreateLoading } = useMutation<
-    string | null,
-    Error,
-    Omit<Analysis, 'dialogs' | 'companyId'>
-  >({
-    mutationFn: (data: Omit<Analysis, 'dialogs' | 'companyId'>) => {
+  const { mutate: handleUpdate, isPending: isCreateLoading } = useMutation({
+    mutationFn: async (data: Omit<Analysis, 'dialogs' | 'companyId'>) => {
       const randomCompanyId = String(Math.random()).substring(2, 12);
       const analysisData: Analysis = {
         ...data,
@@ -47,14 +43,8 @@ export const AnalysisUpdateContainer = (
         ],
       };
 
-      try {
-        validateAnalysis(analysisData);
-      } catch (error) {
-        showError(error instanceof Error ? error.message : 'Ошибка валидации');
-        return Promise.resolve(null);
-      }
-
-      return updateAnalysis(analysisData);
+      validateAnalysis(analysisData);
+      return await updateAnalysis(analysisData);
     },
     onSuccess: (id) => {
       if (!id) return;

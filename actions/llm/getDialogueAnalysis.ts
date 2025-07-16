@@ -86,13 +86,7 @@ export async function getDialogueAnalysis(
     }
   }
 
-  throw new Error(`** ANALYSIS_ERROR **
-_____________
-ATTEMPTS:
-${attempts.map((a, i) => `${i + 1}: ${a}`).join('\n')}
-ERRORS:
-${errors.map((e, i) => `${i + 1}: ${e}`).join('\n')}
-_____________`);
+  throw new Error(`STOPPED_ERROR`);
 }
 
 function createAnalysisPrompt(

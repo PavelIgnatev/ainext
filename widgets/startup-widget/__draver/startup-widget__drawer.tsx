@@ -300,7 +300,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
                   name="part"
                   label="Уникальная часть (ссылка на бота, сайт, etc)"
                 >
-                  <Input placeholder="@aisenderOfficial_bot" />
+                  <Input placeholder="t.me/test" />
                 </Form.Item>
               </Col>
 

@@ -254,7 +254,7 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
           name="part"
         >
           <TextArea
-            placeholder="@aisenderOfficial_bot"
+            placeholder="t.me/test"
             className={classes.textArea}
             maxLength={1000}
             autoComplete="off"

@@ -30,6 +30,7 @@ export const AutoResponseOptionsSchema = z.object({
   options: AutoResponseConfigSchema,
   onRequest: z.function().returns(z.void()).optional(),
   onTry: z.function().args(z.string()).returns(z.void()).optional(),
+  onThrow: z.function().args(z.string()).returns(z.void()).optional(),
   onLogger: z.function().args(z.string(), z.any()).returns(z.void()).optional(),
 });
 

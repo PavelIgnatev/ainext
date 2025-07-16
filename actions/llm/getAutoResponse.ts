@@ -36,7 +36,14 @@ export async function getAutoResponse(
   AutoResponseSchema.parse(context);
   AutoResponseOptionsSchema.parse(options);
 
-  const { llmParams, options: config, onRequest, onTry, onLogger } = options;
+  const {
+    llmParams,
+    options: config,
+    onRequest,
+    onTry,
+    onThrow,
+    onLogger,
+  } = options;
   const { messages, ...otherLlmParams } = llmParams;
   const maxRetries = LLM_CONSTANTS.DEFAULT_MAX_RETRIES;
 
@@ -158,16 +165,17 @@ export async function getAutoResponse(
   }
 
   if (generations.length > 0) {
-    return generations[generations.length - 1];
-  }
-
-  throw new Error(`** GENERATION_ERROR **
+    onThrow?.(`** GENERATION_ERROR **
 _____________
 GENERATIONS:
 ${generations.map((g, i) => `${i + 1}: ${g.text}`).join('\n')}
 ERRORS:
 ${errors.map((e, i) => `${i + 1}: ${e}`).join('\n')}
 _____________`);
+    return generations[generations.length - 1];
+  }
+
+  throw new Error('STOPPED_ERROR');
 }
 
 function createAutoResponsePrompt(

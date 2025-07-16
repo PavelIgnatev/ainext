@@ -76,14 +76,7 @@ export const AnalysisIdContainer = () => {
           throw new Error('Данные разбора недоступны');
         }
 
-        try {
-          validateAnalysis(analysisData);
-        } catch (error) {
-          showError(
-            error instanceof Error ? error.message : 'Ошибка валидации'
-          );
-          return null;
-        }
+        validateAnalysis(analysisData);
 
         const isCurrentDialogLead = analysisData.leadDialogs?.[currentDialogId];
         let analysisResult: LLMDialogueAnalysisResult | null = null;
@@ -196,8 +189,10 @@ export const AnalysisIdContainer = () => {
         return finalDialogs;
       },
       onSuccess: (dialogs) => {
-        setDialogs(dialogs);
-        queryClient.invalidateQueries({ queryKey: ['analysis', analysisId] });
+        if (dialogs) {
+          setDialogs(dialogs);
+          queryClient.invalidateQueries({ queryKey: ['analysis', analysisId] });
+        }
       },
       onError: (error) => showError(error.message),
     });

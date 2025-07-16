@@ -32,6 +32,7 @@ const VALIDATION_PATTERNS = {
   FORBIDDEN_BASIC_SYMBOLS: /[?!]/,
   FORBIDDEN_QUESTION_SYMBOLS: /[!.:]/,
   FORBIDDEN_GREETING_SYMBOLS: /[?:]/,
+  FORBIDDEN_AT_SYMBOL: /(?:^|\s)@\w+/,
   FORBIDDEN_PART_ENDINGS: ['.', '?', ',', '!'],
   USERNAME_PATTERN: /^[a-zA-Z0-9_+]+$/,
 } as const;
@@ -62,6 +63,8 @@ const VALIDATION_MESSAGES = {
   FORBIDDEN_BASIC_SYMBOLS: 'Поле содержит недопустимые символы: ? или !',
   FORBIDDEN_QUESTION_SYMBOLS: 'Поле содержит недопустимые символы: !, : или .',
   FORBIDDEN_GREETING_SYMBOLS: 'Поле содержит недопустимые символы: ? или :',
+  FORBIDDEN_AT_SYMBOL:
+    'Поле содержит слова, начинающиеся с символа @, которые запрещены',
   FORBIDDEN_PART_ENDINGS:
     'Значение не должно заканчиваться на ".", "?", "," или "!"',
   MISSING_QUESTION_MARK: 'Добавьте знак "?" в следующих вопросах',
@@ -112,8 +115,18 @@ function validateField(
 }
 
 function validateAnalysisFields(data: Analysis) {
-  const { aiRole, goal, companyDescription, firstQuestion, addedQuestion } =
-    data;
+  const {
+    aiRole,
+    goal,
+    companyDescription,
+    companyName,
+    firstQuestion,
+    addedQuestion,
+    leadDefinition,
+    leadGoal,
+    addedInformation,
+    flowHandling,
+  } = data;
 
   const fieldValidations = [
     {
@@ -131,6 +144,36 @@ function validateAnalysisFields(data: Analysis) {
     {
       value: companyDescription,
       name: 'Описание компании',
+      pattern: VALIDATION_PATTERNS.FORBIDDEN_BASIC_SYMBOLS,
+      message: VALIDATION_MESSAGES.FORBIDDEN_BASIC_SYMBOLS,
+    },
+    {
+      value: companyName,
+      name: 'Название компании',
+      pattern: VALIDATION_PATTERNS.FORBIDDEN_BASIC_SYMBOLS,
+      message: VALIDATION_MESSAGES.FORBIDDEN_BASIC_SYMBOLS,
+    },
+    {
+      value: leadDefinition,
+      name: 'Критерии лида',
+      pattern: VALIDATION_PATTERNS.FORBIDDEN_BASIC_SYMBOLS,
+      message: VALIDATION_MESSAGES.FORBIDDEN_BASIC_SYMBOLS,
+    },
+    {
+      value: leadGoal,
+      name: 'Целевое действие при статусе лид',
+      pattern: VALIDATION_PATTERNS.FORBIDDEN_BASIC_SYMBOLS,
+      message: VALIDATION_MESSAGES.FORBIDDEN_BASIC_SYMBOLS,
+    },
+    {
+      value: addedInformation,
+      name: 'Дополнительная информация',
+      pattern: VALIDATION_PATTERNS.FORBIDDEN_BASIC_SYMBOLS,
+      message: VALIDATION_MESSAGES.FORBIDDEN_BASIC_SYMBOLS,
+    },
+    {
+      value: flowHandling,
+      name: 'Обработка сценариев',
       pattern: VALIDATION_PATTERNS.FORBIDDEN_BASIC_SYMBOLS,
       message: VALIDATION_MESSAGES.FORBIDDEN_BASIC_SYMBOLS,
     },
@@ -197,6 +240,66 @@ function validateUniquePart(part: string | null, goal: string) {
   }
 }
 
+function validateNumericFields(data: Analysis) {
+  const { messagesCount } = data;
+
+  const numericFields = {
+    'Количество сообщений': messagesCount,
+  };
+
+  const invalidNumericFields = Object.entries(numericFields)
+    .filter(([_, value]) => isNaN(Number(value)) || Number(value) < 0)
+    .map(([fieldName]) => fieldName);
+
+  if (invalidNumericFields.length > 0) {
+    throw new Error(
+      `${VALIDATION_MESSAGES.INVALID_NUMERIC}: ${invalidNumericFields.join(', ')}`
+    );
+  }
+}
+
+function validateAtSymbol(data: Analysis) {
+  const fieldsToCheck = [
+    { value: data.companyId, name: 'ID компании' },
+    { value: data.aiRole, name: 'Роль AI менеджера' },
+    { value: data.companyDescription, name: 'Описание компании' },
+    { value: data.companyName, name: 'Название компании' },
+    { value: data.goal, name: 'Целевое действие' },
+    { value: data.meName, name: 'Имя инициатора' },
+    { value: data.meGender, name: 'Пол инициатора' },
+    { value: data.userName, name: 'Имя отвечающего' },
+    { value: data.userGender, name: 'Пол отвечающего' },
+    { value: data.firstQuestion, name: 'Первый вопрос' },
+    { value: data.leadDefinition, name: 'Критерии лида' },
+    { value: data.leadGoal, name: 'Целевое действие при статусе лид' },
+    { value: data.addedInformation, name: 'Дополнительная информация' },
+    { value: data.addedQuestion, name: 'Дополнительный вопрос' },
+    { value: data.flowHandling, name: 'Обработка сценариев' },
+    { value: data.part, name: 'Уникальная часть' },
+  ];
+
+  for (const field of fieldsToCheck) {
+    if (
+      field.value &&
+      VALIDATION_PATTERNS.FORBIDDEN_AT_SYMBOL.test(field.value)
+    ) {
+      const atWords = field.value.match(/(?:^|\s)@\w+/g);
+      if (atWords) {
+        const cleanAtWords = atWords.map((word) => word.trim());
+        const uniqueAtWords = Array.from(new Set(cleanAtWords));
+        const wordsList = uniqueAtWords.map((word) => `"${word}"`).join(', ');
+        const suggestions = uniqueAtWords
+          .map((word) => `t.me/${word.slice(1)}`)
+          .join(', ');
+
+        throw new Error(
+          `Ошибка в поле "${field.name}": ${VALIDATION_MESSAGES.FORBIDDEN_AT_SYMBOL}. Найденные слова: ${wordsList}. Предлагаемая замена: ${suggestions}`
+        );
+      }
+    }
+  }
+}
+
 export function validateAnalysis(data: Analysis) {
   try {
     AnalysisSchema.parse(data);
@@ -207,9 +310,17 @@ export function validateAnalysis(data: Analysis) {
     throw error;
   }
 
-  const { goal, part, firstQuestion, addedQuestion } = data;
+  const { goal, part, firstQuestion, addedQuestion, language } = data;
+
+  if (!['ENGLISH', 'RUSSIAN', 'UKRAINIAN'].includes(language)) {
+    throw new Error(
+      `Ошибка в поле "Язык": ${VALIDATION_MESSAGES.INVALID_LANGUAGE}`
+    );
+  }
 
   validateUniquePart(part, goal);
   validateAnalysisFields(data);
   validateQuestionMarks(firstQuestion, addedQuestion || null);
+  validateNumericFields(data);
+  validateAtSymbol(data);
 }

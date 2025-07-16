@@ -25,6 +25,7 @@ const VALIDATION_PATTERNS = {
   FORBIDDEN_BASIC_SYMBOLS: /[?!]/,
   FORBIDDEN_QUESTION_SYMBOLS: /[!.:]/,
   FORBIDDEN_GREETING_SYMBOLS: /[?:]/,
+  FORBIDDEN_AT_SYMBOL: /(?:^|\s)@\w+/,
   FORBIDDEN_PART_ENDINGS: ['.', '?', ',', '!'],
   USERNAME_PATTERN: /^[a-zA-Z0-9_+]+$/,
 } as const;
@@ -54,6 +55,8 @@ const VALIDATION_MESSAGES = {
   FORBIDDEN_BASIC_SYMBOLS: 'Поле содержит недопустимые символы: ? или !',
   FORBIDDEN_QUESTION_SYMBOLS: 'Поле содержит недопустимые символы: !, : или .',
   FORBIDDEN_GREETING_SYMBOLS: 'Поле содержит недопустимые символы: ? или :',
+  FORBIDDEN_AT_SYMBOL:
+    'Поле содержит слова, начинающиеся с символа @, которые запрещены',
   FORBIDDEN_PART_ENDINGS:
     'Значение не должно заканчиваться на ".", "?", "," или "!"',
   MISSING_QUESTION_MARK: 'Добавьте знак "?" в следующих вопросах',
@@ -461,6 +464,45 @@ function validateNumericFields(data: GroupId) {
   }
 }
 
+function validateAtSymbol(data: GroupId) {
+  const fieldsToCheck = [
+    { value: data.groupId, name: 'Идентификатор' },
+    { value: data.name, name: 'Название' },
+    { value: data.aiRole, name: 'Роль AI менеджера' },
+    { value: data.goal, name: 'Целевое действие' },
+    { value: data.companyDescription, name: 'Описание компании' },
+    { value: data.firstMessagePrompt, name: 'Первое приветствие' },
+    { value: data.secondMessagePrompt, name: 'Первый вопрос' },
+    { value: data.leadDefinition, name: 'Критерии лида' },
+    { value: data.leadGoal, name: 'Целевое действие при статусе лид' },
+    { value: data.part, name: 'Уникальная часть' },
+    { value: data.flowHandling, name: 'Обработка сценариев' },
+    { value: data.addedInformation, name: 'Дополнительная информация' },
+    { value: data.addedQuestion, name: 'Дополнительный вопрос' },
+  ];
+
+  for (const field of fieldsToCheck) {
+    if (
+      field.value &&
+      VALIDATION_PATTERNS.FORBIDDEN_AT_SYMBOL.test(field.value)
+    ) {
+      const atWords = field.value.match(/(?:^|\s)@\w+/g);
+      if (atWords) {
+        const cleanAtWords = atWords.map((word) => word.trim());
+        const uniqueAtWords = Array.from(new Set(cleanAtWords));
+        const wordsList = uniqueAtWords.map((word) => `"${word}"`).join(', ');
+        const suggestions = uniqueAtWords
+          .map((word) => `t.me/${word.slice(1)}`)
+          .join(', ');
+
+        throw new Error(
+          `Ошибка в поле "${field.name}": ${VALIDATION_MESSAGES.FORBIDDEN_AT_SYMBOL}. Найденные слова: ${wordsList}. Предлагаемая замена: ${suggestions}`
+        );
+      }
+    }
+  }
+}
+
 function validateRandomStrings(data: GroupId) {
   if (EXCLUDED_GROUP_IDS.includes(data.groupId)) {
     return;
@@ -501,5 +543,6 @@ export function validateGroupId(data: GroupId) {
   validateGroupIdFields(data);
   validateQuestionMarks(secondMessagePrompt, addedQuestion || null);
   validateNumericFields(data);
+  validateAtSymbol(data);
   validateRandomStrings(data);
 }

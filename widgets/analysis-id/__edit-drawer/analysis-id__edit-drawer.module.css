@@ -16,9 +16,15 @@
   border-radius: 0 !important;
   box-shadow: none !important;
   border: none !important;
+  max-width: none !important;
+  margin: 0 !important;
+  width: 100% !important;
+  min-height: auto !important;
+  overflow: visible !important;
+  align-items: stretch !important;
 }
 
-@media (max-height: 650px) {
+@media (max-width: 650px) {
   .editDrawer :global(.ant-drawer-body) {
     overflow-y: auto;
     overflow-x: hidden;

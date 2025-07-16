@@ -101,13 +101,8 @@ export const StartupWidgetContainer = () => {
       data: GroupId;
       database: Array<string>;
     }) => {
-      try {
-        validateGroupId(data);
-        validateGroupIdUsers(database);
-      } catch (error) {
-        showError(error instanceof Error ? error.message : 'Ошибка валидации');
-        return;
-      }
+      validateGroupId(data);
+      validateGroupIdUsers(database);
 
       await updateGroupIdUsers(data.groupId, database);
       await updateGroupId(data);
