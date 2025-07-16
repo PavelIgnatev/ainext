@@ -44,7 +44,7 @@ export const AnalysisUpdateContainer = (
       };
 
       validateAnalysis(analysisData);
-      return await updateAnalysis(analysisData);
+      return updateAnalysis(analysisData);
     },
     onSuccess: (id) => {
       if (!id) return;

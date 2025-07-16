@@ -189,10 +189,8 @@ export const AnalysisIdContainer = () => {
         return finalDialogs;
       },
       onSuccess: (dialogs) => {
-        if (dialogs) {
-          setDialogs(dialogs);
-          queryClient.invalidateQueries({ queryKey: ['analysis', analysisId] });
-        }
+        setDialogs(dialogs);
+        queryClient.invalidateQueries({ queryKey: ['analysis', analysisId] });
       },
       onError: (error) => showError(error.message),
     });
