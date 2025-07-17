@@ -147,8 +147,7 @@ export async function getAutoResponse(
       onLogger?.('AR_RESPONSE', {
         name: context.companyName,
         attempt: i + 1,
-        message: normalizedText,
-        links: processedMessage.links,
+        message,
       });
 
       return { ...processedMessage, text: normalizedText };
@@ -174,7 +173,7 @@ export async function getAutoResponse(
     onThrow?.(`** GENERATION_ERROR **
 _____________
 GENERATIONS:
-${generations.map((g, i) => `${i + 1}: ${g.text}`).join('\n')}
+${generations.map((g, i) => `${i + 1}: ${llmRestoreLinks(g)}`).join('\n')}
 ERRORS:
 ${errors.map((e, i) => `${i + 1}: ${e}`).join('\n')}
 _____________`);
