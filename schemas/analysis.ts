@@ -35,6 +35,7 @@ const VALIDATION_PATTERNS = {
   FORBIDDEN_AT_SYMBOL: /(?:^|\s)@\w+/,
   FORBIDDEN_PART_ENDINGS: ['.', '?', ',', '!'],
   USERNAME_PATTERN: /^[a-zA-Z0-9_+]+$/,
+  FORBIDDEN_HTTP_TELEGRAM: /https?:\/\/t\.me\//i,
 } as const;
 
 const FIELD_NAMES: Record<string, string> = {
@@ -74,6 +75,8 @@ const VALIDATION_MESSAGES = {
   INVALID_LANGUAGE: 'Выберите корректный язык: ENGLISH, RUSSIAN или UKRAINIAN',
   INVALID_NUMERIC: 'Следующие поля должны быть положительными числами',
   REQUIRED_FIELD: 'Обязательное поле!',
+  FORBIDDEN_HTTP_TELEGRAM:
+    'Ссылки на Telegram следует указывать в формате t.me/username без префиксов https:// или http://',
 } as const;
 
 function formatZodError(error: z.ZodError): string {
@@ -300,6 +303,47 @@ function validateAtSymbol(data: Analysis) {
   }
 }
 
+function validateTelegramLinks(data: Analysis) {
+  const fieldsToCheck = [
+    { value: data.companyId, name: 'ID компании' },
+    { value: data.aiRole, name: 'Роль AI менеджера' },
+    { value: data.companyDescription, name: 'Описание компании' },
+    { value: data.companyName, name: 'Название компании' },
+    { value: data.goal, name: 'Целевое действие' },
+    { value: data.meName, name: 'Имя инициатора' },
+    { value: data.meGender, name: 'Пол инициатора' },
+    { value: data.userName, name: 'Имя отвечающего' },
+    { value: data.userGender, name: 'Пол отвечающего' },
+    { value: data.firstQuestion, name: 'Первый вопрос' },
+    { value: data.leadDefinition, name: 'Критерии лида' },
+    { value: data.leadGoal, name: 'Целевое действие при статусе лид' },
+    { value: data.addedInformation, name: 'Дополнительная информация' },
+    { value: data.addedQuestion, name: 'Дополнительный вопрос' },
+    { value: data.flowHandling, name: 'Обработка сценариев' },
+    { value: data.part, name: 'Уникальная часть' },
+  ];
+
+  for (const field of fieldsToCheck) {
+    if (
+      field.value &&
+      VALIDATION_PATTERNS.FORBIDDEN_HTTP_TELEGRAM.test(field.value)
+    ) {
+      const httpLinks = [
+        ...new Set(field.value.match(/https?:\/\/t\.me\/[^\s]*/gi)),
+      ];
+      if (httpLinks) {
+        const suggestions = httpLinks
+          .map((link) => link.replace(/https?:\/\//, ''))
+          .join(', ');
+
+        throw new Error(
+          `Ошибка в поле "${field.name}": ${VALIDATION_MESSAGES.FORBIDDEN_HTTP_TELEGRAM}. Найденные ссылки: ${httpLinks.join(', ')}. Предлагаемая замена: ${suggestions}`
+        );
+      }
+    }
+  }
+}
+
 export function validateAnalysis(data: Analysis) {
   try {
     AnalysisSchema.parse(data);
@@ -323,4 +367,5 @@ export function validateAnalysis(data: Analysis) {
   validateQuestionMarks(firstQuestion, addedQuestion || null);
   validateNumericFields(data);
   validateAtSymbol(data);
+  validateTelegramLinks(data);
 }

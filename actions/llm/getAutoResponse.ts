@@ -78,7 +78,10 @@ export async function getAutoResponse(
       messages = [{ role: 'system', content: systemPrompt }];
 
       for (let j = 0; j < generations.length; j++) {
-        const restoredText = llmRestoreLinks(generations[j]);
+        const restoredText = llmRestoreLinks(
+          generations[j],
+          context.personalChannel
+        );
 
         messages.push({
           role: 'assistant',
@@ -119,7 +122,10 @@ export async function getAutoResponse(
       const processedMessage = await llmExtractLinks(llmResponse);
       const normalizedText = fullNormalize(processedMessage.text);
       generations.push({ ...processedMessage, text: normalizedText });
-      message = llmRestoreLinks({ ...processedMessage, text: normalizedText });
+      message = llmRestoreLinks(
+        { ...processedMessage, text: normalizedText },
+        context.personalChannel
+      );
 
       llmDefaultValidation(normalizedText, stage);
 
