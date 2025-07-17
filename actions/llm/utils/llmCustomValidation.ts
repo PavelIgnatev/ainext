@@ -1,4 +1,5 @@
 import type { LlmProcessedText } from './llmLink';
+import { findPotentialDomains } from './llmLink';
 
 type ValidationFunction = (
   message: string,
@@ -75,6 +76,29 @@ function validateMinimumSentences(
   return { isValid: true };
 }
 
+function validateNoPotentialLinksInFirstStage(
+  message: string,
+  stage: number,
+  _processedMessage: LlmProcessedText,
+  _finalPart: string
+) {
+  if (stage === 1) {
+    const potentialDomains = findPotentialDomains(message);
+    if (potentialDomains.length > 0) {
+      return {
+        isValid: false,
+        error:
+          `Potential links detected in message: ${potentialDomains.join(', ')}\n` +
+          'REASON: Any URLs or domain names are not allowed in the first stage of dialogue\n' +
+          'REQUIREMENT: Avoid mentioning websites, domains, or any text that looks like a link\n' +
+          'HOW TO FIX: Remove or rephrase any website references, domain names, or URL-like text\n' +
+          'EXAMPLES TO AVOID: aisender.com, www.example.com, example.ru, site.org',
+      };
+    }
+  }
+  return { isValid: true };
+}
+
 function validateNoLinksInFirstStage(
   _message: string,
   stage: number,
@@ -130,6 +154,7 @@ function validateFinalPart(
 export const CUSTOM_VALIDATION_RULES: ValidationFunction[] = [
   validateQuestionMarkInEarlyStages,
   validateMinimumSentences,
+  validateNoPotentialLinksInFirstStage,
   validateNoLinksInFirstStage,
   validateFinalPart,
 ];

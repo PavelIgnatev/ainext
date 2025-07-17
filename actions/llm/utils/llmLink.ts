@@ -2,7 +2,7 @@ export interface LlmProcessedText {
   text: string;
   links: Map<string, string>;
 }
-function findPotentialDomains(text: string): string[] {
+export function findPotentialDomains(text: string): string[] {
   const cleaned = text.replace(/\n/g, ' ');
   const regex =
     /(?:[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})|(?:(?:https?:\/\/)?(?:(?:\d{1,3}\.){3}\d{1,3}|(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z0-9-]+)(?::\d+)?(?:\/\S*)?)/gi;

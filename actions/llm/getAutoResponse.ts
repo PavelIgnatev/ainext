@@ -72,7 +72,8 @@ export async function getAutoResponse(
       finalPart,
     });
 
-    let messages = [];
+    let messages: { role: 'assistant' | 'system' | 'user'; content: string }[] =
+      [];
 
     if (generations.length > 0 && errors.length > 0) {
       messages = [{ role: 'system', content: systemPrompt }];
@@ -117,8 +118,7 @@ export async function getAutoResponse(
 
       onRequest?.();
 
-      const llmResponse = await makeLLMRequest(currentParams as any);
-
+      const llmResponse = await makeLLMRequest(currentParams);
       const processedMessage = await llmExtractLinks(llmResponse);
       const normalizedText = fullNormalize(processedMessage.text);
       generations.push({ ...processedMessage, text: normalizedText });
