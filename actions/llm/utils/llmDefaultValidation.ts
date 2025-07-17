@@ -273,7 +273,6 @@ function validateApologies(message: string) {
   const apologyPatterns = [
     'извини',
     'извините',
-    'прости',
     'простите',
     'sorry',
     'apologize',
@@ -301,6 +300,23 @@ function validateApologies(message: string) {
       };
     }
   }
+
+  if (/\bпрости/.test(message)) {
+    return {
+      isValid: false,
+      error:
+        `Apology phrase found: "прости"\n\n` +
+        'REASON: Apologies and excuses break professional communication style\n' +
+        'REQUIREMENT: Express thoughts directly without apologetic phrases\n' +
+        'EXAMPLES OF INVALID INPUT:\n' +
+        '- "Извините за ошибку"\n' +
+        '- "Sorry about that"\n' +
+        '- "Прошу прощения"\n' +
+        '- "I apologize for"\n' +
+        'HOW TO FIX: Remove apologies and state information directly',
+    };
+  }
+
   return { isValid: true };
 }
 
