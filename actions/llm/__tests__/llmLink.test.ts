@@ -211,13 +211,13 @@ describe('llmLink', () => {
 
       {
         input: 'http://t.me/VIPmalvinamira_bot?start=promo',
-        expected: ['http://t.me/VIPmalvinamira_bot?start=promo'],
+        expected: ['t.me/VIPmalvinamira_bot?start=promo'],
       },
 
       {
         input:
           'ссылка на бота https://t.me/VIPmalvinamira_bot?start=promo лови',
-        expected: ['https://t.me/VIPmalvinamira_bot?start=promo'],
+        expected: ['t.me/VIPmalvinamira_bot?start=promo'],
       },
 
       {
@@ -670,6 +670,62 @@ describe('llmLink', () => {
 
       expect(foundUrls).toHaveLength(expected.length);
       expected.forEach((url) => {
+        expect(foundUrls).toContain(url);
+      });
+    }
+  });
+
+  it('проверка удаления звездочек с конца', async () => {
+    const testCases = [
+      {
+        input: '**t.me/aisender**',
+        expected: ['t.me/aisender'],
+        description: 'Удаление звездочек с обеих сторон telegram ссылки',
+      },
+      {
+        input: 'Проверьте **https://t.me/mychannel**',
+        expected: ['t.me/mychannel'],
+        description: 'Удаление звездочек с конца https telegram ссылки',
+      },
+      {
+        input: 'Ссылка **http://t.me/testchannel***',
+        expected: ['t.me/testchannel'],
+        description:
+          'Удаление множественных звездочек с конца http telegram ссылки',
+      },
+      {
+        input: 'telegram канал: **t.me/channel/123**!',
+        expected: ['t.me/channel/123'],
+        description: 'Удаление звездочек с конца telegram ссылки с путем',
+      },
+      {
+        input: 'Переход на **t.me/bot?start=promo***',
+        expected: ['t.me/bot?start=promo'],
+        description: 'Удаление звездочек с конца telegram ссылки с параметрами',
+      },
+      {
+        input: 'Обычный сайт **example.com**',
+        expected: ['example.com'],
+        description: 'Удаление звездочек с конца обычной ссылки',
+      },
+      {
+        input: 't.me/channel без звездочек',
+        expected: ['t.me/channel'],
+        description: 'Ссылка без звездочек остается без изменений',
+      },
+      {
+        input: 'Начало *t.me/channel** окончание',
+        expected: ['t.me/channel'],
+        description: 'Удаление только звездочек с конца, не с начала',
+      },
+    ];
+
+    for (const testCase of testCases) {
+      const result = await llmExtractLinks(testCase.input);
+      const foundUrls = Array.from(result.links.values());
+
+      expect(foundUrls).toHaveLength(testCase.expected.length);
+      testCase.expected.forEach((url) => {
         expect(foundUrls).toContain(url);
       });
     }

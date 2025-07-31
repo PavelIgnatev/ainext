@@ -65,7 +65,10 @@ export async function llmExtractLinks(text: string): Promise<LlmProcessedText> {
       const placeholder = `LINK${Math.floor(Math.random() * 10 ** 10)}`;
       links.set(
         placeholder,
-        domain.replace('https://t.me', 't.me').replace('http://t.me', 't.me')
+        domain
+          .replace('https://t.me', 't.me')
+          .replace('http://t.me', 't.me')
+          .replace(/\*+$/, '')
       );
       processedText = processedText.replace(domain, placeholder);
     }
