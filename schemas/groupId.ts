@@ -19,6 +19,7 @@ const GroupIdSchema = z.object({
   flowHandling: z.string().nullable(),
   addedInformation: z.string().nullable(),
   addedQuestion: z.string().nullable(),
+  googleTableCrmId: z.string().optional(),
 });
 
 const VALIDATION_PATTERNS = {

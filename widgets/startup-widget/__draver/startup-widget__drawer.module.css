@@ -2,6 +2,46 @@
   padding: 10px 20px 60px 20px !important;
 }
 
+.crmSectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.crmSectionTitle::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  background: #000000;
+  margin-right: 8px;
+  border-radius: 2px;
+}
+
+.identifiersSectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.identifiersSectionTitle::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  background: #000000;
+  margin-right: 8px;
+  border-radius: 2px;
+}
+
+.copyButton {
+  margin-left: 8px;
+}
+
 /* Стили для disabled инпутов - делаем их похожими на обычные */
 .drawerBody :global(.ant-input[disabled]) {
   background-color: #ffffff !important;

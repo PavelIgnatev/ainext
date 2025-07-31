@@ -25,11 +25,7 @@ export async function getGroupIdUsers(groupId: string) {
           g: groupId,
           s: { $ne: true },
           f: { $ne: true },
-          $or: [
-            { p: { $exists: false } },
-            { p: null },
-            { p: { $lt: new Date(new Date().getTime() - 180 * 60000) } },
-          ],
+          $or: [{ p: { $exists: false } }, { p: null }],
         },
         {
           projection: {
@@ -40,7 +36,27 @@ export async function getGroupIdUsers(groupId: string) {
       )
       .toArray();
 
-    return filterDatabase(users.map(({ u }) => u));
+    const workingUsers = await collection
+      .find<GroupIdUsers>(
+        {
+          g: groupId,
+          s: { $ne: true },
+          f: { $ne: true },
+          p: { $ne: null },
+        },
+        {
+          projection: {
+            _id: 0,
+            u: 1,
+          },
+        }
+      )
+      .toArray();
+
+    return {
+      users: filterDatabase(users.map(({ u }) => u)),
+      workingDatabase: filterDatabase(workingUsers.map(({ u }) => u)),
+    };
   } catch {
     throw new Error('GET_GROUP_ID_USERS_ERROR');
   }
@@ -56,18 +72,16 @@ export const updateGroupIdUsers = async (
     const db = await coreDB();
     const collection = db.collection('groupIdUsers');
 
-    const pastTime = new Date(new Date().getTime() - 180 * 60000);
-
     await collection.deleteMany({
       g: groupId,
       s: { $ne: true },
       f: { $ne: true },
-      $or: [{ p: { $exists: false } }, { p: null }, { p: { $lt: pastTime } }],
+      $or: [{ p: { $exists: false } }, { p: null }],
     });
 
     const existingUsernames = await collection.distinct('u', {
       g: groupId,
-      $or: [{ s: true }, { f: true }, { p: { $gte: pastTime } }],
+      $or: [{ s: true }, { f: true }],
     });
 
     const existingUsernamesSet = new Set(

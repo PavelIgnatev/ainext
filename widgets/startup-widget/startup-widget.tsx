@@ -7,6 +7,7 @@ import { StartupWidgetLoading } from './__loading/startup-widget__loading';
 import { Title } from '@/components/title/title';
 import classes from './startup-widget.module.css';
 import { GroupId } from '@/@types/GroupId';
+import { Crm } from '@/@types/Crm';
 
 interface StartupWidgetProps {
   search: string;
@@ -15,8 +16,14 @@ interface StartupWidgetProps {
   groupIdData: GroupId | null;
   groupIdLoading: boolean;
 
-  groupIdDatabase: Array<string>;
+  groupIdDatabase: {
+    users: string[];
+    workingDatabase: string[];
+  };
   groupIdDatabaseLoading: boolean;
+
+  crmData: Crm | null;
+  crmLoading: boolean;
 
   isSubmitLoading: boolean;
 
@@ -28,9 +35,11 @@ interface StartupWidgetProps {
   onSumbitDrawer: ({
     data,
     database,
+    crm,
   }: {
     data: GroupId;
     database: Array<string>;
+    crm: Crm | null;
   }) => void;
   onSearchGroupId: (search: string) => void;
 }
@@ -48,6 +57,9 @@ export const StartupWidget = (props: StartupWidgetProps) => {
 
     groupIdDatabase,
     groupIdDatabaseLoading,
+
+    crmData,
+    crmLoading,
 
     isSubmitLoading,
 
@@ -95,14 +107,22 @@ export const StartupWidget = (props: StartupWidgetProps) => {
         loading={false}
         onClickGroupId={onClickGroupId}
       />
-      <StartupWidgetDrawer
-        groupId={groupId}
-        groupIdData={groupIdData}
-        groupIdDatabase={groupIdDatabase}
-        loading={groupIdLoading || groupIdDatabaseLoading || isSubmitLoading}
-        onCloseDrawer={onCloseDrawer}
-        onSumbitDrawer={onSumbitDrawer}
-      />
+      {groupId && (
+        <StartupWidgetDrawer
+          groupId={groupId}
+          groupIdData={groupIdData}
+          groupIdDatabase={groupIdDatabase}
+          crmData={crmData}
+          loading={
+            groupIdLoading ||
+            groupIdDatabaseLoading ||
+            crmLoading ||
+            isSubmitLoading
+          }
+          onCloseDrawer={onCloseDrawer}
+          onSumbitDrawer={onSumbitDrawer}
+        />
+      )}
     </div>
   );
 };
