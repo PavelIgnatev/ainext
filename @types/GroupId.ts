@@ -1,5 +1,6 @@
 export type GroupId = {
   groupId: string;
+  newGroupId: string;
 
   name: string;
   target: number;
@@ -24,4 +25,5 @@ export type GroupId = {
   addedQuestion: string | null;
 
   googleTableCrmId?: string;
+  dateUpdated?: Date;
 };

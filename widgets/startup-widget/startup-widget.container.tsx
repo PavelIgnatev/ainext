@@ -6,9 +6,19 @@ import { useDebounce } from 'use-debounce';
 import { StartupWidget } from './startup-widget';
 import { GroupId } from '@/@types/GroupId';
 import { Crm } from '@/@types/Crm';
-import { getGroupId, getGroupIds, updateGroupId } from '@/actions/db/groupId';
+import {
+  getGroupId,
+  getGroupIds,
+  updateGroupId,
+  getGroupIdPrefixes,
+  changeGroupIdGroupId,
+} from '@/actions/db/groupId';
 import { useNotifications } from '@/hooks/useNotifications';
-import { getGroupIdUsers, updateGroupIdUsers } from '@/actions/db/groupIdUsers';
+import {
+  changeGroupIdUsersGroupId,
+  getGroupIdUsers,
+  updateGroupIdUsers,
+} from '@/actions/db/groupIdUsers';
 import {
   getCrmByGroupId,
   updateCrmByGroupId,
@@ -18,6 +28,7 @@ import { validateGroupId } from '@/schemas/groupId';
 import { validateGroupIdUsers } from '@/schemas/groupIdUsers';
 import { createGoogleTable } from '@/actions/google-crm/oauth-sheets';
 import { validateCrm } from '@/schemas/crm';
+import { changeDialoguesGroupId } from '@/actions/db/dialogues';
 
 const DEBOUNCE_DELAY = 300;
 
@@ -68,6 +79,7 @@ export const StartupWidgetContainer = () => {
   const { showError, showSuccess, contextHolder } = useNotifications();
   const [groupId, setGroupId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [showPrefixField, setShowPrefixField] = useState(false);
   const [debouncedSearch] = useDebounce(search, DEBOUNCE_DELAY);
 
   const { data: groupIds = [], isLoading: isGroupIdsLoading } = useQuery({
@@ -166,6 +178,24 @@ export const StartupWidgetContainer = () => {
     gcTime: 0,
   });
 
+  const { data: prefixes = [], isLoading: isPrefixesLoading } = useQuery({
+    queryKey: ['prefixes'],
+    queryFn: async () => {
+      try {
+        const result = await getGroupIdPrefixes();
+        return result;
+      } catch (error) {
+        showError('Произошла ошибка при загрузке префиксов');
+        return [];
+      }
+    },
+    enabled: showPrefixField && !!groupId && !groupId.includes('prefix'),
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
   const { mutate: handleSubmit, isPending: isSubmitLoading } = useMutation({
     mutationFn: async ({
       data,
@@ -182,6 +212,8 @@ export const StartupWidgetContainer = () => {
       if (crm) {
         validateCrm(crm);
       }
+
+      const { groupId, newGroupId } = data;
 
       const isGroupIdChanged = compareGroupIdData(data, groupIdData);
       const isDatabaseChanged = compareDatabaseData(
@@ -212,6 +244,13 @@ export const StartupWidgetContainer = () => {
           await deleteCrmByGroupId(data.groupId);
         }
       }
+
+      console.log(groupId, newGroupId);
+      if (groupId !== newGroupId) {
+        await changeGroupIdGroupId(groupId, newGroupId);
+        await changeGroupIdUsersGroupId(groupId, newGroupId);
+        await changeDialoguesGroupId(groupId, newGroupId);
+      }
     },
     onSuccess: () => {
       showSuccess(
@@ -240,12 +279,19 @@ export const StartupWidgetContainer = () => {
         isSubmitLoading={isSubmitLoading}
         crmData={crmData}
         crmLoading={isCrmLoading}
+        showPrefixField={showPrefixField}
+        prefixes={prefixes}
+        prefixesLoading={isPrefixesLoading}
         onSearchGroupId={setSearch}
-        onCloseDrawer={() => setGroupId(null)}
+        onCloseDrawer={() => {
+          setGroupId(null);
+          setShowPrefixField(false);
+        }}
         onSumbitDrawer={handleSubmit}
         onClickGroupId={(groupId: string) => {
           setGroupId(groupId);
         }}
+        onShowPrefixField={() => setShowPrefixField(true)}
       />
     </>
   );

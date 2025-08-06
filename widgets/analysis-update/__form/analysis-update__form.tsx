@@ -1,5 +1,5 @@
 import { Button, Col, Form, Input, Row, Select } from 'antd';
-import React, { useRef } from 'react';
+import React from 'react';
 import type { Analysis } from '@/@types/Analysis';
 import { convertUndefinedToNull } from '@/utils/convertUndefinedToNull';
 
@@ -33,7 +33,7 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
     className,
   } = props;
 
-  const formRef = useRef<any>(null);
+  const [form] = Form.useForm();
 
   const getInitialValues = () => {
     if (analysis) {
@@ -75,13 +75,13 @@ export const AnalysisUpdateForm = (props: AnalysisUpdateFormProps) => {
 
   return (
     <Form
+      form={form}
       name="basic"
       layout="vertical"
       className={`${classes.form} ${className || ''}`}
       onFinish={handleFinish}
       initialValues={getInitialValues()}
       onFinishFailed={onFinishFailed}
-      ref={formRef}
     >
       <div className={classes.scrollableContent}>
         <Row gutter={[16, 8]} className={classes.formRow}>

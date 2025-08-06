@@ -98,3 +98,57 @@ export async function updateGroupId(groupIdData: GroupId) {
     throw new Error('UPDATE_GROUP_ID_ERROR');
   }
 }
+
+export async function changeGroupIdGroupId(
+  prevGroupId: string,
+  newGroupId: string
+) {
+  try {
+    const db = await coreDB();
+    const collection = db.collection('groupId') as Collection<GroupId>;
+
+    await collection.updateMany(
+      {
+        groupId: prevGroupId,
+      },
+      {
+        $set: {
+          groupId: newGroupId,
+          dateUpdated: new Date(),
+        },
+      }
+    );
+  } catch {
+    throw new Error('GU_CHANGE_GROUP_ID_ERROR');
+  }
+}
+
+export async function getGroupIdPrefixes(): Promise<string[]> {
+  try {
+    const db = await coreDB();
+    const collection = db.collection('groupId');
+
+    const groupIds = await collection
+      .find<Pick<GroupId, 'groupId'>>(
+        { groupId: { $regex: '-prefix-' } },
+        {
+          projection: {
+            _id: 0,
+            groupId: 1,
+          },
+        }
+      )
+      .toArray();
+
+    const prefixes = groupIds
+      .map(({ groupId }) => {
+        const match = groupId.match(/-prefix-(.+)$/);
+        return match ? match[1] : null;
+      })
+      .filter((prefix): prefix is string => prefix !== null);
+
+    return [...new Set(prefixes)];
+  } catch {
+    throw new Error('GET_GROUP_ID_PREFIXES_ERROR');
+  }
+}

@@ -102,3 +102,26 @@ export const updateGroupIdUsers = async (
     throw new Error('UPDATE_GROUP_ID_USERS_ERROR');
   }
 };
+
+export async function changeGroupIdUsersGroupId(
+  prevGroupId: string,
+  newGroupId: string
+) {
+  try {
+    const db = await coreDB();
+    const collection = db.collection('groupIdUsers');
+
+    await collection.updateMany(
+      {
+        g: prevGroupId,
+      },
+      {
+        $set: {
+          g: newGroupId,
+        },
+      }
+    );
+  } catch {
+    throw new Error('USERS_CHANGE_GROUP_ID_ERROR');
+  }
+}

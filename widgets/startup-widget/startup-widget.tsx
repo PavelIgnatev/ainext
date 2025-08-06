@@ -25,6 +25,10 @@ interface StartupWidgetProps {
   crmData: Crm | null;
   crmLoading: boolean;
 
+  showPrefixField: boolean;
+  prefixes: string[];
+  prefixesLoading: boolean;
+
   isSubmitLoading: boolean;
 
   groupIds: Pick<GroupId, 'groupId' | 'name' | 'target' | 'currentCount'>[];
@@ -42,6 +46,7 @@ interface StartupWidgetProps {
     crm: Crm | null;
   }) => void;
   onSearchGroupId: (search: string) => void;
+  onShowPrefixField: () => void;
 }
 
 export const StartupWidget = (props: StartupWidgetProps) => {
@@ -61,12 +66,17 @@ export const StartupWidget = (props: StartupWidgetProps) => {
     crmData,
     crmLoading,
 
+    showPrefixField,
+    prefixes,
+    prefixesLoading,
+
     isSubmitLoading,
 
     onClickGroupId,
     onSumbitDrawer,
     onCloseDrawer,
     onSearchGroupId,
+    onShowPrefixField,
   } = props;
 
   if (groupIdsloading) {
@@ -113,6 +123,9 @@ export const StartupWidget = (props: StartupWidgetProps) => {
           groupIdData={groupIdData}
           groupIdDatabase={groupIdDatabase}
           crmData={crmData}
+          showPrefixField={showPrefixField}
+          prefixes={prefixes}
+          prefixesLoading={prefixesLoading}
           loading={
             groupIdLoading ||
             groupIdDatabaseLoading ||
@@ -121,6 +134,7 @@ export const StartupWidget = (props: StartupWidgetProps) => {
           }
           onCloseDrawer={onCloseDrawer}
           onSumbitDrawer={onSumbitDrawer}
+          onShowPrefixField={onShowPrefixField}
         />
       )}
     </div>

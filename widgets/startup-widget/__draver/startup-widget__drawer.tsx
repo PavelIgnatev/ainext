@@ -1,4 +1,5 @@
 import {
+  AutoComplete,
   Button,
   Col,
   Drawer,
@@ -9,9 +10,10 @@ import {
   Select,
   Space,
   Spin,
+  Tooltip,
 } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { GroupId } from '@/@types/GroupId';
 import { Crm } from '@/@types/Crm';
@@ -19,6 +21,22 @@ import { Crm } from '@/@types/Crm';
 import styles from './startup-widget__drawer.module.css';
 
 const { Option } = Select;
+
+const getTimeInfo = (dateUpdated?: Date) => {
+  if (!dateUpdated) {
+    return { canManagePrefix: true, remainingMinutes: 0 };
+  }
+
+  const now = new Date();
+  const updated = new Date(dateUpdated);
+  const diffMs = now.getTime() - updated.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+
+  const canManagePrefix = diffMinutes >= 60;
+  const remainingMinutes = Math.max(0, 60 - diffMinutes);
+
+  return { canManagePrefix, remainingMinutes };
+};
 
 interface StartupWidgetDrawerProps {
   loading: boolean;
@@ -31,6 +49,10 @@ interface StartupWidgetDrawerProps {
   };
   crmData: Crm | null;
 
+  showPrefixField: boolean;
+  prefixes: string[];
+  prefixesLoading: boolean;
+
   onCloseDrawer: () => void;
   onSumbitDrawer: ({
     data,
@@ -41,6 +63,7 @@ interface StartupWidgetDrawerProps {
     database: Array<string>;
     crm: Crm | null;
   }) => void;
+  onShowPrefixField: () => void;
 }
 
 export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
@@ -50,12 +73,21 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
     groupIdData,
     groupIdDatabase,
     crmData,
+    showPrefixField,
+    prefixes,
+    prefixesLoading,
     onCloseDrawer,
     onSumbitDrawer,
+    onShowPrefixField,
   } = props;
 
   const [hasChanges, setHasChanges] = useState(false);
+  const [selectedPrefix, setSelectedPrefix] = useState<string | null>(null);
   const [form] = Form.useForm();
+
+  const { canManagePrefix, remainingMinutes } = getTimeInfo(
+    groupIdData?.dateUpdated
+  );
 
   const initialValues = {
     ...groupIdData,
@@ -69,17 +101,33 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
     crmWebhook: crmData?.webhook || '',
   };
 
+  const trimValue = (value: any) => {
+    return typeof value === 'string' ? value.trim() : value;
+  };
+
   const checkForChanges = (_: any, allValues: any) => {
-    const hasChanges = Object.keys(allValues).some((key) => {
+    if (!groupId || loading) return;
+
+    const formHasChanges = Object.keys(allValues).some((key) => {
       if (key === 'workingDatabase') return false;
-      return (
-        JSON.stringify(allValues[key]) !==
-        JSON.stringify((initialValues as any)[key])
-      );
+      const currentValue = trimValue(allValues[key]);
+      const initialValue = trimValue((initialValues as any)[key]);
+      return JSON.stringify(currentValue) !== JSON.stringify(initialValue);
     });
 
-    setHasChanges(hasChanges);
+    const hasAnyChanges =
+      formHasChanges ||
+      !!selectedPrefix ||
+      (groupId.includes('prefix') ? showPrefixField : false);
+
+    setHasChanges(hasAnyChanges);
   };
+
+  useEffect(() => {
+    if (!groupId || loading) return;
+    const formValues = form.getFieldsValue();
+    checkForChanges(null, formValues);
+  }, [selectedPrefix, showPrefixField, groupId, loading]);
 
   const handleCopyToClipboard = async (text: string) => {
     try {
@@ -101,26 +149,31 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
       const values = await form.validateFields();
 
       const data: GroupId = {
-        groupId: values.groupId,
-        name: values.name,
+        groupId: trimValue(values.groupId),
+        newGroupId: hasChanges
+          ? selectedPrefix
+            ? `${trimValue(values.groupId)}-prefix-${selectedPrefix}`
+            : trimValue(values.groupId.replace(/-prefix-.*$/, ''))
+          : trimValue(values.groupId),
+        name: trimValue(values.name),
         target: Number(values.target),
         currentCount: Number(values.currentCount),
         messagesCount: Number(values.messagesCount),
-        language: values.language,
-        aiRole: values.aiRole,
-        companyDescription: values.companyDescription,
-        goal: values.goal,
-        leadDefinition: values.leadDefinition,
-        leadGoal: values.leadGoal,
-        firstMessagePrompt: values.firstMessagePrompt,
-        secondMessagePrompt: values.secondMessagePrompt,
-        part: values.part?.trim() || null,
-        flowHandling: values.flowHandling?.trim() || null,
-        addedInformation: values.addedInformation?.trim() || null,
-        addedQuestion: values.addedQuestion?.trim() || null,
+        language: trimValue(values.language),
+        aiRole: trimValue(values.aiRole),
+        companyDescription: trimValue(values.companyDescription),
+        goal: trimValue(values.goal),
+        leadDefinition: trimValue(values.leadDefinition),
+        leadGoal: trimValue(values.leadGoal),
+        firstMessagePrompt: trimValue(values.firstMessagePrompt),
+        secondMessagePrompt: trimValue(values.secondMessagePrompt),
+        part: trimValue(values.part) || null,
+        flowHandling: trimValue(values.flowHandling) || null,
+        addedInformation: trimValue(values.addedInformation) || null,
+        addedQuestion: trimValue(values.addedQuestion) || null,
       };
 
-      const database = values.database
+      const database = trimValue(values.database)
         .split('\n')
         .map((line: string) => line.trim())
         .filter((line: string) => line.length > 0);
@@ -129,9 +182,9 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
         values.crmType === 'none' || !values.crmType
           ? null
           : {
-              groupId: values.groupId,
-              type: values.crmType,
-              webhook: values.crmWebhook?.trim() || '',
+              groupId: trimValue(values.groupId),
+              type: trimValue(values.crmType),
+              webhook: trimValue(values.crmWebhook) || '',
             };
 
       onSumbitDrawer({ data, database, crm });
@@ -163,6 +216,28 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
       }}
       extra={
         <Space>
+          {!showPrefixField && (
+            <Tooltip
+              title={
+                !canManagePrefix && !loading
+                  ? `Управление префиксом доступно через ${remainingMinutes} мин. Остановите запуск (если еще не остановлен) и подождите.`
+                  : ''
+              }
+            >
+              <Button
+                loading={loading}
+                disabled={loading || !canManagePrefix}
+                onClick={onShowPrefixField}
+                type="primary"
+              >
+                {loading
+                  ? ''
+                  : groupId.includes('prefix')
+                    ? 'Убрать из под префикса'
+                    : 'Поставить под префикс'}
+              </Button>
+            </Tooltip>
+          )}
           <Button
             loading={loading}
             disabled={!hasChanges && !loading}
@@ -174,7 +249,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
         </Space>
       }
     >
-      <Spin spinning={loading} style={{ marginTop: '50px' }}>
+      <Spin spinning={loading || prefixesLoading} style={{ marginTop: '50px' }}>
         {!loading && groupId && (
           <Form
             form={form}
@@ -205,6 +280,68 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
                 </Form.Item>
               </Col>
             </Row>
+            {showPrefixField && (
+              <Row gutter={16}>
+                <Col span={24}>
+                  {groupId.includes('prefix') ? (
+                    <Form.Item label="Новый идентификатор">
+                      <Input
+                        disabled
+                        value={groupId.replace(/-prefix-.*$/, '')}
+                      />
+                    </Form.Item>
+                  ) : (
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Form.Item label="Новый идентификатор">
+                          <Input
+                            disabled
+                            value={
+                              selectedPrefix
+                                ? `${groupId}-prefix-${selectedPrefix}`
+                                : groupId
+                            }
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item
+                          name="prefixInput"
+                          label="Выберите или введите префикс"
+                        >
+                          <AutoComplete
+                            placeholder="Выберите или введите префикс"
+                            allowClear
+                            style={{
+                              transition: 'none',
+                            }}
+                            classNames={{
+                              popup: {
+                                root: 'no-transition',
+                              },
+                            }}
+                            onChange={(value) => {
+                              setSelectedPrefix(value || null);
+                            }}
+                            options={prefixes
+                              .sort((a, b) => a.localeCompare(b))
+                              .map((prefix) => ({
+                                value: prefix,
+                                label: prefix,
+                              }))}
+                            filterOption={(input, option) =>
+                              option?.label
+                                ?.toLowerCase()
+                                .includes(input.toLowerCase()) ?? false
+                            }
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  )}
+                </Col>
+              </Row>
+            )}
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
@@ -466,7 +603,10 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
                     <Input.TextArea
                       rows={6}
                       disabled
-                      style={{ backgroundColor: '#f5f5f5' }}
+                      style={{
+                        backgroundColor: '#f5f5f5',
+                        cursor: 'not-allowed',
+                      }}
                     />
                   </Form.Item>
                 </Col>
