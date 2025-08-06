@@ -45,11 +45,11 @@
 /* Стили для disabled инпутов - делаем их похожими на обычные */
 .drawerBody :global(.ant-input[disabled]) {
   -webkit-touch-callout: none !important; /* iOS Safari */
-    -webkit-user-select: none !important; /* Safari */
-     -khtml-user-select: none !important; /* Konqueror HTML */
-       -moz-user-select: none !important; /* Old versions of Firefox */
-        -ms-user-select: none !important; /* Internet Explorer/Edge */
-            user-select: none !important;
+  -webkit-user-select: none !important; /* Safari */
+  -khtml-user-select: none !important; /* Konqueror HTML */
+  -moz-user-select: none !important; /* Old versions of Firefox */
+  -ms-user-select: none !important; /* Internet Explorer/Edge */
+  user-select: none !important;
   background-color: #f4f1f1 !important;
   border-color: #000000 !important;
   color: rgba(0, 0, 0, 0.88) !important;

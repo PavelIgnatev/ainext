@@ -245,7 +245,6 @@ export const StartupWidgetContainer = () => {
         }
       }
 
-      console.log(groupId, newGroupId);
       if (groupId !== newGroupId) {
         await changeGroupIdGroupId(groupId, newGroupId);
         await changeGroupIdUsersGroupId(groupId, newGroupId);

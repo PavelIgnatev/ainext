@@ -114,7 +114,6 @@ export async function changeGroupIdGroupId(
       {
         $set: {
           groupId: newGroupId,
-          dateUpdated: new Date(),
         },
       }
     );

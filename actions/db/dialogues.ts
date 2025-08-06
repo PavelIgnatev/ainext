@@ -17,7 +17,6 @@ export async function changeDialoguesGroupId(
       {
         $set: {
           groupId: newGroupId,
-          dateUpdated: new Date(),
         },
       }
     );
