@@ -1,0 +1,299 @@
+.tableContainer {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #000000;
+  overflow: hidden;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.modernTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.tableHead {
+  background: #f8f9fa;
+  border-bottom: 1px solid #000000;
+}
+
+.headerRow {
+  background: transparent;
+}
+
+.headerCell {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border: none;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.headerCell:last-child {
+  border-right: none;
+}
+
+.tableBody {
+  background: #ffffff;
+}
+
+.tableRow {
+  border-bottom: 1px solid #000000;
+  cursor: pointer !important;
+  transition: all 0.15s ease;
+}
+
+.tableRow:hover {
+  background: #f9fafb;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableCell {
+  padding: 12px 16px;
+  vertical-align: middle;
+  border: none;
+}
+
+.idCell {
+  display: flex;
+  align-items: center;
+}
+
+.idText {
+  background: black;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 12px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  cursor: pointer !important;
+}
+
+.usernameCell {
+  display: flex;
+  align-items: center;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.usernameCell span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.platformCell {
+  display: flex;
+  align-items: center;
+}
+
+.platformBadge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.platformTelegram {
+  background: #0088cc;
+  color: white;
+}
+
+.platformWhatsapp {
+  background: #25d366;
+  color: white;
+}
+
+.statusCell {
+  display: flex;
+  align-items: center;
+}
+
+.statusBadge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.statusActive {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.statusInactive {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.statusBanned {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.launchCountCell {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.lastActivityCell {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0;
+  padding: 20px;
+  border-top: 1px solid #000000;
+  background: #f9fafb;
+}
+
+.paginationInfo {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.paginationControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pageNumbers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 12px;
+}
+
+.pageNumber {
+  padding: 8px 12px;
+  border: 1px solid #000000;
+  background: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000;
+  transition: all 0.15s ease;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pageNumber:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+.pageNumberActive {
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
+}
+
+.pageNumberActive:hover {
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
+}
+
+.dots {
+  padding: 8px 4px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .tableContainer {
+    border-radius: 6px;
+  }
+
+  .headerCell {
+    padding: 10px 14px;
+    font-size: 11px;
+  }
+
+  .tableCell {
+    padding: 10px 14px;
+  }
+
+
+  .modernTable {
+    font-size: 13px;
+  }
+
+  .idText {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .usernameCell {
+    font-size: 13px;
+  }
+
+  .platformBadge,
+  .statusBadge {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+
+  .launchCountCell {
+    font-size: 12px;
+  }
+
+  .lastActivityCell {
+    font-size: 12px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .paginationControls {
+    justify-content: center;
+  }
+
+  .pageNumbers {
+    margin: 0 8px;
+  }
+
+  .pageNumber {
+    padding: 6px 10px;
+    font-size: 13px;
+    min-width: 32px;
+    height: 32px;
+  }
+}

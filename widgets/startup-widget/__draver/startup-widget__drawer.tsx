@@ -82,6 +82,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
   } = props;
 
   const [hasChanges, setHasChanges] = useState(false);
+  const [hasSelectedChanges, setHasSelectedChanges] = useState(false);
   const [selectedPrefix, setSelectedPrefix] = useState<string | null>(null);
   const [form] = Form.useForm();
 
@@ -115,12 +116,10 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
       return JSON.stringify(currentValue) !== JSON.stringify(initialValue);
     });
 
-    const hasAnyChanges =
-      formHasChanges ||
-      !!selectedPrefix ||
-      (groupId.includes('prefix') ? showPrefixField : false);
-
-    setHasChanges(hasAnyChanges);
+    setHasChanges(formHasChanges);
+    setHasSelectedChanges(
+      !!selectedPrefix || (groupId.includes('prefix') ? showPrefixField : false)
+    );
   };
 
   useEffect(() => {
@@ -150,7 +149,7 @@ export const StartupWidgetDrawer = (props: StartupWidgetDrawerProps) => {
 
       const data: GroupId = {
         groupId: trimValue(values.groupId),
-        newGroupId: hasChanges
+        newGroupId: hasSelectedChanges
           ? selectedPrefix
             ? `${trimValue(values.groupId)}-prefix-${selectedPrefix}`
             : trimValue(values.groupId.replace(/-prefix-.*$/, ''))

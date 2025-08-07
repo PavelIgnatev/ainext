@@ -49,6 +49,29 @@ export async function updateCrmByGroupId(crmData: Crm) {
   }
 }
 
+export async function changeCRMGroupId(
+  prevGroupId: string,
+  newGroupId: string
+) {
+  try {
+    const db = await coreDB();
+    const collection = db.collection('crm');
+
+    await collection.updateMany(
+      {
+        groupId: prevGroupId,
+      },
+      {
+        $set: {
+          groupId: newGroupId,
+        },
+      }
+    );
+  } catch {
+    throw new Error('CRM_CHANGE_GROUP_ID_ERROR');
+  }
+}
+
 export async function deleteCrmByGroupId(groupId: string) {
   try {
     const db = await coreDB();

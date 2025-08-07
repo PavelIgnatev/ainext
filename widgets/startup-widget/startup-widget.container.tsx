@@ -23,12 +23,14 @@ import {
   getCrmByGroupId,
   updateCrmByGroupId,
   deleteCrmByGroupId,
+  changeCRMGroupId,
 } from '@/actions/db/crm';
 import { validateGroupId } from '@/schemas/groupId';
 import { validateGroupIdUsers } from '@/schemas/groupIdUsers';
 import { createGoogleTable } from '@/actions/google-crm/oauth-sheets';
 import { validateCrm } from '@/schemas/crm';
 import { changeDialoguesGroupId } from '@/actions/db/dialogues';
+import { getGroupedAccounts } from '@/actions/db/accounts';
 
 const DEBOUNCE_DELAY = 300;
 
@@ -249,6 +251,7 @@ export const StartupWidgetContainer = () => {
         await changeGroupIdGroupId(groupId, newGroupId);
         await changeGroupIdUsersGroupId(groupId, newGroupId);
         await changeDialoguesGroupId(groupId, newGroupId);
+        await changeCRMGroupId(groupId, newGroupId);
       }
     },
     onSuccess: () => {
