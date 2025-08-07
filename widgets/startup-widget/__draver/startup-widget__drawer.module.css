@@ -122,12 +122,3 @@
 .drawerBody :global(.ant-auto-complete-dropdown) {
   transition: none !important;
 }
-
-:global(.no-transition) {
-  transition: none !important;
-}
-
-:global(.no-transition *) {
-  transition: none !important;
-  animation: none !important;
-}
