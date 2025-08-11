@@ -81,7 +81,7 @@ export const updateGroupIdUsers = async (
 
     const existingUsernames = await collection.distinct('u', {
       g: groupId,
-      $or: [{ s: true }, { f: true }],
+      $or: [{ s: true }, { f: true }, { p: { $ne: null } }],
     });
 
     const existingUsernamesSet = new Set(
