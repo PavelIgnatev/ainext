@@ -209,7 +209,7 @@ export const StartupWidgetContainer = () => {
       crm: Crm | null;
     }) => {
       validateGroupId(data);
-      validateGroupIdUsers(database);
+      validateGroupIdUsers(database, data.groupId);
 
       if (crm) {
         validateCrm(crm);

@@ -67,7 +67,7 @@ export const updateGroupIdUsers = async (
   database: string[]
 ) => {
   try {
-    validateGroupIdUsers(database);
+    validateGroupIdUsers(database, groupId);
 
     const db = await coreDB();
     const collection = db.collection('groupIdUsers');

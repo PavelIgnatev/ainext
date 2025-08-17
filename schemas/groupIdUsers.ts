@@ -12,6 +12,8 @@ const VALIDATION_MESSAGES = {
   EMPTY_DATABASE: 'База данных не может быть пустой',
   INVALID_GROUP_ID: 'Некорректный идентификатор группы',
   SHORT_USERNAME: 'Юзернеймы должны содержать минимум 3 символа',
+  PHONES_ONLY:
+    'Для запуска с режимом "phone" допускаются только номера телефонов',
 } as const;
 
 function validateDatabase(database: Array<string>) {
@@ -47,7 +49,30 @@ function validateDatabase(database: Array<string>) {
   }
 }
 
-export function validateGroupIdUsers(database: Array<string>) {
+function validatePhoneDatabase(database: Array<string>) {
+  if (!database || database.length === 0) {
+    throw new Error(VALIDATION_MESSAGES.EMPTY_DATABASE);
+  }
+
+  const filteredDatabase = database
+    .map((u: string) => u.trim().toLowerCase())
+    .filter((u: string) => u.length > 0);
+
+  if (filteredDatabase.length === 0) {
+    throw new Error(VALIDATION_MESSAGES.EMPTY_DATABASE);
+  }
+
+  const invalidEntries = filteredDatabase.filter(
+    (entry) => !entry.startsWith('+')
+  );
+  if (invalidEntries.length > 0) {
+    throw new Error(
+      `${VALIDATION_MESSAGES.PHONES_ONLY}. Некорректные юзернеймы: ${invalidEntries.join(', ')}`
+    );
+  }
+}
+
+export function validateGroupIdUsers(database: Array<string>, groupId: string) {
   try {
     GroupIdUsersSchema.parse(database);
   } catch (error) {
@@ -57,6 +82,12 @@ export function validateGroupIdUsers(database: Array<string>) {
       );
     }
     throw error;
+  }
+
+  const isPhoneMode = groupId.toLowerCase().includes('phone');
+  if (isPhoneMode) {
+    validatePhoneDatabase(database);
+    return;
   }
 
   validateDatabase(database);
