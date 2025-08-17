@@ -3,17 +3,20 @@ import { z } from 'zod';
 const GroupIdUsersSchema = z.array(z.string().min(1));
 
 const VALIDATION_PATTERNS = {
-  USERNAME_PATTERN: /^[a-zA-Z0-9_+]+$/,
+  USERNAME_PATTERN: /^[a-zA-Z][a-zA-Z0-9_]*$/,
+  PHONE_E164: /^\+[0-9]{7,15}$/,
 } as const;
 
 const VALIDATION_MESSAGES = {
   INVALID_USERNAME:
-    'Некорректные юзернеймы. Проверьте, что в юзернеймах содержатся только английские буквы, цифры или символ подчеркивания (_)',
+    'Юзернейм должен начинаться с английской буквы и содержать только английские буквы, цифры или символ подчеркивания (_)',
   EMPTY_DATABASE: 'База данных не может быть пустой',
   INVALID_GROUP_ID: 'Некорректный идентификатор группы',
   SHORT_USERNAME: 'Юзернеймы должны содержать минимум 3 символа',
   PHONES_ONLY:
     'Для запуска с режимом "phone" допускаются только номера телефонов',
+  INVALID_PHONE_FORMAT:
+    'Номера телефонов должны быть в формате +[цифры] без пробелов, скобок и разделителей',
 } as const;
 
 function validateDatabase(database: Array<string>) {
@@ -29,7 +32,19 @@ function validateDatabase(database: Array<string>) {
     throw new Error(VALIDATION_MESSAGES.EMPTY_DATABASE);
   }
 
-  const shortUsernames = filteredDatabase.filter(
+  const nonPhoneEntries = filteredDatabase.filter((u) => !u.startsWith('+'));
+  const phoneEntries = filteredDatabase.filter((u) => u.startsWith('+'));
+
+  const invalidPhones = phoneEntries.filter(
+    (p) => !VALIDATION_PATTERNS.PHONE_E164.test(p)
+  );
+  if (invalidPhones.length > 0) {
+    throw new Error(
+      `${VALIDATION_MESSAGES.INVALID_PHONE_FORMAT}. Некорректные поля: ${invalidPhones.join(', ')}`
+    );
+  }
+
+  const shortUsernames = nonPhoneEntries.filter(
     (username) => username.length < 3
   );
   if (shortUsernames.length > 0) {
@@ -38,13 +53,20 @@ function validateDatabase(database: Array<string>) {
     );
   }
 
-  const invalidUsernames = filteredDatabase.filter(
+  const usernamesStartWithDigit = nonPhoneEntries.filter((u) => /^\d/.test(u));
+  if (usernamesStartWithDigit.length > 0) {
+    throw new Error(
+      `Юзернеймы не могут начинаться с цифр. Исправьте: ${usernamesStartWithDigit.join(', ')}`
+    );
+  }
+
+  const invalidUsernames = nonPhoneEntries.filter(
     (username) => !VALIDATION_PATTERNS.USERNAME_PATTERN.test(username)
   );
 
   if (invalidUsernames.length > 0) {
     throw new Error(
-      `Некорректные юзернеймы: ${invalidUsernames.join(', ')}. ${VALIDATION_MESSAGES.INVALID_USERNAME}. Каждый новый юзернейм должен находиться в отдельной строке.`
+      `${VALIDATION_MESSAGES.INVALID_USERNAME}. Исправьте: ${invalidUsernames.join(', ')}`
     );
   }
 }
@@ -62,12 +84,22 @@ function validatePhoneDatabase(database: Array<string>) {
     throw new Error(VALIDATION_MESSAGES.EMPTY_DATABASE);
   }
 
-  const invalidEntries = filteredDatabase.filter(
+  const invalidWithoutPlus = filteredDatabase.filter(
     (entry) => !entry.startsWith('+')
   );
-  if (invalidEntries.length > 0) {
+  if (invalidWithoutPlus.length > 0) {
     throw new Error(
-      `${VALIDATION_MESSAGES.PHONES_ONLY}. Некорректные юзернеймы: ${invalidEntries.join(', ')}`
+      `${VALIDATION_MESSAGES.PHONES_ONLY}. Исправьте: ${invalidWithoutPlus.join(', ')}`
+    );
+  }
+
+  const invalidByFormat = filteredDatabase.filter(
+    (entry) =>
+      entry.startsWith('+') && !VALIDATION_PATTERNS.PHONE_E164.test(entry)
+  );
+  if (invalidByFormat.length > 0) {
+    throw new Error(
+      `${VALIDATION_MESSAGES.INVALID_PHONE_FORMAT}. Исправьте: ${invalidByFormat.join(', ')}`
     );
   }
 }
@@ -87,7 +119,6 @@ export function validateGroupIdUsers(database: Array<string>, groupId: string) {
   const isPhoneMode = groupId.toLowerCase().includes('phone');
   if (isPhoneMode) {
     validatePhoneDatabase(database);
-    return;
   }
 
   validateDatabase(database);
