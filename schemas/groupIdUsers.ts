@@ -17,6 +17,8 @@ const VALIDATION_MESSAGES = {
     'Для запуска с режимом "phone" допускаются только номера телефонов',
   INVALID_PHONE_FORMAT:
     'Номера телефонов должны быть в формате +[цифры] без пробелов, скобок и разделителей',
+  PHONES_NOT_ALLOWED:
+    'В обычных запусках без части "phone" рассылать по номерам нельзя',
 } as const;
 
 function validateDatabase(database: Array<string>) {
@@ -117,7 +119,16 @@ export function validateGroupIdUsers(database: Array<string>, groupId: string) {
   }
 
   const isPhoneMode = groupId.toLowerCase().includes('phone');
-  if (isPhoneMode) {
+  if (!isPhoneMode) {
+    const phoneEntries = database
+      .map((u: string) => u.trim())
+      .filter((u: string) => u.length > 0 && u.startsWith('+'));
+    if (phoneEntries.length > 0) {
+      throw new Error(
+        `${VALIDATION_MESSAGES.PHONES_NOT_ALLOWED}. Исправьте: ${phoneEntries.join(', ')}`
+      );
+    }
+  } else {
     validatePhoneDatabase(database);
   }
 
