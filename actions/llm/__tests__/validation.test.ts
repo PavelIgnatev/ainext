@@ -211,9 +211,6 @@ describe('LLM Default Validation', () => {
       });
 
       it('должен блокировать устойчивые выражения', () => {
-        expect(() => llmDefaultValidation('ps: не забудьте')).toThrow(
-          'Formal marker detected'
-        );
         expect(() =>
           llmDefaultValidation('к вашему сведению: это важно')
         ).toThrow('Formal marker detected');
@@ -238,9 +235,6 @@ describe('LLM Default Validation', () => {
       });
 
       it('должен блокировать множественные маркеры', () => {
-        expect(() =>
-          llmDefaultValidation('вопрос важный: как дела? ps: ответьте')
-        ).toThrow('Formal marker detected');
         expect(() =>
           llmDefaultValidation('важно: помнить! nb: и это тоже')
         ).toThrow('Formal marker detected');

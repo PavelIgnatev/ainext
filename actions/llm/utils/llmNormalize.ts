@@ -9,6 +9,7 @@ export function fullNormalize(message: string): string {
     .replace('<ASSISTANT>', '')
     .replaceAll(/[`『』「」]/g, '')
     .replace('т.me', 't.me')
+    .replace('nt.me', 't.me')
     .replace('т .me', 't.me')
     .replace('т. me', 't.me')
     .replace(/[^\S\n]+/g, ' ')

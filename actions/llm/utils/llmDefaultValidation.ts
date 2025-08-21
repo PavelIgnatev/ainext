@@ -190,7 +190,6 @@ function validateQuestionMarkers(message: string) {
     'n.b.:',
     'nota bene:',
     'p.s.:',
-    'ps:',
     'post scriptum:',
   ];
 
