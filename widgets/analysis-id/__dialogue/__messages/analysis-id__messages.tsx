@@ -44,8 +44,9 @@ export const AnalysisIdMessages: React.FC<AnalysisIdMessagesProps> = ({
 
     const { status, reason, think } = systemMessage.content;
     const statusText = {
-      lead: '⭐ Выделен как "LEAD"',
-      negative: '⛔ Выявлен негатив в диалоге',
+      lead: '⭐ Выделен как "LEAD" (дальнейшний анализ диалога прекращен)',
+      negative:
+        '⛔ Выявлен негатив в диалоге (дальнейшний анализ диалога прекращен)',
       continue: '🔍 Промежуточный анализ диалога',
     }[status as 'lead' | 'negative' | 'continue'];
 
