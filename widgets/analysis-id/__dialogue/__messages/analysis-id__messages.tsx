@@ -114,7 +114,7 @@ export const AnalysisIdMessages: React.FC<AnalysisIdMessagesProps> = ({
                 <span
                   style={{
                     position: 'absolute',
-                    top: '4px',
+                    top: '5px',
                     right: '4px',
                     fontSize: '14px',
                     color: '#2563eb',
