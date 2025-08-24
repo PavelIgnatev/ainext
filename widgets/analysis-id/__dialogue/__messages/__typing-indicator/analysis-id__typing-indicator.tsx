@@ -8,18 +8,18 @@ interface AnalysisIdTypingIndicatorProps {
 
 export const AnalysisIdTypingIndicator: React.FC<
   AnalysisIdTypingIndicatorProps
-> = ({ message = 'Печатает...', className }) => {
+> = ({ message = 'Печатает', className }) => {
   return (
     <div
       className={`${classes.message} ${classes.messageLeft} ${classes.loadingMessage} ${className || ''}`}
     >
       <div className={classes.messageContent}>
+        {message}
         <div className={classes.typingIndicator}>
           <span></span>
           <span></span>
           <span></span>
         </div>
-        {message}
       </div>
     </div>
   );

@@ -1,3 +1,7 @@
+export type SystemMessage = {
+  role: 'system';
+  content: Record<string, any>;
+};
 export type DialogMessage = {
   role: 'assistant' | 'user';
   content: string;
@@ -24,6 +28,6 @@ export type Analysis = {
   leadDefinition: string;
   leadGoal: string;
 
-  dialogs: DialogMessage[][];
+  dialogs: (DialogMessage | SystemMessage)[][];
   leadDialogs?: Record<number, boolean>;
 };

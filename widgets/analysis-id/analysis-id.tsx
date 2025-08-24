@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { Analysis, DialogMessage } from '../../@types/Analysis';
+import { Analysis, DialogMessage, SystemMessage } from '../../@types/Analysis';
 import { AnalysisIdDialogue } from './__dialogue/analysis-id__dialogue';
 import { AnalysisIdLoadingPage } from './__loading-page/analysis-id__loading-page';
 import { AnalysisIdEmptyPage } from './__empty-page/analysis-id__empty-page';
@@ -14,6 +14,8 @@ interface AnalysisIdProps {
   analysisId: string;
   analysis: Analysis | null;
   messages: DialogMessage[];
+  systemMessage: SystemMessage | null;
+  loadingMessage: string;
   isAnalysisLoading: boolean;
   isMessageLoading: boolean;
   isAdmin: boolean;
@@ -32,6 +34,8 @@ export const AnalysisId = (props: AnalysisIdProps) => {
     analysisId,
     isAnalysisLoading,
     messages,
+    systemMessage,
+    loadingMessage,
     isMessageLoading,
     isAdmin,
     onNewDialog,
@@ -53,6 +57,8 @@ export const AnalysisId = (props: AnalysisIdProps) => {
       <AnalysisIdDialogue
         isAdmin={isAdmin}
         messages={messages}
+        systemMessage={systemMessage}
+        loadingMessage={loadingMessage}
         messageLoading={isMessageLoading}
         dialogsLength={analysis.dialogs.length}
         onNewDialog={onNewDialog}

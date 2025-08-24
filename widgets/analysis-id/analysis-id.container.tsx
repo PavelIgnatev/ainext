@@ -3,7 +3,7 @@ import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { DialogMessage } from '../../@types/Analysis';
+import { DialogMessage, SystemMessage } from '../../@types/Analysis';
 import { AnalysisId } from '../analysis-id/analysis-id';
 import { getAnalysisById, updateAnalysis } from '@/actions/db/analysis';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -14,6 +14,7 @@ import { getGreeting } from '@/utils/getGreeting';
 import { checkAdmin } from '@/actions/admin/checkAdmin';
 import { validateAnalysis } from '@/schemas/analysis';
 import { llmRestoreLinks } from '@/actions/llm/utils/llmLink';
+import { calculateAnalysisStage } from '@/utils/analysisHelpers';
 
 const extractLastQuestion = (
   text: string
@@ -42,9 +43,12 @@ export const AnalysisIdContainer = () => {
   const params = useParams();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
-  const { showError, showInfo, contextHolder } = useNotifications();
-  const [dialogs, setDialogs] = useState<DialogMessage[][] | null>(null);
+  const { showError, contextHolder } = useNotifications();
+  const [dialogs, setDialogs] = useState<
+    (DialogMessage | SystemMessage)[][] | null
+  >(null);
   const [currentDialogId, setCurrentDialogId] = useState<number>(0);
+  const [loadingMessage, setLoadingMessage] = useState<string>('Печатает');
 
   const analysisId = String(params.id);
   const queryDialogId = searchParams.get('dialogId');
@@ -71,7 +75,7 @@ export const AnalysisIdContainer = () => {
 
   const { mutate: autoResponseMutation, isPending: isAutoResponseLoading } =
     useMutation({
-      mutationFn: async (dialogue: DialogMessage[]) => {
+      mutationFn: async (dialogue: (DialogMessage | SystemMessage)[]) => {
         if (!analysisData) {
           throw new Error('Данные разбора недоступны');
         }
@@ -79,31 +83,113 @@ export const AnalysisIdContainer = () => {
         validateAnalysis(analysisData);
 
         const isCurrentDialogLead = analysisData.leadDialogs?.[currentDialogId];
+        const isCurrentDialogNegative =
+          analysisData.dialogs?.[currentDialogId]?.find(
+            (msg): msg is SystemMessage =>
+              msg.role === 'system' && msg.content.status === 'negative'
+          ) || false;
         let analysisResult: LLMDialogueAnalysisResult | null = null;
+        let responseThink: string | null = null;
 
-        if (!isCurrentDialogLead && dialogue.length > 3) {
-          analysisResult = await getDialogueAnalysis(
-            {
-              companyName: analysisData.companyName,
-              leadDefinition: analysisData.leadDefinition,
-              language: analysisData.language,
-            },
-            {
-              llmParams: {
-                model: 'command-a-03-2025',
-                temperature: 0.1,
-                k: 1,
-                messages: dialogue,
+        const messages = dialogue.filter(
+          (msg): msg is DialogMessage => msg.role !== 'system'
+        );
+
+        if (!isCurrentDialogLead && !isCurrentDialogNegative) {
+          let currentTry = 0;
+          const maxRetries = 5;
+
+          if (messages.length <= 3) {
+            analysisResult = {
+              status: 'continue',
+              reason:
+                'Недостаточно данных для анализа. Оценка будет проведена на следующем этапе.',
+            };
+          } else {
+            setLoadingMessage('Анализируем диалог');
+            const {
+              analysisResult: tempAnalysisResult,
+              responseThink: tempResponseThink,
+            } = await getDialogueAnalysis(
+              {
+                companyName: analysisData.companyName,
+                leadDefinition: analysisData.leadDefinition,
+                language: analysisData.language,
               },
-              onTry: (error) => showInfo(error),
-              onLogger: (logName, data) => {
-                console.log(`[${logName}]`, data);
+              {
+                llmParams: {
+                  model: 'command-a-reasoning-08-2025',
+                  temperature: 0.1,
+                  k: 1,
+                  messages,
+                },
+                onTry: (error) => {
+                  currentTry++;
+                  setLoadingMessage(
+                    `Анализируем диалог (повторная попытка ${currentTry}/${maxRetries})`
+                  );
+                  if (isAdmin) {
+                    console.log(`[DIALOGUE_ANALYSIS_ERROR]`, error);
+                  }
+                },
+                onLogger: (logName, data) => {
+                  if (isAdmin) {
+                    console.log(`[${logName}]`, data);
+                  }
+                },
+              }
+            );
+
+            analysisResult = tempAnalysisResult;
+            responseThink = tempResponseThink;
+          }
+
+          if (dialogs) {
+            const currentSystemMessage = dialogs[currentDialogId]?.find(
+              (msg): msg is SystemMessage => msg.role === 'system'
+            );
+
+            const stage = analysisResult?.status
+              ? calculateAnalysisStage(messages)
+              : currentSystemMessage?.content?.stage ||
+                calculateAnalysisStage(messages);
+
+            const tempSystemMessage: SystemMessage = {
+              role: 'system',
+              content: {
+                status:
+                  analysisResult?.status ||
+                  currentSystemMessage?.content?.status ||
+                  null,
+                reason:
+                  analysisResult?.reason ||
+                  currentSystemMessage?.content?.reason ||
+                  null,
+                think:
+                  responseThink || currentSystemMessage?.content?.think || null,
+                stage,
               },
-            }
-          );
+            };
+
+            const tempDialog = dialogue.filter(
+              (msg): msg is DialogMessage => msg.role !== 'system'
+            );
+            const tempDialogWithSystem = [tempSystemMessage, ...tempDialog];
+
+            const tempDialogs = dialogs.map((dialog, index) =>
+              index === currentDialogId ? tempDialogWithSystem : dialog
+            );
+
+            setDialogs(tempDialogs);
+          }
         }
 
         const isLead = isCurrentDialogLead || analysisResult?.status === 'lead';
+
+        let autoResponseTry = 0;
+        const autoResponseMaxRetries = 5;
+
+        setLoadingMessage('Генерируем ответ');
 
         const response = await getAutoResponse(
           {
@@ -132,11 +218,18 @@ export const AnalysisIdContainer = () => {
               temperature: 1,
               presence_penalty: 0.8,
               p: 0.95,
-              messages: dialogue,
+              messages,
             },
-            onTry: (error) => showInfo(error),
+            onTry: () => {
+              autoResponseTry++;
+              setLoadingMessage(
+                `Генерируем ответ (повторная попытка ${autoResponseTry}/${autoResponseMaxRetries})`
+              );
+            },
             onLogger: (logName, data) => {
-              console.log(`[${logName}]`, data);
+              if (isAdmin) {
+                console.log(`[${logName}]`, data);
+              }
             },
           }
         );
@@ -171,9 +264,41 @@ export const AnalysisIdContainer = () => {
           throw new Error('Диалоги не инициализированы');
         }
 
-        const finalDialogs = dialogs.map((dialog, index) =>
-          index === currentDialogId ? finalDialog : dialog
-        );
+        const finalDialogs = dialogs.map((dialog, index) => {
+          if (index === currentDialogId) {
+            const dialogWithoutSystem = finalDialog.filter(
+              (msg): msg is DialogMessage => msg.role !== 'system'
+            );
+
+            const currentSystemMessage = dialog.find(
+              (msg): msg is SystemMessage => msg.role === 'system'
+            );
+
+            const stage = analysisResult?.status
+              ? calculateAnalysisStage(dialogWithoutSystem)
+              : currentSystemMessage?.content?.stage ||
+                calculateAnalysisStage(dialogWithoutSystem);
+
+            const systemMessage: SystemMessage = {
+              role: 'system',
+              content: {
+                status:
+                  analysisResult?.status ||
+                  currentSystemMessage?.content?.status ||
+                  null,
+                reason:
+                  analysisResult?.reason ||
+                  currentSystemMessage?.content?.reason ||
+                  null,
+                think:
+                  responseThink || currentSystemMessage?.content?.think || null,
+                stage,
+              },
+            };
+            return [systemMessage, ...dialogWithoutSystem];
+          }
+          return dialog;
+        });
 
         const updatedLeadDialogs = { ...analysisData.leadDialogs };
         if (isLead && !isCurrentDialogLead) {
@@ -192,7 +317,9 @@ export const AnalysisIdContainer = () => {
         setDialogs(dialogs);
         queryClient.invalidateQueries({ queryKey: ['analysis', analysisId] });
       },
-      onError: (error) => showError(error.message),
+      onError: (error) => {
+        showError(error.message);
+      },
     });
 
   const updateUrlDialogId = useCallback(
@@ -223,6 +350,7 @@ export const AnalysisIdContainer = () => {
     const updatedDialogs = [
       ...dialogs,
       [
+        { role: 'system', content: { status: null, reason: null, stage: 0 } },
         {
           role: 'assistant',
           content: getGreeting(analysisData.language, analysisData.userName),
@@ -231,7 +359,7 @@ export const AnalysisIdContainer = () => {
           role: 'assistant',
           content: analysisData.firstQuestion,
         },
-      ] as DialogMessage[],
+      ] as (DialogMessage | SystemMessage)[],
     ];
 
     try {
@@ -316,7 +444,19 @@ export const AnalysisIdContainer = () => {
     if (!dialogs || !dialogs[currentDialogId]) {
       return [];
     }
-    return dialogs[currentDialogId];
+    return dialogs[currentDialogId].filter(
+      (msg): msg is DialogMessage => msg.role !== 'system'
+    );
+  }, [dialogs, currentDialogId]);
+
+  const getSystemMessage = useCallback(() => {
+    if (!dialogs || !dialogs[currentDialogId]) {
+      return null;
+    }
+    const systemMessage = dialogs[currentDialogId].find(
+      (msg): msg is SystemMessage => msg.role === 'system'
+    );
+    return systemMessage || null;
   }, [dialogs, currentDialogId]);
 
   useEffect(() => {
@@ -347,6 +487,8 @@ export const AnalysisIdContainer = () => {
         analysis={analysisData}
         analysisId={String(analysisId)}
         messages={getMessages()}
+        systemMessage={getSystemMessage()}
+        loadingMessage={loadingMessage}
         isMessageLoading={isAutoResponseLoading}
         isAnalysisLoading={isAnalysisLoading}
         currentDialogId={currentDialogId}

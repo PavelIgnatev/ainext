@@ -3,9 +3,10 @@
 import { Button, Drawer, Input, List, Popconfirm } from 'antd';
 import React, { useState } from 'react';
 
-import { DialogMessage } from '../../../@types/Analysis';
+import { DialogMessage, SystemMessage } from '../../../@types/Analysis';
 import { AnalysisIdMessages } from './__messages/analysis-id__messages';
 import { useAnalysisMessageInput } from '../analysis-id.hooks';
+
 import classes from './analysis-id__dialogue.module.css';
 
 interface AnalysisIdDialogueProps {
@@ -13,6 +14,8 @@ interface AnalysisIdDialogueProps {
   messageLoading: boolean;
   dialogsLength: number;
   messages: DialogMessage[];
+  systemMessage: SystemMessage | null;
+  loadingMessage: string;
 
   onNewDialog: () => void;
   onSaveMessage: (message: string) => void;
@@ -22,6 +25,8 @@ interface AnalysisIdDialogueProps {
 
 export const AnalysisIdDialogue = ({
   messages,
+  systemMessage,
+  loadingMessage,
   dialogsLength,
   messageLoading,
   isAdmin,
@@ -47,15 +52,6 @@ export const AnalysisIdDialogue = ({
     <div className={classes.analysisIdDialogue}>
       <div className={classes.viewDialog}>
         <div className={classes.viewDialogButtons}>
-          <Button
-            type="dashed"
-            onClick={() => setVisibleSavedDialog(true)}
-            className={classes.button}
-            disabled={messageLoading}
-          >
-            История диалогов
-          </Button>
-
           <Popconfirm
             title="Начать новый диалог?"
             description="История данного диалога будет сохранена."
@@ -72,6 +68,15 @@ export const AnalysisIdDialogue = ({
             </Button>
           </Popconfirm>
 
+          <Button
+            type="dashed"
+            onClick={() => setVisibleSavedDialog(true)}
+            className={classes.button}
+            disabled={messageLoading}
+          >
+            История диалогов
+          </Button>
+
           {isAdmin && (
             <Button
               type="dashed"
@@ -86,7 +91,10 @@ export const AnalysisIdDialogue = ({
 
         <AnalysisIdMessages
           messages={formattedMessages}
+          systemMessage={systemMessage}
           messageLoading={messageLoading}
+          loadingMessage={loadingMessage}
+          originalMessages={messages}
         />
 
         <form
@@ -118,9 +126,14 @@ export const AnalysisIdDialogue = ({
         title="История диалогов"
         placement="right"
         closable
+        size="default"
         onClose={() => setVisibleSavedDialog(false)}
         open={visibleSavedDialog}
-        styles={{ body: { padding: 0 } }}
+        styles={{
+          body: { padding: 0 },
+          wrapper: { maxWidth: '420px' },
+          header: { padding: '16px 24px 16px 6px' },
+        }}
       >
         <List
           dataSource={Array.from(

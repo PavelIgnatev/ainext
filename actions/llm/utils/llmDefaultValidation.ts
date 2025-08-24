@@ -268,57 +268,6 @@ function validateIdeographicOrArabic(message: string) {
   return { isValid: true };
 }
 
-function validateApologies(message: string) {
-  const apologyPatterns = [
-    'извини',
-    'извините',
-    'простите',
-    'sorry',
-    'apologize',
-    'apologies',
-    'excuse',
-    'pardon',
-    'виноват',
-    'сожале',
-  ];
-
-  for (const pattern of apologyPatterns) {
-    if (message.includes(pattern)) {
-      return {
-        isValid: false,
-        error:
-          `Apology phrase found: "${pattern}"\n\n` +
-          'REASON: Apologies and excuses break professional communication style\n' +
-          'REQUIREMENT: Express thoughts directly without apologetic phrases\n' +
-          'EXAMPLES OF INVALID INPUT:\n' +
-          '- "Извините за ошибку"\n' +
-          '- "Sorry about that"\n' +
-          '- "Прошу прощения"\n' +
-          '- "I apologize for"\n' +
-          'HOW TO FIX: Remove apologies and state information directly',
-      };
-    }
-  }
-
-  if (/\bпрости/.test(message)) {
-    return {
-      isValid: false,
-      error:
-        `Apology phrase found: "прости"\n\n` +
-        'REASON: Apologies and excuses break professional communication style\n' +
-        'REQUIREMENT: Express thoughts directly without apologetic phrases\n' +
-        'EXAMPLES OF INVALID INPUT:\n' +
-        '- "Извините за ошибку"\n' +
-        '- "Sorry about that"\n' +
-        '- "Прошу прощения"\n' +
-        '- "I apologize for"\n' +
-        'HOW TO FIX: Remove apologies and state information directly',
-    };
-  }
-
-  return { isValid: true };
-}
-
 function validateGreetings(message: string) {
   const greetings = [
     'приветствую всех участников',
@@ -474,7 +423,6 @@ export const DEFAULT_VALIDATION_RULES: Validator[] = [
   validateIdeographicOrArabic,
   validateGreetings,
   validateQuestionMarkers,
-  validateApologies,
 ];
 
 export function llmDefaultValidation(message: string, stage?: number) {

@@ -18,7 +18,7 @@ const LLM_CONSTANTS = {
 export async function getDialogueAnalysis(
   context: DialogueAnalysis,
   options: DialogueAnalysisOptions
-): Promise<DialogueAnalysisResult> {
+): Promise<{ analysisResult: DialogueAnalysisResult; responseThink: string }> {
   DialogueAnalysisSchema.parse(context);
   DialogueAnalysisOptionsSchema.parse(options);
 
@@ -56,8 +56,9 @@ export async function getDialogueAnalysis(
     try {
       onRequest?.();
 
-      llmResponse = await makeLLMRequest(params);
-      const analysisResult = extractJsonResponse(llmResponse);
+      const { responseText, responseThink } = await makeLLMRequest(params);
+      llmResponse = responseText;
+      const analysisResult = extractJsonResponse(responseText);
 
       if (!analysisResult) {
         throw new Error('ANALYSIS_RESULT_NOT_DEFINED');
@@ -68,7 +69,7 @@ export async function getDialogueAnalysis(
         ...analysisResult,
       });
 
-      return analysisResult;
+      return { analysisResult, responseThink };
     } catch (error: any) {
       const errorMessage = error.message || 'UNDEFINED_ERROR';
       attempts.push(llmResponse || 'NO_RESPONSE');

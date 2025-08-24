@@ -18,13 +18,20 @@ export async function makeLLMRequest(params: CohereAIParams) {
       timeout: REQUEST_TIMEOUT,
     });
 
-    const responseText = String(data?.message?.content?.[0]?.text || '').trim();
+    const responseText = String(
+      data?.message?.content?.find((item: any) => item.type === 'text')?.text ||
+        ''
+    ).trim();
+    const responseThink = String(
+      data?.message?.content?.find((item: any) => item.type === 'thinking')
+        ?.thinking || ''
+    ).trim();
 
     if (!responseText) {
       throw new Error('[SERVER_LEVEL] EMPTY OR INVALID API RESPONSE');
     }
 
-    return responseText;
+    return { responseText, responseThink };
   } catch (error: any) {
     const errorMessage = error.message || 'UNDEFINED_ERROR';
     const statusCode = error.response?.status;

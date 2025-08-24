@@ -118,8 +118,8 @@ export async function getAutoResponse(
 
       onRequest?.();
 
-      const llmResponse = await makeLLMRequest(currentParams);
-      const processedMessage = await llmExtractLinks(llmResponse);
+      const { responseText } = await makeLLMRequest(currentParams);
+      const processedMessage = await llmExtractLinks(responseText);
       const normalizedText = fullNormalize(processedMessage.text);
       generations.push({ ...processedMessage, text: normalizedText });
       message = llmRestoreLinks(

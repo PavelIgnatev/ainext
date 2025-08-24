@@ -23,46 +23,21 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #666666;
+  color: black;
   opacity: 0.7;
 }
 
 .messageContent {
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 14px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 2px #0000001a;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 15px;
   line-height: 1.4;
-  position: relative;
-  background: #f8f8f8;
-  border: 1px solid #e8e8e8;
-  color: #666666;
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.messageContent::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: -8px;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 8px 8px 8px 0;
-  border-color: transparent #e8e8e8 transparent transparent;
-}
-
-.messageContent::after {
-  content: '';
-  position: absolute;
-  top: 0px;
-  left: -7px;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 7px 7px 7px 0;
-  border-color: transparent #f8f8f8 transparent transparent;
+  color: black;
 }
 
 .typingIndicator {

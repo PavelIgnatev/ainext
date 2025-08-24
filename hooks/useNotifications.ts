@@ -16,9 +16,9 @@ export const useNotifications = () => {
   );
 
   const showInfo = useCallback(
-    (description: string) => {
+    (description: string, title?: string) => {
       api.info({
-        message: 'Повторная попытка...',
+        message: title || 'Повторная попытка...',
         description,
         duration: 3,
       });

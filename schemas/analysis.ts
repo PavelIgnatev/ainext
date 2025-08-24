@@ -6,6 +6,13 @@ const DialogMessageSchema = z.object({
   content: z.string().min(1),
 });
 
+const SystemMessageSchema = z.object({
+  role: z.literal('system'),
+  content: z.record(z.any()),
+});
+
+const MessageSchema = z.union([DialogMessageSchema, SystemMessageSchema]);
+
 const AnalysisSchema = z.object({
   companyId: z.string(),
   aiRole: z.string().min(1),
@@ -21,7 +28,8 @@ const AnalysisSchema = z.object({
   firstQuestion: z.string().min(1),
   leadDefinition: z.string().min(1),
   leadGoal: z.string().min(1),
-  dialogs: z.array(z.array(DialogMessageSchema)),
+  dialogs: z.array(z.array(MessageSchema)),
+  leadDialogs: z.record(z.boolean()).optional(),
   addedInformation: z.string().nullable(),
   addedQuestion: z.string().nullable(),
   flowHandling: z.string().nullable(),
