@@ -81,11 +81,12 @@ export const AnalysisIdMessages: React.FC<AnalysisIdMessagesProps> = ({
             title={think ? `Рассуждение ИИ:\n\n${think}` : null}
             placement="topLeft"
             trigger={think ? 'hover' : []}
+            classNames={{ root: classes.tooltipOverlay }}
             styles={{
               root: {
                 maxWidth: isMobile ? '90vw' : '600px',
                 maxHeight: isMobile ? '50vh' : '400px',
-                overflowY: 'auto',
+                overflow: 'auto',
                 whiteSpace: 'pre-wrap',
               },
             }}

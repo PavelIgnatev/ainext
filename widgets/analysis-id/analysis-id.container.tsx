@@ -194,6 +194,10 @@ export const AnalysisIdContainer = () => {
         const response = await getAutoResponse(
           {
             aiRole: analysisData.aiRole,
+            aiAnalysis:
+              isLead || messages.length <= 3
+                ? ''
+                : analysisResult?.reason || '',
             companyDescription: analysisData.companyDescription,
             companyName: analysisData.companyName,
             goal: analysisData.goal,

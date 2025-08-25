@@ -15,6 +15,7 @@ export const AutoResponseSchema = z.object({
   firstQuestion: z.string().min(1),
   leadGoal: z.string().min(1),
   part: z.string().nullable(),
+  aiAnalysis: z.string().nullable(),
   flowHandling: z.string().nullable(),
   addedInformation: z.string().nullable(),
   addedQuestion: z.string().nullable(),

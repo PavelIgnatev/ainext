@@ -5,6 +5,7 @@ export type SystemMessage = {
 export type DialogMessage = {
   role: 'assistant' | 'user';
   content: string;
+  think?: string | null;
 };
 
 export type Analysis = {

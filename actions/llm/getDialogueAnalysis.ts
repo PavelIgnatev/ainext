@@ -18,7 +18,10 @@ const LLM_CONSTANTS = {
 export async function getDialogueAnalysis(
   context: DialogueAnalysis,
   options: DialogueAnalysisOptions
-): Promise<{ analysisResult: DialogueAnalysisResult; responseThink: string }> {
+): Promise<{
+  analysisResult: DialogueAnalysisResult;
+  responseThink: string | null;
+}> {
   DialogueAnalysisSchema.parse(context);
   DialogueAnalysisOptionsSchema.parse(options);
 
@@ -34,11 +37,16 @@ export async function getDialogueAnalysis(
   const combinedMessages = getCombinedMessages(cleanMessages);
   const analysisPrompt = createAnalysisPrompt(leadDefinition, language);
 
+  const dialogueMarkup = buildDialogueMarkup(combinedMessages);
+  const userInstruction = buildUserInstruction(language);
   const params = {
     ...otherLlmParams,
     messages: [
-      ...combinedMessages,
-      { role: 'system' as const, content: analysisPrompt },
+      {
+        role: 'system' as const,
+        content: `${analysisPrompt}\n\n${dialogueMarkup}`,
+      },
+      { role: 'user' as const, content: userInstruction },
     ],
   };
 
@@ -127,12 +135,42 @@ Your response should be a JSON object with the following fields:
 "reason": "<Specific trigger detected>"  
 }  
 Please ensure that the analysis is precise and each classification is supported by clear references to the user's messages. The response should be concise and specific.
-For translation purposes, replace the reason in the desired language using ${language} to automatically translate the reason. For example, if the user's language is Russian, translate the reason into Russian. You will replace the "reason" with the translated version based on the user's language preference.
+
+6. **REASON REQUIREMENTS**  
+The "reason" field must contain:
+- Detailed analysis of what triggered this classification (minimum 2-3 sentences)
+- Specific examples from the conversation that support this classification
+- MINIMAL recommendation on what to do next (1-2 sentences maximum)
+- All text must be in ${language} language
 
 **Structured JSON Response**  
 Your response should be a JSON object with the following fields:  
 {  
 "status": "negative" | "lead" | "continue",  
-"reason": "<Specific trigger detected>"  
+"reason": "<Detailed analysis with examples + minimal recommendation>"  
 }`;
+}
+
+function buildDialogueMarkup(
+  messages: { role: 'assistant' | 'user'; content: string }[]
+): string {
+  if (!messages.length) return '';
+  const items = messages
+    .map((m) => {
+      const tag = m.role === 'user' ? 'USER' : 'ASSISTANT';
+      return `<${tag}>\n  [MESSAGE]${m.content}[/MESSAGE]\n</${tag}>`;
+    })
+    .join('\n');
+  return `<DIALOGUE_HISTORY>\n${items}\n</DIALOGUE_HISTORY>`;
+}
+
+function buildUserInstruction(language: string): string {
+  return `<INSTRUCTION>
+  - Analyze the conversation strictly using [DIALOGUE_HISTORY]
+  - Return ONLY a JSON object with keys "status" and "reason"
+  - status must be one of: "negative" | "lead" | "continue"
+  - reason must contain detailed analysis (2-3 sentences) with specific examples + minimal recommendation (1-2 sentences) in ${language.toUpperCase()}
+  - Prefer "lead" if there is any reasonable indication
+  - Do not include any extra text, tags, or comments
+</INSTRUCTION>`;
 }

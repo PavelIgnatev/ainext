@@ -32,3 +32,24 @@
 .dialog::-webkit-scrollbar-thumb:hover {
   background: #b0b0b0;
 }
+
+.tooltipOverlay {
+  scrollbar-width: thin;
+  scrollbar-color: #9aa4b2 transparent;
+}
+.tooltipOverlay::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.tooltipOverlay::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tooltipOverlay::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.tooltipOverlay::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}

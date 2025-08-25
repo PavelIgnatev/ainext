@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BaseMessage } from '../../../analysis-id.types';
 import { DialogMessage } from '../../../../../@types/Analysis';
 import classes from './analysis-id__message-item.module.css';
+import { Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
 interface AnalysisIdMessageItemProps {
   message: BaseMessage;
@@ -14,6 +16,15 @@ export const AnalysisIdMessageItem: React.FC<AnalysisIdMessageItemProps> = ({
   originalMessages,
   messageIndex,
 }) => {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
   const messageStyle =
     message.fromId === 'клиент' ? classes.messageRight : classes.messageLeft;
   const positionClass = message.positionInGroup
@@ -21,6 +32,7 @@ export const AnalysisIdMessageItem: React.FC<AnalysisIdMessageItemProps> = ({
     : '';
 
   const formattedText = message.text.replace(/\\n/g, '\n');
+  const think = originalMessages[messageIndex]?.think;
 
   const renderReplyPreview = () => {
     if (message.fromId === 'клиент' || messageIndex === 0) return null;
@@ -52,10 +64,53 @@ export const AnalysisIdMessageItem: React.FC<AnalysisIdMessageItemProps> = ({
 
   return (
     <div className={`${classes.message} ${messageStyle} ${positionClass}`}>
-      <div className={classes.messageContent}>
-        {renderReplyPreview()}
-        {formattedText}
-      </div>
+      {think ? (
+        <Tooltip
+          title={think ? `Рассуждение ИИ:\n\n${think}` : null}
+          placement="topLeft"
+          trigger={think ? 'hover' : []}
+          classNames={{ root: classes.tooltipOverlay }}
+          styles={{
+            root: {
+              maxWidth: isMobile ? '90vw' : '600px',
+              maxHeight: isMobile ? '50vh' : '400px',
+              overflow: 'auto',
+              whiteSpace: 'pre-wrap',
+            },
+          }}
+        >
+          <div className={classes.messageContent}>
+            {renderReplyPreview()}
+            {formattedText}
+            <span
+              style={{
+                position: 'absolute',
+                top: '5px',
+                right: '4px',
+                fontSize: '14px',
+                color: '#2563eb',
+                userSelect: 'none',
+                lineHeight: 1,
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                borderRadius: '50%',
+                width: '18px',
+                height: '18px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1px solid rgba(37, 99, 235, 0.3)',
+              }}
+            >
+              <InfoCircleOutlined />
+            </span>
+          </div>
+        </Tooltip>
+      ) : (
+        <div className={classes.messageContent}>
+          {renderReplyPreview()}
+          {formattedText}
+        </div>
+      )}
     </div>
   );
 };

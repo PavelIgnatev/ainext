@@ -5,4 +5,5 @@ export interface BaseMessage {
   text: string;
   fromId: string;
   positionInGroup?: MessagePositionInGroup;
+  think?: string | null;
 }

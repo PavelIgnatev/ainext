@@ -22,10 +22,10 @@ export async function makeLLMRequest(params: CohereAIParams) {
       data?.message?.content?.find((item: any) => item.type === 'text')?.text ||
         ''
     ).trim();
-    const responseThink = String(
-      data?.message?.content?.find((item: any) => item.type === 'thinking')
-        ?.thinking || ''
-    ).trim();
+    const responseThink =
+      (data?.message?.content
+        ?.find((item: any) => item.type === 'thinking')
+        ?.thinking?.trim() as string) || null;
 
     if (!responseText) {
       throw new Error('[SERVER_LEVEL] EMPTY OR INVALID API RESPONSE');

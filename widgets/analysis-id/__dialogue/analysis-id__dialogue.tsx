@@ -46,6 +46,7 @@ export const AnalysisIdDialogue = ({
     id,
     text: message.content,
     fromId: message.role === 'user' ? 'клиент' : 'менеджер',
+    think: message.think,
   }));
 
   return (
