@@ -24,6 +24,9 @@ interface AnalysisIdProps {
   onNewDialog: () => void;
   onSaveMessage: (message: string) => void;
   onDialogSelect: (dialogId: number) => void;
+  onPingDialog: (dialogId: number) => void;
+  isPingLoading: boolean;
+  pingLoadingMessage: string;
 }
 
 export const AnalysisId = (props: AnalysisIdProps) => {
@@ -38,9 +41,13 @@ export const AnalysisId = (props: AnalysisIdProps) => {
     loadingMessage,
     isMessageLoading,
     isAdmin,
+    currentDialogId,
     onNewDialog,
     onSaveMessage,
     onDialogSelect,
+    onPingDialog,
+    isPingLoading,
+    pingLoadingMessage,
   } = props;
 
   if (isAnalysisLoading) {
@@ -61,10 +68,14 @@ export const AnalysisId = (props: AnalysisIdProps) => {
         loadingMessage={loadingMessage}
         messageLoading={isMessageLoading}
         dialogsLength={analysis.dialogs.length}
+        currentDialogId={currentDialogId}
         onNewDialog={onNewDialog}
         onSaveMessage={onSaveMessage}
         onDialogSelect={onDialogSelect}
         onToggleEditMode={() => setIsEditMode((prev) => !prev)}
+        onPingDialog={onPingDialog}
+        isPingLoading={isPingLoading}
+        pingLoadingMessage={pingLoadingMessage}
       />
 
       {analysis && (

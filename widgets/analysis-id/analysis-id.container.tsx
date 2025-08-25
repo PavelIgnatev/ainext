@@ -9,6 +9,7 @@ import { getAnalysisById, updateAnalysis } from '@/actions/db/analysis';
 import { useNotifications } from '@/hooks/useNotifications';
 import { getAutoResponse } from '@/actions/llm/getAutoResponse';
 import { getDialogueAnalysis } from '@/actions/llm/getDialogueAnalysis';
+import { getPing } from '@/actions/llm/getPing';
 import { type DialogueAnalysisResult as LLMDialogueAnalysisResult } from '@/actions/llm/schemas/llmDialogueAnalysis';
 import { getGreeting } from '@/utils/getGreeting';
 import { checkAdmin } from '@/actions/admin/checkAdmin';
@@ -49,6 +50,7 @@ export const AnalysisIdContainer = () => {
   >(null);
   const [currentDialogId, setCurrentDialogId] = useState<number>(0);
   const [loadingMessage, setLoadingMessage] = useState<string>('Печатает');
+  const [pingLoadingMessage, setPingLoadingMessage] = useState<string>('');
 
   const analysisId = String(params.id);
   const queryDialogId = searchParams.get('dialogId');
@@ -71,6 +73,99 @@ export const AnalysisIdContainer = () => {
     queryKey: ['admin'],
     queryFn: checkAdmin,
     retry: false,
+  });
+
+  const { mutate: pingMutation, isPending: isPingLoading } = useMutation({
+    mutationFn: async (dialogId: number) => {
+      if (!analysisData) {
+        throw new Error('Данные разбора недоступны');
+      }
+
+      const currentDialog = dialogs?.[dialogId];
+      if (!currentDialog) {
+        throw new Error('Диалог не найден');
+      }
+
+      const userMessages = currentDialog.filter(
+        (msg): msg is DialogMessage => msg.role === 'user'
+      );
+
+      if (userMessages.length === 0) {
+        throw new Error('Нет сообщений от клиента для пинга');
+      }
+
+      let pingTry = 0;
+      const pingMaxRetries = 5;
+
+      setPingLoadingMessage('Генерируем пинг-напоминание...');
+
+      const response = await getPing(
+        {
+          aiName: analysisData.meName,
+          aiGender: analysisData.meGender,
+          language: analysisData.language,
+        },
+        {
+          options: { maxLength: 100 },
+          llmParams: {
+            model: 'command-a-03-2025',
+            k: 30,
+            temperature: 1,
+            presence_penalty: 0.8,
+            p: 0.95,
+            messages: currentDialog.filter(
+              (msg): msg is DialogMessage => msg.role !== 'system'
+            ),
+          },
+          onRequest: () => {
+            setPingLoadingMessage('Генерируем пинг-напоминание...');
+          },
+          onTry: (error) => {
+            pingTry++;
+            setPingLoadingMessage(
+              `Генерируем пинг-напоминание (повторная попытка ${pingTry}/${pingMaxRetries})`
+            );
+            if (isAdmin) {
+              console.log(`[PING_ERROR]`, error);
+            }
+          },
+          onLogger: (logName, data) => {
+            if (isAdmin) {
+              console.log(`[${logName}]`, data);
+            }
+          },
+        }
+      );
+
+      const pingMessage: DialogMessage = {
+        role: 'assistant',
+        content: response,
+      };
+
+      const updatedDialog = [...currentDialog, pingMessage];
+      const updatedDialogs = dialogs?.map((dialog, index) =>
+        index === dialogId ? updatedDialog : dialog
+      );
+
+      if (updatedDialogs) {
+        setDialogs(updatedDialogs);
+        setPingLoadingMessage('');
+
+        await updateAnalysis({
+          ...analysisData,
+          dialogs: updatedDialogs,
+        });
+      }
+
+      return updatedDialogs;
+    },
+    onSuccess: () => {
+      setPingLoadingMessage('');
+    },
+    onError: (error) => {
+      setPingLoadingMessage('');
+      showError(error.message);
+    },
   });
 
   const { mutate: autoResponseMutation, isPending: isAutoResponseLoading } =
@@ -444,6 +539,13 @@ export const AnalysisIdContainer = () => {
     [currentDialogId, updateUrlDialogId]
   );
 
+  const handlePingDialog = useCallback(
+    (dialogId: number) => {
+      pingMutation(dialogId);
+    },
+    [pingMutation]
+  );
+
   const getMessages = useCallback(() => {
     if (!dialogs || !dialogs[currentDialogId]) {
       return [];
@@ -499,6 +601,9 @@ export const AnalysisIdContainer = () => {
         onNewDialog={handleNewDialog}
         onSaveMessage={handleSaveMessage}
         onDialogSelect={handleDialogSelect}
+        onPingDialog={handlePingDialog}
+        isPingLoading={isPingLoading}
+        pingLoadingMessage={pingLoadingMessage}
       />
     </>
   );

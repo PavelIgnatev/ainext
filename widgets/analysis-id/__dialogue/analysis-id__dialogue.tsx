@@ -16,11 +16,15 @@ interface AnalysisIdDialogueProps {
   messages: DialogMessage[];
   systemMessage: SystemMessage | null;
   loadingMessage: string;
+  currentDialogId: number;
+  isPingLoading: boolean;
+  pingLoadingMessage: string;
 
   onNewDialog: () => void;
   onSaveMessage: (message: string) => void;
   onDialogSelect: (dialogId: number) => void;
   onToggleEditMode: () => void;
+  onPingDialog: (dialogId: number) => void;
 }
 
 export const AnalysisIdDialogue = ({
@@ -30,10 +34,14 @@ export const AnalysisIdDialogue = ({
   dialogsLength,
   messageLoading,
   isAdmin,
+  currentDialogId,
   onNewDialog,
   onSaveMessage,
   onDialogSelect,
   onToggleEditMode,
+  onPingDialog,
+  isPingLoading,
+  pingLoadingMessage,
 }: AnalysisIdDialogueProps) => {
   const [visibleSavedDialog, setVisibleSavedDialog] = useState(false);
 
@@ -53,6 +61,15 @@ export const AnalysisIdDialogue = ({
     <div className={classes.analysisIdDialogue}>
       <div className={classes.viewDialog}>
         <div className={classes.viewDialogButtons}>
+          <Button
+            type="dashed"
+            onClick={() => setVisibleSavedDialog(true)}
+            className={classes.button}
+            disabled={messageLoading || isPingLoading}
+          >
+            История диалогов
+          </Button>
+
           <Popconfirm
             title="Начать новый диалог?"
             description="История данного диалога будет сохранена."
@@ -63,7 +80,7 @@ export const AnalysisIdDialogue = ({
             <Button
               type="dashed"
               className={classes.button}
-              disabled={messageLoading}
+              disabled={messageLoading || isPingLoading}
             >
               Начать новый диалог
             </Button>
@@ -71,11 +88,12 @@ export const AnalysisIdDialogue = ({
 
           <Button
             type="dashed"
-            onClick={() => setVisibleSavedDialog(true)}
+            onClick={() => onPingDialog(currentDialogId)}
             className={classes.button}
-            disabled={messageLoading}
+            disabled={messageLoading || isPingLoading}
+            loading={isPingLoading}
           >
-            История диалогов
+            Протестировать пинг
           </Button>
 
           {isAdmin && (
@@ -83,7 +101,7 @@ export const AnalysisIdDialogue = ({
               type="dashed"
               onClick={onToggleEditMode}
               className={classes.button}
-              disabled={messageLoading}
+              disabled={messageLoading || isPingLoading}
             >
               Изменить разбор
             </Button>
@@ -96,6 +114,7 @@ export const AnalysisIdDialogue = ({
           messageLoading={messageLoading}
           loadingMessage={loadingMessage}
           originalMessages={messages}
+          pingLoadingMessage={pingLoadingMessage}
         />
 
         <form
@@ -110,7 +129,7 @@ export const AnalysisIdDialogue = ({
             className={classes.viewDialogInput}
             size="large"
             autoSize={{ minRows: 1, maxRows: 4 }}
-            disabled={messageLoading}
+            disabled={messageLoading || isPingLoading}
           />
           <Button
             type="primary"

@@ -15,6 +15,7 @@ interface AnalysisIdMessagesProps {
   systemMessage: SystemMessage | null;
   messageLoading: boolean;
   loadingMessage: string;
+  pingLoadingMessage: string;
   originalMessages: DialogMessage[];
 }
 
@@ -24,6 +25,7 @@ export const AnalysisIdMessages: React.FC<AnalysisIdMessagesProps> = ({
   messageLoading,
   loadingMessage,
   originalMessages,
+  pingLoadingMessage,
 }) => {
   const { dialogRef, formattedMessages } = useAnalysisMessages(messages);
   const [isMobile, setIsMobile] = useState(false);
@@ -196,6 +198,9 @@ export const AnalysisIdMessages: React.FC<AnalysisIdMessagesProps> = ({
         ))}
         {messageLoading && (
           <AnalysisIdTypingIndicator message={loadingMessage} />
+        )}
+        {pingLoadingMessage && (
+          <AnalysisIdTypingIndicator message={pingLoadingMessage} />
         )}
       </div>
     </div>
