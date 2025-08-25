@@ -145,7 +145,7 @@ The "reason" field must contain:
 Your response should be a JSON object with the following fields:  
 {  
 "status": "negative" | "lead" | "continue",  
-"reason": "<Detailed analysis with examples + minimal recommendation>"  
+"reason": "<Detailed analysis with examples>"  
 }`;
 }
 
