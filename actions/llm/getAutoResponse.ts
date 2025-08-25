@@ -267,8 +267,6 @@ ${language === 'RUSSIAN' ? '- ** MANDATORY FOR RUSSIAN: Use "ВЫ" (capitalized)
       - Project complete confidence as the ultimate expert in your field
     [/GOAL]
 
-    ${aiAnalysis ? `[DIALOGUE_ANALYSIS_AND_RECOMMENDATION]${aiAnalysis}[/DIALOGUE_ANALYSIS_AND_RECOMMENDATION]` : ''}
-
     [REQUIRED_COMPONENTS]
       ${finalPart ? `- ** MANDATORY: Naturally integrate "${finalPart}" into the reply **` : ''}
       ${
@@ -288,6 +286,7 @@ ${language === 'RUSSIAN' ? '- ** MANDATORY FOR RUSSIAN: Use "ВЫ" (capitalized)
     [STRUCTURE]${messagesCount} sentences[/STRUCTURE]
     [STYLE]Professional but conversational[/STYLE]
     [REPHRASING]Always rephrase information using different words between messages - avoid repetition, this is the main task[/REPHRASING]
+    ${aiAnalysis ? `[HUMAN_DIALOGUE_ANALYSIS]${aiAnalysis}[/HUMAN_DIALOGUE_ANALYSIS]` : ''}
     [POLITENESS]Always address the user with respectful and formal language - maintain professional courtesy and respect
     ${language === 'RUSSIAN' ? '- ** MANDATORY FOR RUSSIAN: Use "ВЫ" (capitalized) when addressing the user - this is non-negotiable **' : ''}
     - Demonstrate highest level of respect and professional courtesy
@@ -310,7 +309,7 @@ ${language === 'RUSSIAN' ? '- ** MANDATORY FOR RUSSIAN: Use "ВЫ" (capitalized)
   - Prioritize [LATEST_USER_MESSAGE] as the primary context to respond to
   - If [RETRY_CONTEXT] is present, fix only validation issues while preserving meaning
   - Output only the message text, no tags, no explanations
-  - Ensure the final reply is at least 200 characters long
+  - **Ensure the final reply is at least 200 characters long**
 
   <TAGS_GUIDE>
     [USER_PROFILE]

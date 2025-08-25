@@ -139,8 +139,6 @@ Please ensure that the analysis is precise and each classification is supported 
 6. **REASON REQUIREMENTS**  
 The "reason" field must contain:
 - Detailed analysis of what triggered this classification (minimum 2-3 sentences)
-- Specific examples from the conversation that support this classification
-- MINIMAL recommendation on what to do next (1-2 sentences maximum)
 - All text must be in ${language} language
 
 **Structured JSON Response**  
@@ -169,7 +167,7 @@ function buildUserInstruction(language: string): string {
   - Analyze the conversation strictly using [DIALOGUE_HISTORY]
   - Return ONLY a JSON object with keys "status" and "reason"
   - status must be one of: "negative" | "lead" | "continue"
-  - reason must contain detailed analysis (2-3 sentences) with specific examples + minimal recommendation (1-2 sentences) in ${language.toUpperCase()}
+  - reason must contain detailed analysis (2-3 sentences) in ${language.toUpperCase()}
   - Prefer "lead" if there is any reasonable indication
   - Do not include any extra text, tags, or comments
 </INSTRUCTION>`;
