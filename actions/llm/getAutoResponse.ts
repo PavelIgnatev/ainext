@@ -267,6 +267,8 @@ ${language === 'RUSSIAN' ? '- ** MANDATORY FOR RUSSIAN: Use "ВЫ" (capitalized)
       - Project complete confidence as the ultimate expert in your field
     [/GOAL]
 
+    ${aiAnalysis ? `[DIALOGUE_ANALYSIS_AND_RECOMMENDATION]${aiAnalysis}[/DIALOGUE_ANALYSIS_AND_RECOMMENDATION]` : ''}
+
     [REQUIRED_COMPONENTS]
       ${finalPart ? `- ** MANDATORY: Naturally integrate "${finalPart}" into the reply **` : ''}
       ${
@@ -298,7 +300,6 @@ ${language === 'RUSSIAN' ? '- ** MANDATORY FOR RUSSIAN: Use "ВЫ" (capitalized)
     [COMPANY_OFFERING]${companyDescription}[/COMPANY_OFFERING]
     ${stage !== 1 && flowHandling ? `[DIALOGUE_FLOW]${flowHandling}[/DIALOGUE_FLOW]` : ''}
     ${stage !== 1 && addedInformation ? `[CONTEXTUAL_DATA]${addedInformation}[/CONTEXTUAL_DATA]` : ''}
-    ${aiAnalysis ? `[AI_ANALYSIS]${aiAnalysis}[/AI_ANALYSIS]` : ''}
   [/CONTEXT]
 
 </ASSISTANT_IDENTITY>
